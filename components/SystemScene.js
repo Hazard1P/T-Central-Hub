@@ -376,7 +376,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
 
       <group rotation={[-0.15, -0.08, 0]}>
         <SectorRing position={[-5.7, 2.25, 0.2]} radius={3.1} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[0, -3.05, 0]} radius={3.85} color="#b78dff" label="Rust Sector" />
+        <SectorRing position={[0, -3.05, 0]} radius={3.85} color="#b78dff" label="T-Central Hub" />
         <SectorRing position={[5.15, 2.5, -0.45]} radius={2.7} color="#ffd15c" label="Support Sector" />
 
         <ConstellationLines />
