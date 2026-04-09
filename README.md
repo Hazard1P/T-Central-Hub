@@ -62,3 +62,9 @@ Open:
 - `/servers/rust-monthly`
 - `/donate`
 - `/report-player`
+
+
+## Central system trim
+- Reduced the large front-facing intro layer
+- Kept the central 3D system as the main experience
+- Left status pill visible without the oversized homepage heading

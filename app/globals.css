@@ -486,3 +486,16 @@ button { font: inherit; }
     font-size: clamp(28px, 9vw, 42px);
   }
 }
+
+
+.system-overlay.minimal {
+  padding: 16px 18px 0;
+}
+
+.system-overlay.minimal .overlay-status {
+  margin-top: 0;
+}
+
+.system-overlay.minimal .overlay-copy {
+  display: none;
+}

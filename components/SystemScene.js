@@ -7,9 +7,9 @@ import { Html, OrbitControls, Stars, Trail } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
-  { label: 'Home', type: 'reset', position: [-1.8, 5.2, 0], note: 'Reset view' },
-  { label: 'Donate', href: '/donate', position: [0.2, 5.35, 0], note: 'Support the hub' },
-  { label: 'Report', href: '/report-player', position: [2.1, 5.1, 0], note: 'Player reporting' }
+  { label: 'Center', type: 'reset', position: [-1.3, 5.0, 0], note: 'Reset system view' },
+  { label: 'Donate', href: '/donate', position: [0.8, 5.1, 0], note: 'Support system' },
+  { label: 'Report', href: '/report-player', position: [2.9, 4.95, 0], note: 'Player reporting' }
 ];
 
 const NODES = [
@@ -507,15 +507,7 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
 
 function SystemOverlay({ loading, mode }) {
   return (
-    <div className="system-overlay">
-      <div className="overlay-copy">
-        <p className="eyebrow">T-Central Hub</p>
-        <h1>Fully interactive 3D system for Arma3 CTH and Rust.</h1>
-        <p className="muted">
-          The homepage is the interface. Bubble navigation floats inside the system, black holes act as entry
-          anchors, and the rest of the ecosystem is mapped as stars, nodes, and orbiting infrastructure.
-        </p>
-      </div>
+    <div className="system-overlay minimal">
       <div className="overlay-status">
         <span>{loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}</span>
       </div>
