@@ -36,6 +36,7 @@ const nav = [
   ['/servers/arma3-cth', 'Arma3 CTH'],
   ['/servers/rust-vanilla', 'Rust Vanilla'],
   ['/information', 'Information'],
+  ['/report-player', 'Report Player'],
   ['/donate', 'Donate']
 ];
 
@@ -82,8 +83,8 @@ export default function RootLayout({ children }) {
                 <h4>Built in</h4>
                 <ul>
                   <li>Interactive cosmic map homepage</li>
+                  <li>Player reporting section</li>
                   <li>Donate and subscription support</li>
-                  <li>SEO files and Vercel-ready structure</li>
                 </ul>
               </div>
             </div>

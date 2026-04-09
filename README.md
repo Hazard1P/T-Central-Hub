@@ -10,6 +10,7 @@ Fully upgraded premium multi-page Next.js website for:
 - Dedicated Rust page
 - Information page
 - Donate page
+- Report Player page
 - PayPal subscription integration
 - Discord integration
 - SEO metadata
@@ -51,3 +52,8 @@ Replace `https://t-central.me` in:
 ## Notes
 - Live server player counts are still static placeholders unless you add a backend or API source later.
 - The PayPal subscription button is already wired to your provided plan.
+
+
+## Player reporting
+- Added a dedicated `/report-player` page
+- Reports currently route through Discord for moderation follow-up

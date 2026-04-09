@@ -8,6 +8,7 @@ import Link from 'next/link';
 const bullets = [
   'Interactive cosmic hub navigation on the homepage',
   'Dedicated premium pages for Arma3 and Rust',
+  'Player reporting section for moderation issues',
   'Donation and PayPal subscription support',
   'SEO-ready metadata, sitemap, and robots',
   'Future-ready structure for live status and announcements',
@@ -54,6 +55,7 @@ export default function HomePage() {
             <div className="button-column">
               <Link href="/servers/arma3-cth" className="button primary">Open Arma3 page</Link>
               <Link href="/servers/rust-vanilla" className="button secondary">Open Rust page</Link>
+              <Link href="/report-player" className="button secondary">Report a player</Link>
               <Link href="/donate" className="button secondary">Open support page</Link>
             </div>
           </div>

@@ -16,7 +16,7 @@ const blocks = [
   },
   {
     title: 'Support and moderation',
-    text: 'Point players toward Discord, moderation contact flow, and issue reporting without building any account system.'
+    text: 'Point players toward Discord, moderation contact flow, and the dedicated player reporting page without building any account system.'
   }
 ];
 
