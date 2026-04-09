@@ -1,18 +1,18 @@
 import PageShell from '@/components/PageShell';
 
-export const metadata = { title: 'Rust Monthly' };
+export const metadata = { title: 'Rust Bi-Weekly' };
 
-export default function RustMonthlyPage() {
+export default function RustBiweeklyPage() {
   return (
     <PageShell
-      eyebrow="Rust Monthly"
-      title="Longer progression with a slower wipe rhythm."
-      text="The monthly server is built for players who want more time to settle in, build, and progress."
+      eyebrow="Rust Bi-Weekly"
+      title="Bi-weekly Rust cycle with a direct route in."
+      text="Use this page for the bi-weekly server address, map notes, and future wipe updates."
     >
       <div className="info-grid three">
         <article className="content-card">
           <p className="eyebrow">Address</p>
-          <h3>tcentralrust3.game.nfoservers.com:28015</h3>
+          <h3>tcentralrust.game.nfoservers.com:28015</h3>
         </article>
         <article className="content-card">
           <p className="eyebrow">Map</p>

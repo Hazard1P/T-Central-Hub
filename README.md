@@ -1,35 +1,43 @@
-# T-Central Hub Ultimate
+# T-Central Hub Vercel System
 
-Fully upgraded premium multi-page Next.js website for:
-- Arma3 Capture the Hill
-- Rust Vanilla Bi-Weekly Wipe
-- Rust Vanilla Monthly Wipe
-- Rust Vanilla Weekly Wipe
+A full Next.js codebase for a Vercel-deployable interactive 3D game server hub.
 
 ## Included
-- Interactive 3D cosmic map homepage
-- Dedicated Arma3 page
-- Dedicated Rust page
-- Information page
-- Donate page
-- Report Player page
-- PayPal subscription integration
-- Discord integration
-- SEO metadata
-- robots.js and sitemap.js
-- Vercel-ready structure
-- Artwork and Arma screenshot in `/public`
+- Full-screen 3D homepage system
+- Bubble navigation inside the 3D scene
+- Arma3 black hole entry point
+- Rust black hole cluster with orbiting matter
+- Dyson sphere S.S link
+- National Security Star link
+- Affiliate Star link
+- Focus-panel interaction flow
+- Transition overlay when opening a destination
+- Donate page with PayPal subscription
+- Player reporting page
+- Dedicated pages for:
+  - Arma3 CTH
+  - Rust Bi-Weekly
+  - Rust Weekly
+  - Rust Monthly
+- Vercel-compatible API route for status layer
 
-## Server details
-### Arma3
-- `tcentral.game.nfoservers.com:2302`
+## Honest status layer behavior
+The included status API route does **not** fake live server data.
+It works like this:
+- If `STATUS_SOURCE_URL` is **not** configured, the site shows status as unavailable/unconfigured.
+- If `STATUS_SOURCE_URL` is configured and returns JSON, the hub uses it.
 
-### Rust
-- Server name: `NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe`
-- Address: `tcentralrust.game.nfoservers.com:28015`
-- Current map: `Procedural Map`
-- Current players: `0 / 250`
-- Currently locked: `No`
+Expected remote JSON shape:
+```json
+{
+  "statuses": {
+    "arma3": { "online": true, "players": 14, "maxPlayers": 60, "map": "Altis", "source": "Remote source" },
+    "rust_biweekly": { "online": true, "players": 23, "maxPlayers": 250, "map": "Procedural Map", "source": "Remote source" },
+    "rust_weekly": { "online": false, "players": 0, "maxPlayers": 250, "map": "Procedural Map", "source": "Remote source" },
+    "rust_monthly": { "online": true, "players": 8, "maxPlayers": 250, "map": "Procedural Map", "source": "Remote source" }
+  }
+}
+```
 
 ## Local development
 ```bash
@@ -44,74 +52,13 @@ Open:
 1. Upload the folder to GitHub.
 2. Import the repo into Vercel.
 3. Deploy with default settings.
+4. Optionally add `STATUS_SOURCE_URL` as an environment variable if you later build or connect a real status source.
 
-## Important after deployment
-Replace `https://t-central.me` in:
-- `app/layout.js`
-- `app/robots.js`
-- `app/sitemap.js`
-
-## Notes
-- Live server player counts are still static placeholders unless you add a backend or API source later.
-- The PayPal subscription button is already wired to your provided plan.
-
-
-## Player reporting
-- Added a dedicated `/report-player` page
-- Reports currently route through Discord for moderation follow-up
-
-
-### Rust Monthly
-- Server name: `T-Central Rust Vanilla Monthly Wipe`
-- Address: `tcentralrust3.game.nfoservers.com:28015`
-- Current map: `Procedural Map`
-- Current players: `0 / 250`
-
-### Rust Weekly
-- Server name: `T-Central Rust Vanilla Weekly Wipe`
-- Address: `tcentralrust2.game.nfoservers.com:28015`
-- Current map: `Procedural Map`
-- Current players: `0 / 250`
-- Currently locked: `No`
-
-
-## 3D map notes
-- Added a Vercel-compatible 3D homepage map using:
-  - `three`
-  - `@react-three/fiber`
-  - `@react-three/drei`
-- Rust servers are pinned around the black hole cluster on the lower section of the map
-- The remaining hub routes are mapped across the constellation for navigation
-
-
-## Warp and Dyson upgrades
-- Added warp zoom transitions into Arma3 and Rust routes from the 3D homepage map
-- Upgraded Arma3 into its own interactive black hole anchor
-- Added a spinning Dyson sphere on the support side of the map
-
-
-## Map definition upgrade
-- Dyson sphere label changed to `S.S`
-- 3D map now uses clearer sectors:
-  - Arma Sector
-  - Rust Sector
-  - Support Sector
-- Node labels now include short role descriptions
-- Rust servers remain pinned to the lower black hole cluster
-
-
-## External star link
-- Added a standalone shining star on the 3D map
-- The star links to the Government of Canada page for reporting national security information
-
-
-## Interaction redesign
-- Removed anchored camera warp behavior from the map
-- Added free camera navigation with pan, zoom, and rotate controls
-- Added a focus panel interaction flow so node selection and opening feel cleaner
-
-
-## Black hole matter upgrade
-- Added visible orbiting matter streams around the Rust black hole
-- Added visible orbiting matter streams around the Arma black hole
-- Kept free camera navigation and focus-panel interaction flow
+## Routes
+- `/`
+- `/servers/arma3-cth`
+- `/servers/rust-biweekly`
+- `/servers/rust-weekly`
+- `/servers/rust-monthly`
+- `/donate`
+- `/report-player`
