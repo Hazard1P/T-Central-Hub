@@ -30,7 +30,7 @@ export default function DonatePage() {
     <PageShell
       eyebrow="Support the hub"
       title="Back the system and help it keep growing."
-      text="This donate page is rebuilt around your PayPal subscription flow so supporters can subscribe directly without extra account steps."
+      text="Thanks for helping grow our universe!."
     >
       <div className="donate-layout">
         <section className="content-card donate-hero-card">
