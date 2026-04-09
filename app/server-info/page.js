@@ -13,12 +13,22 @@ const serverCards = [
   {
     title: 'Rust Vanilla Server',
     details: [
-      'Replace with your live Rust IP and port',
-      'Focus: vanilla gameplay and survival progression',
-      'Use this card for wipe cycle details and rules summary',
-      'Great place for Discord alerts and server expectations.',
+      'Server name: NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe',
+      'Direct connect: tcentralrust.game.nfoservers.com:28015',
+      'Game: Rust',
+      'Current map: Procedural Map',
+      'Current players: 0 / 250',
+      'Currently locked: No',
+      'Wipe cadence: Bi-Weekly Wipe',
     ],
   },
+];
+
+const rustQuickStats = [
+  { label: 'Server', value: 'Rust Vanilla' },
+  { label: 'Wipe', value: 'Bi-Weekly' },
+  { label: 'Map', value: 'Procedural Map' },
+  { label: 'Capacity', value: '250 Players' },
 ];
 
 export default function ServerInfoPage() {
@@ -45,6 +55,22 @@ export default function ServerInfoPage() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="section-block" style={{ paddingBottom: 0 }}>
+          <SectionTitle
+            eyebrow="Rust quick view"
+            title="Current Rust server snapshot."
+            text="A dedicated card set for the live Rust public details you provided."
+          />
+          <div className="card-grid four">
+            {rustQuickStats.map((item) => (
+              <article key={item.label} className="content-card">
+                <p className="eyebrow">{item.label}</p>
+                <h3>{item.value}</h3>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -9,9 +9,7 @@ export default function Hero() {
           <p className="eyebrow">T-Central Hub</p>
           <h1 className="hero-title">A premium home for Arma3 CTH and Rust Vanilla players.</h1>
           <p className="hero-copy">
-            Designed as a sharp, futuristic server hub with room for community growth, donation support,
-            server visibility, and clean onboarding. This starter is multi-page, deployable on Vercel, and
-            organized to scale without a login system.
+            Designed as a sharp, futuristic server hub with room for community growth, donation support, server visibility, and clean onboarding. It now includes your Rust Vanilla Bi-Weekly Wipe details and is organized to scale without a login system.
           </p>
           <div className="button-row">
             <Link href="/server-info" className="button primary">View Server Info</Link>
@@ -19,9 +17,9 @@ export default function Hero() {
           </div>
           <div className="stat-grid compact">
             <div className="stat-card"><span>Games</span><strong>2 Active Servers</strong></div>
-            <div className="stat-card"><span>Focus</span><strong>Vanilla + CTH</strong></div>
+            <div className="stat-card"><span>Rust Wipe</span><strong>Bi-Weekly</strong></div>
+            <div className="stat-card"><span>Rust Players</span><strong>0 / 250</strong></div>
             <div className="stat-card"><span>Deploy</span><strong>Vercel Ready</strong></div>
-            <div className="stat-card"><span>Structure</span><strong>Multi-page</strong></div>
           </div>
         </div>
         <div className="visual-card">

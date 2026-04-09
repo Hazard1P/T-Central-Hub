@@ -32,3 +32,12 @@ npm run dev
 - Add Discord and donation links
 - Add live server status cards
 - Add media gallery and announcements
+
+
+## Rust server details included
+- Server name: NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe
+- Address: tcentralrust.game.nfoservers.com:28015
+- Game: Rust
+- Current map: Procedural Map
+- Current players: 0 / 250
+- Locked: No
