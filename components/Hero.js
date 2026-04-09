@@ -6,10 +6,9 @@ export default function Hero() {
       <div className="container hero-grid">
         <div>
           <p className="eyebrow">T-Central Hub</p>
-          <h1 className="hero-title">A sharper, more cinematic server hub for Arma3 CTH and Rust Vanilla.</h1>
+          <h1 className="hero-title">Your front door into Arma3 CTH and Rust Vanilla, built to welcome new players and keep regulars connected.</h1>
           <p className="hero-copy">
-            Everything has been upgraded into a cleaner multi-page experience with stronger visuals,
-            support flow, better game separation, and a homepage that feels like an actual system map.
+            Find the server you want, grab the connection details fast, join the Discord, and stay in the loop on what is happening across the hub. The layout is built to feel immersive without getting in your way.
           </p>
           <div className="button-row">
             <Link href="/servers/arma3-cth" className="button primary">Explore Arma3 CTH</Link>
@@ -17,8 +16,8 @@ export default function Hero() {
           </div>
           <div className="stats-grid compact">
             <div className="stat-card"><span>Games</span><strong>2 Active Servers</strong></div>
-            <div className="stat-card"><span>Discord</span><strong>Live Community Link</strong></div>
-            <div className="stat-card"><span>Support</span><strong>Subscription Enabled</strong></div>
+            <div className="stat-card"><span>Discord</span><strong>Join the community</strong></div>
+            <div className="stat-card"><span>Support</span><strong>Support available</strong></div>
             <div className="stat-card"><span>Deploy</span><strong>Vercel Ready</strong></div>
           </div>
         </div>
@@ -34,7 +33,7 @@ export default function Hero() {
             <span className="pulse pulse-c" />
             <div className="orb-label">
               <p className="eyebrow">Core hub</p>
-              <h3>System-scale presentation with game-specific routes.</h3>
+              <h3>Choose your path, find your server, and jump in.</h3>
             </div>
           </div>
         </div>

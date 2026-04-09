@@ -43,7 +43,7 @@ Open:
 3. Deploy with default settings.
 
 ## Important after deployment
-Replace `https://example.com` in:
+Replace `https://t-central.me` in:
 - `app/layout.js`
 - `app/robots.js`
 - `app/sitemap.js`

@@ -18,17 +18,16 @@ export default function DonatePage() {
       <div className="container">
         <SectionTitle
           eyebrow="Support the hub"
-          title="Donation support and recurring subscription support."
-          text="This page is set up for public support with your provided PayPal subscription plan and no login system."
+          title="Support the hub if you want to help it keep growing."
+          text="Players who want to support the servers can do it here in a simple way, without making an account or jumping through extra steps."
         />
 
         <div className="donation-panel premium-panel">
           <div>
             <p className="eyebrow">Why support matters</p>
-            <h3>Help fund uptime, improvements, event nights, and future upgrades.</h3>
+            <h3>Help keep the servers active, polished, and improving over time.</h3>
             <p className="muted">
-              Use this messaging area to explain that contributions help cover hosting, site polish,
-              media assets, moderation effort, and community-facing improvements over time.
+              Support can go toward hosting, better presentation, community improvements, and the kind of polish that makes people want to come back.
             </p>
             <div className="button-row">
               <a href="https://discord.gg/8bJAEau9" target="_blank" rel="noreferrer" className="button secondary">Join Discord</a>

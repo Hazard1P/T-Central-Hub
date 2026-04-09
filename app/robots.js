@@ -1,6 +1,6 @@
 export default function robots() {
   return {
     rules: { userAgent: '*', allow: '/' },
-    sitemap: 'https://example.com/sitemap.xml'
+    sitemap: 'https://t-central.me/sitemap.xml'
   };
 }

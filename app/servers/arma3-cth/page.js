@@ -21,16 +21,15 @@ export default function ArmaPage() {
       <div className="container">
         <SectionTitle
           eyebrow="Arma3 CTH"
-          title="Tactical battlefield identity, built into its own premium page."
-          text="This page focuses on direct connect information, the visual battlefield feel, and a structure that can later hold rotations, events, and top-player highlights."
+          title="Step into the Arma3 CTH side of the hub and get what you need to deploy fast."
+          text="This page keeps your server address front and center while giving players a place to check the vibe of the battlefield, join the Discord, and come back for future events and updates."
         />
         <div className="feature-hero-grid">
           <div className="content-card large">
             <p className="eyebrow">Direct connect</p>
             <h3>tcentral.game.nfoservers.com:2302</h3>
             <p className="muted">
-              Use this as the public landing point for your Arma3 community, with clean access to the server
-              address and space for future community-facing updates.
+              Use this page to help players connect quickly, understand the feel of the server, and stay close to future announcements, events, and featured content.
             </p>
             <div className="button-row">
               <CopyAddressButton value="tcentral.game.nfoservers.com:2302" />

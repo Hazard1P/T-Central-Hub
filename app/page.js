@@ -24,7 +24,7 @@ export default function HomePage() {
           <SectionTitle
             eyebrow="System map"
             title="A homepage that feels like an actual hub."
-            text="The cosmic artwork is now used as an interactive navigation surface so the site feels branded, memorable, and purpose-built instead of generic."
+            text="Use the system map to jump straight to the part of the hub you need, whether that is Arma3, Rust, support, or general information."
           />
           <CosmicMap />
         </div>
@@ -35,14 +35,14 @@ export default function HomePage() {
           <div>
             <SectionTitle
               eyebrow="Server lineup"
-              title="Two games, one polished front door."
-              text="Each game now has its own cleaner destination page, while support, community, and general information stay centralized."
+              title="Two games, one hub that is easier to explore and better for players."
+              text="Whether you are here for tactical hill fights or a fresh Rust wipe, each page is designed to get you where you want to go with less friction."
             />
             <ServerCards />
           </div>
           <div className="content-card large">
             <p className="eyebrow">Upgrade summary</p>
-            <h3>Everything is now tightened up for a better public impression.</h3>
+            <h3>A cleaner experience for new visitors and returning community members.</h3>
             <div className="list-block compact-list">
               {bullets.map((item) => (
                 <div key={item} className="list-item">

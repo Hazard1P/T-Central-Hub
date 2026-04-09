@@ -32,8 +32,8 @@ export default function InformationPage() {
         <div className="container">
           <SectionTitle
             eyebrow="Information"
-            title="A cleaner central page for trust, updates, and onboarding."
-            text="This page is designed to support both communities with structure for standards, onboarding, and future update posts."
+            title="A central page for updates, expectations, and helping players settle in."
+            text="Keep both communities informed with one easy place for expectations, update notes, and quick guidance."
           />
           <div className="card-grid two">
             {blocks.map((block) => (

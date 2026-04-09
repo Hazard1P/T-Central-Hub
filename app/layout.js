@@ -2,13 +2,13 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata = {
-  metadataBase: new URL('https://example.com'),
+  metadataBase: new URL('https://t-central.me'),
   title: {
     default: 'T-Central Hub | Arma3 CTH and Rust Vanilla',
     template: '%s | T-Central Hub'
   },
   description:
-    'Premium game server hub for Arma3 Capture the Hill and Rust Vanilla with cinematic visuals, donation support, subscriptions, server info, and Vercel-ready deployment.',
+    'Join T-Central Hub for Arma3 Capture the Hill and Rust Vanilla. Explore server info, connect with the community, support the hub, and jump into the battlefield or the wipe with confidence.',
   keywords: [
     'T-Central Hub',
     'Arma3 CTH',
@@ -20,13 +20,13 @@ export const metadata = {
   ],
   openGraph: {
     title: 'T-Central Hub',
-    description: 'Premium hub for Arma3 CTH and Rust Vanilla.',
+    description: 'Explore T-Central Hub, meet the community, get the server details you need, and jump into Arma3 CTH or Rust Vanilla.',
     images: ['/cosmic-map.jpg']
   },
   twitter: {
     card: 'summary_large_image',
     title: 'T-Central Hub',
-    description: 'Premium hub for Arma3 CTH and Rust Vanilla.',
+    description: 'Explore T-Central Hub, meet the community, get the server details you need, and jump into Arma3 CTH or Rust Vanilla.',
     images: ['/cosmic-map.jpg']
   }
 };

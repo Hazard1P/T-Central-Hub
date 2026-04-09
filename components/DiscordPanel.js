@@ -5,10 +5,9 @@ export default function DiscordPanel() {
         <div className="discord-panel">
           <div>
             <p className="eyebrow">Community hub</p>
-            <h3>Join the Discord for updates, support, squads, and server news.</h3>
+            <h3>Join the Discord to meet players, get updates, ask for help, and stay connected between sessions.</h3>
             <p className="muted">
-              Keep both communities connected through one shared invite, with room for announcements,
-              support flow, and event coordination.
+              Whether you are looking for a squad, checking for server updates, or just want to stay close to the community, Discord is the fastest way to stay involved.
             </p>
           </div>
           <div className="button-column">

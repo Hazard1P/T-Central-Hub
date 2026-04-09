@@ -22,16 +22,15 @@ export default function RustPage() {
       <div className="container">
         <SectionTitle
           eyebrow="Rust Vanilla"
-          title="Built to make the Rust server feel established and easy to join."
-          text="This page is structured for wipe cadence, map details, server address, and future notes like wipe countdowns, featured rules, or community updates."
+          title="A Rust page built to welcome survivors, explain the essentials, and make joining simple."
+          text="Players can check the wipe cadence, confirm the map and address, and head in knowing the basics before they spawn."
         />
         <div className="card-grid two">
           <article className="content-card large">
             <p className="eyebrow">Direct connect</p>
             <h3>tcentralrust.game.nfoservers.com:28015</h3>
             <p className="muted">
-              Use this page as the primary join destination for your Rust community while keeping the site
-              clean and fast without adding unnecessary account systems.
+              Use this page as the main Rust entry point so players can grab the address, understand the server setup, and jump in without extra clutter.
             </p>
             <div className="button-row">
               <CopyAddressButton value="tcentralrust.game.nfoservers.com:28015" />
