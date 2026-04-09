@@ -7,10 +7,10 @@ import Link from 'next/link';
 
 const bullets = [
   'Interactive 3D cosmic map that works on Vercel',
-  'Black hole Rust cluster with pinned weekly, bi-weekly, and monthly nodes',
-  'Dedicated premium pages for Arma3 and every Rust wipe cadence',
-  'Donation, subscription, and player reporting support',
-  'SEO-ready metadata, sitemap, and robots files',
+  'Warp zoom transitions into Arma3 and Rust routes',
+  'Rust servers pinned around the black hole cluster',
+  'Arma3 upgraded into its own interactive black hole anchor',
+  'Spinning Dyson sphere for the support network',
   'Future-ready structure for live status and announcement integrations'
 ];
 
@@ -23,8 +23,8 @@ export default function HomePage() {
         <div className="container">
           <SectionTitle
             eyebrow="Interactive navigation"
-            title="A real 3D map that turns the hub into a visual server system."
-            text="You can rotate, zoom, and click through the constellation. The Rust servers are pinned around the black hole cluster under the main field, while the rest of the hub is mapped across the wider system."
+            title="A real 3D map with warp transitions and system anchors."
+            text="Rotate, zoom, and click through the constellation. The Rust servers remain pinned around the lower black hole cluster, Arma3 now has its own black hole system, and the support side is represented by a spinning Dyson sphere."
           />
           <InteractiveGalaxyMap />
         </div>

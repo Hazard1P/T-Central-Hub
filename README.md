@@ -82,3 +82,9 @@ Replace `https://t-central.me` in:
   - `@react-three/drei`
 - Rust servers are pinned around the black hole cluster on the lower section of the map
 - The remaining hub routes are mapped across the constellation for navigation
+
+
+## Warp and Dyson upgrades
+- Added warp zoom transitions into Arma3 and Rust routes from the 3D homepage map
+- Upgraded Arma3 into its own interactive black hole anchor
+- Added a spinning Dyson sphere on the support side of the map

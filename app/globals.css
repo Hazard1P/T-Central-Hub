@@ -391,3 +391,14 @@ main { flex: 1; }
     font-size: 10px;
   }
 }
+
+
+.map-anchor-label.clickable {
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.map-anchor-label.clickable:hover {
+  border-color: rgba(216,255,97,0.34);
+  transform: translateY(-1px);
+}
