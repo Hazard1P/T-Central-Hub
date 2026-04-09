@@ -87,3 +87,10 @@ Open:
 - Added a dedicated S&Box black hole
 - Links directly to `https://sbox.game/`
 - Added an S&Box sector ring to the 3D system
+
+
+## Spatial layout update
+- Increased spacing between black holes, stars, support nodes, and sector rings
+- Opened the camera out to fit the larger map layout
+- Relaxed OrbitControls so the camera feels less fixed and more freely explorable
+- Renamed the lower main sector ring to `T-Central Hub`

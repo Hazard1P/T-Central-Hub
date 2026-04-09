@@ -18,7 +18,7 @@ const NODES = [
     label: 'Arma3 CTH',
     address: 'tcentral.game.nfoservers.com:2302',
     description: 'Public tactical hill-control combat.',
-    position: [-5.7, 2.25, 0.2],
+    position: [-8.4, 2.9, 0.5],
     color: '#84ebff',
     route: '/servers/arma3-cth',
     kind: 'blackhole'
@@ -28,7 +28,7 @@ const NODES = [
     label: 'Rust Cluster',
     address: 'Lower singularity anchor',
     description: 'Main Rust cluster anchor.',
-    position: [0, -3.05, 0],
+    position: [0, -4.6, 0],
     color: '#9b74ff',
     route: '/servers/rust-biweekly',
     kind: 'blackhole'
@@ -38,7 +38,7 @@ const NODES = [
     label: 'Rust Bi-Weekly',
     address: 'tcentralrust.game.nfoservers.com:28015',
     description: 'Bi-weekly wipe cycle.',
-    position: [0.5, -2.7, 0.8],
+    position: [0.8, -4.0, 1.3],
     color: '#d8ff61',
     route: '/servers/rust-biweekly',
     kind: 'node'
@@ -48,7 +48,7 @@ const NODES = [
     label: 'Rust Weekly',
     address: 'tcentralrust2.game.nfoservers.com:28015',
     description: 'Weekly fresh-start cycle.',
-    position: [2.8, -3.35, -0.2],
+    position: [4.6, -4.8, -0.6],
     color: '#ff9fd9',
     route: '/servers/rust-weekly',
     kind: 'node'
@@ -58,7 +58,7 @@ const NODES = [
     label: 'Rust Monthly',
     address: 'tcentralrust3.game.nfoservers.com:28015',
     description: 'Monthly progression cycle.',
-    position: [-2.4, -3.5, -0.15],
+    position: [-4.8, -5.0, -0.4],
     color: '#ffd35c',
     route: '/servers/rust-monthly',
     kind: 'node'
@@ -68,7 +68,7 @@ const NODES = [
     label: 'S&Box',
     address: 'sbox.game',
     description: 'External S&Box black hole route.',
-    position: [0.1, 3.85, -0.3],
+    position: [0.3, 6.2, -0.6],
     color: '#67d7ff',
     route: 'https://sbox.game/',
     external: true,
@@ -79,7 +79,7 @@ const NODES = [
     label: 'S.S',
     address: 'synapticsystems.ca',
     description: 'Core systems link.',
-    position: [5.15, 2.5, -0.45],
+    position: [8.2, 2.4, -0.8],
     color: '#ffd15c',
     route: 'https://synapticsystems.ca',
     external: true,
@@ -90,7 +90,7 @@ const NODES = [
     label: 'Affiliate Star',
     address: 'nfoservers.com',
     description: 'Hosting affiliate and provider link.',
-    position: [7.8, -2.8, 0.35],
+    position: [10.8, -4.4, 0.5],
     color: '#6affc4',
     route: 'https://www.nfoservers.com/?aff=A-J4QVQU',
     external: true,
@@ -101,7 +101,7 @@ const NODES = [
     label: 'National Security Star',
     address: 'canada.ca',
     description: 'Government of Canada reporting resource.',
-    position: [7.15, 4.15, -0.55],
+    position: [10.1, 6.0, -0.8],
     color: '#fff3a0',
     route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
     external: true,
@@ -112,7 +112,7 @@ const NODES = [
     label: 'Player Reporting',
     address: 'Moderation route',
     description: 'Player misconduct and rule-reporting route.',
-    position: [5.9, -0.3, 0.25],
+    position: [8.8, -0.5, 0.35],
     color: '#ff8a8a',
     route: '/report-player',
     kind: 'node'
@@ -174,8 +174,8 @@ function BlackHole({ node, onSelect, label, sublabel, coreColor, ringColor }) {
         onSelect(node);
       }}
     >
-      <MatterStream radius={2.8} color={coreColor} speed={0.12} tilt={[Math.PI / 2.46, 0.1, 0]} density={42} />
-      <MatterStream radius={2.2} color={ringColor} speed={-0.18} tilt={[Math.PI / 2.25, -0.18, 0.18]} density={28} />
+      <MatterStream radius={3.45} color={coreColor} speed={0.12} tilt={[Math.PI / 2.46, 0.1, 0]} density={42} />
+      <MatterStream radius={2.75} color={ringColor} speed={-0.18} tilt={[Math.PI / 2.25, -0.18, 0.18]} density={28} />
       <mesh>
         <sphereGeometry args={[0.92, 48, 48]} />
         <meshStandardMaterial color="#020409" emissive="#09111d" emissiveIntensity={1.0} />
@@ -387,10 +387,10 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
       <Stars radius={70} depth={30} count={3000} factor={4.2} saturation={0} fade speed={0.8} />
 
       <group rotation={[-0.15, -0.08, 0]}>
-        <SectorRing position={[-5.7, 2.25, 0.2]} radius={3.1} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[0, -3.05, 0]} radius={3.85} color="#b78dff" label="Rust Sector" />
-        <SectorRing position={[0.1, 3.85, -0.3]} radius={2.55} color="#67d7ff" label="S&Box Sector" />
-        <SectorRing position={[5.15, 2.5, -0.45]} radius={2.7} color="#ffd15c" label="Support Sector" />
+        <SectorRing position={[-5.7, 2.25, 0.2]} radius={4.4} color="#58dfff" label="Arma Sector" />
+        <SectorRing position={[0, -3.05, 0]} radius={5.6} color="#b78dff" label="T-Central Hub" />
+        <SectorRing position={[0.1, 3.85, -0.3]} radius={3.8} color="#67d7ff" label="S&Box Sector" />
+        <SectorRing position={[5.15, 2.5, -0.45]} radius={4.0} color="#ffd15c" label="Support Sector" />
 
         <ConstellationLines />
         <BubbleNav onBubble={onBubble} />
@@ -441,14 +441,14 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
         enablePan
         enableZoom
         enableRotate
-        minDistance={4}
-        maxDistance={25}
+        minDistance={2.5}
+        maxDistance={40}
         autoRotate={false}
-        zoomSpeed={0.92}
-        rotateSpeed={0.62}
-        panSpeed={0.66}
-        maxPolarAngle={Math.PI * 0.9}
-        minPolarAngle={Math.PI * 0.08}
+        zoomSpeed={1.0}
+        rotateSpeed={0.7}
+        panSpeed={0.8}
+        maxPolarAngle={Math.PI * 0.98}
+        minPolarAngle={0.02}
       />
       <CameraReset tick={resetTick} />
     </>
@@ -469,7 +469,7 @@ function useThreeBridge() {
 function useEffectReset(camera, controls, tick) {
   const React = require('react');
   React.useEffect(() => {
-    camera.position.set(0, 1.45, 11);
+    camera.position.set(0, 1.9, 17);
     camera.lookAt(0, 0, 0);
     if (controls) {
       controls.target.set(0, 0, 0);

@@ -721,3 +721,27 @@ button { font: inherit; }
     align-items: flex-start;
   }
 }
+
+
+.interactive-map-stage.full {
+  background:
+    radial-gradient(circle at top, rgba(159,124,255,0.10), transparent 28%),
+    radial-gradient(circle at right, rgba(131,235,255,0.08), transparent 22%),
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+    var(--bg);
+  background-size: auto, auto, 48px 48px, 48px 48px, auto;
+}
+
+.map-focus-panel {
+  width: min(92vw, 400px);
+}
+
+.bubble-nav {
+  min-width: 120px;
+  text-align: center;
+}
+
+.sector-label {
+  letter-spacing: 0.18em;
+}
