@@ -98,3 +98,8 @@ Replace `https://t-central.me` in:
   - Support Sector
 - Node labels now include short role descriptions
 - Rust servers remain pinned to the lower black hole cluster
+
+
+## External star link
+- Added a standalone shining star on the 3D map
+- The star links to the Government of Canada page for reporting national security information

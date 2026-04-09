@@ -24,7 +24,7 @@ export default function HomePage() {
           <SectionTitle
             eyebrow="Interactive navigation"
             title="A more defined 3D map with sectors, anchors, and warp transitions."
-            text="Rotate, zoom, and click through a more structured constellation. The map now separates the hub into an Arma sector, a Rust sector, and a support sector, with clearer anchor points and more readable navigation."
+            text="Rotate, zoom, and click through a more structured constellation. The map now separates the hub into an Arma sector, a Rust sector, and a support sector, while a separate shining star links out to the Government of Canada national security reporting resource."
           />
           <InteractiveGalaxyMap />
         </div>

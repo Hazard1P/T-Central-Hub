@@ -51,6 +51,16 @@ const SERVER_NODES = [
     color: '#ff8a8a',
     href: '/report-player',
     description: 'Report rule violations.'
+  },
+  {
+    label: 'National Security',
+    sublabel: 'Canada reporting page',
+    position: [7.15, 4.2, -0.6],
+    color: '#fff3a0',
+    href: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
+    description: 'External Government of Canada reporting resource.',
+    external: true,
+    special: 'star'
   }
 ];
 
@@ -206,6 +216,63 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
   );
 }
 
+
+function ShiningStar({ position = [7.15, 4.2, -0.6], onClick, onHover }) {
+  const core = useRef();
+  const flareA = useRef();
+  const flareB = useRef();
+
+  useFrame((state, delta) => {
+    const pulse = 1 + Math.sin(state.clock.elapsedTime * 2.2) * 0.12;
+    if (core.current) {
+      core.current.scale.setScalar(pulse);
+      core.current.rotation.y += delta * 0.4;
+    }
+    if (flareA.current) flareA.current.rotation.z += delta * 0.45;
+    if (flareB.current) flareB.current.rotation.z -= delta * 0.32;
+  });
+
+  return (
+    <group
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick('https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', position, false, true);
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        onHover('National Security');
+      }}
+    >
+      <mesh ref={core}>
+        <octahedronGeometry args={[0.34, 0]} />
+        <meshStandardMaterial color="#fff3a0" emissive="#fff3a0" emissiveIntensity={2.3} />
+      </mesh>
+
+      <mesh ref={flareA} rotation={[0, 0, 0.3]}>
+        <torusGeometry args={[0.72, 0.028, 12, 90]} />
+        <meshStandardMaterial color="#fff7c7" emissive="#fff7c7" emissiveIntensity={1.1} />
+      </mesh>
+
+      <mesh ref={flareB} rotation={[0.6, 0.4, 0.9]}>
+        <torusGeometry args={[1.02, 0.02, 12, 90]} />
+        <meshStandardMaterial color="#fff3a0" emissive="#fff3a0" emissiveIntensity={0.95} />
+      </mesh>
+
+      <pointLight position={[0, 0, 0]} color="#fff3a0" intensity={14} distance={10} />
+      <Html position={[0, 1.15, 0]} center>
+        <button
+          className="map-anchor-label clickable star-link"
+          onClick={() => onClick('https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', position, false, true)}
+        >
+          <span className="anchor-title">National Security Star</span>
+          <span className="anchor-copy">Canada resource</span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
 function ConstellationLines() {
   const points = useMemo(() => SERVER_NODES.map((node) => new THREE.Vector3(...node.position)), []);
   const geometry = useMemo(() => {
@@ -216,7 +283,8 @@ function ConstellationLines() {
       new THREE.Vector3(0, -3.1, 0),
       new THREE.Vector3(-5.6, 2.4, 0.3),
       points[4],
-      new THREE.Vector3(5.15, 2.5, -0.45)
+      new THREE.Vector3(5.15, 2.5, -0.45),
+      new THREE.Vector3(7.15, 4.2, -0.6)
     ];
     const curve = new THREE.CatmullRomCurve3(ordered, false, 'catmullrom', 0.25);
     return new THREE.BufferGeometry().setFromPoints(curve.getPoints(260));
@@ -365,6 +433,7 @@ function Scene() {
 
         <ArmaBlackHole onClick={beginWarp} onHover={setActive} />
         <DysonSphere onClick={beginWarp} onHover={setActive} />
+        <ShiningStar onClick={beginWarp} onHover={setActive} />
 
         {SERVER_NODES.filter((node) => node.label !== 'Arma3 CTH').map((node) => (
           <Node
@@ -400,9 +469,7 @@ export default function InteractiveGalaxyMap() {
         <p className="eyebrow">3D system map</p>
         <h3>A more defined constellation with sectors, anchors, and clearer navigation roles.</h3>
         <p className="muted">
-          The map is now broken into clearer regions: the upper Arma sector, the lower Rust sector, and the
-          support sector on the right. The Rust servers stay pinned around the lower black hole, Arma uses its
-          own black hole anchor, and the Dyson sphere now carries the S.S link.
+          The map is now broken into clearer regions: the upper Arma sector, the lower Rust sector, and the support sector on the right. The Rust servers stay pinned around the lower black hole, Arma uses its own black hole anchor, the Dyson sphere carries the S.S link, and a separate shining star links to the Government of Canada national security reporting resource.
         </p>
       </div>
 
