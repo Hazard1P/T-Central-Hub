@@ -1,29 +1,17 @@
-import Link from 'next/link';
 import Hero from '@/components/Hero';
+import CosmicMap from '@/components/CosmicMap';
 import SectionTitle from '@/components/SectionTitle';
+import ServerCards from '@/components/ServerCards';
+import DiscordPanel from '@/components/DiscordPanel';
+import Link from 'next/link';
 
-const pillars = [
-  {
-    title: 'Arma3 Capture the Hill',
-    text: 'Promote your battlefield, map loops, faction combat, event nights, and direct connect information in a clean high-end layout.',
-  },
-  {
-    title: 'Rust Vanilla',
-    text: 'Showcase vanilla progression, wipe cadence, survival rules, and community standards without clutter or bloat.',
-  },
-  {
-    title: 'Future-ready hub',
-    text: 'Organized so you can later add live server state, stat cards, featured clips, guides, or staff announcements.',
-  },
-];
-
-const highlights = [
-  'Premium landing page built around strong visual identity',
-  'Clear multi-page structure for information and onboarding',
-  'Donation page without requiring account systems',
-  'Reusable components for future sections and expansions',
-  'Deployable on standard Vercel systems with no backend required',
-  'Clean codebase with room for future integrations',
+const bullets = [
+  'Interactive cosmic hub navigation on the homepage',
+  'Dedicated premium pages for Arma3 and Rust',
+  'Donation and PayPal subscription support',
+  'SEO-ready metadata, sitemap, and robots',
+  'Future-ready structure for live status and announcements',
+  'Deployable on Vercel with no login requirement'
 ];
 
 export default function HomePage() {
@@ -34,18 +22,11 @@ export default function HomePage() {
       <section className="section-block">
         <div className="container">
           <SectionTitle
-            eyebrow="Core design"
-            title="Built like a real community hub, not a placeholder landing page."
-            text="The homepage balances atmosphere, clear navigation, and practical game-server information so new visitors immediately understand what T-Central is about."
+            eyebrow="System map"
+            title="A homepage that feels like an actual hub."
+            text="The cosmic artwork is now used as an interactive navigation surface so the site feels branded, memorable, and purpose-built instead of generic."
           />
-          <div className="card-grid three">
-            {pillars.map((item) => (
-              <article key={item.title} className="content-card">
-                <h3>{item.title}</h3>
-                <p className="muted">{item.text}</p>
-              </article>
-            ))}
-          </div>
+          <CosmicMap />
         </div>
       </section>
 
@@ -53,34 +34,33 @@ export default function HomePage() {
         <div className="container split-grid">
           <div>
             <SectionTitle
-              eyebrow="What this starter includes"
-              title="A polished foundation for growth."
-              text="This version stays lightweight and deployable while still setting you up for future upgrades."
+              eyebrow="Server lineup"
+              title="Two games, one polished front door."
+              text="Each game now has its own cleaner destination page, while support, community, and general information stay centralized."
             />
-            <div className="list-block">
-              {highlights.map((item) => (
+            <ServerCards />
+          </div>
+          <div className="content-card large">
+            <p className="eyebrow">Upgrade summary</p>
+            <h3>Everything is now tightened up for a better public impression.</h3>
+            <div className="list-block compact-list">
+              {bullets.map((item) => (
                 <div key={item} className="list-item">
                   <span className="dot" />
                   <p>{item}</p>
                 </div>
               ))}
             </div>
-          </div>
-          <div className="content-card large">
-            <p className="eyebrow">Quick navigation</p>
-            <h3>Guide players where they need to go.</h3>
-            <p className="muted">
-              Keep the homepage focused, then move details into dedicated sections for server info, donation support,
-              and community-facing information.
-            </p>
             <div className="button-column">
-              <Link href="/server-info" className="button secondary">Open Server Information</Link>
-              <Link href="/information" className="button secondary">Open Information Page</Link>
-              <Link href="/donate" className="button secondary">Open Donation Page</Link>
+              <Link href="/servers/arma3-cth" className="button primary">Open Arma3 page</Link>
+              <Link href="/servers/rust-vanilla" className="button secondary">Open Rust page</Link>
+              <Link href="/donate" className="button secondary">Open support page</Link>
             </div>
           </div>
         </div>
       </section>
+
+      <DiscordPanel />
     </>
   );
 }

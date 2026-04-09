@@ -1,43 +1,53 @@
-# T-Central Hub
+# T-Central Hub Ultimate
 
-Multi-page Next.js website starter for an Arma3 Capture the Hill server and a Rust Vanilla server.
+Fully upgraded premium multi-page Next.js website for:
+- Arma3 Capture the Hill
+- Rust Vanilla Bi-Weekly Wipe
 
-## Features
-- Vercel-ready Next.js App Router project
-- Home page
-- Server Info page
+## Included
+- Interactive cosmic map homepage
+- Dedicated Arma3 page
+- Dedicated Rust page
 - Information page
 - Donate page
-- Uses your uploaded artwork as a visual identity image
-- No login system
+- PayPal subscription integration
+- Discord integration
+- SEO metadata
+- robots.js and sitemap.js
+- Vercel-ready structure
+- Artwork and Arma screenshot in `/public`
+
+## Server details
+### Arma3
+- `tcentral.game.nfoservers.com:2302`
+
+### Rust
+- Server name: `NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe`
+- Address: `tcentralrust.game.nfoservers.com:28015`
+- Current map: `Procedural Map`
+- Current players: `0 / 250`
+- Currently locked: `No`
 
 ## Local development
-1. Install Node.js 18+.
-2. In this folder, run:
-
 ```bash
 npm install
 npm run dev
 ```
 
-3. Open http://localhost:3000
+Open:
+`http://localhost:3000`
 
 ## Deploy to Vercel
-1. Upload this folder to GitHub.
+1. Upload the folder to GitHub.
 2. Import the repo into Vercel.
 3. Deploy with default settings.
 
-## Suggested next upgrades
-- Add real Rust server IP and wipe details
-- Add Discord and donation links
-- Add live server status cards
-- Add media gallery and announcements
+## Important after deployment
+Replace `https://example.com` in:
+- `app/layout.js`
+- `app/robots.js`
+- `app/sitemap.js`
 
-
-## Rust server details included
-- Server name: NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe
-- Address: tcentralrust.game.nfoservers.com:28015
-- Game: Rust
-- Current map: Procedural Map
-- Current players: 0 / 250
-- Locked: No
+## Notes
+- Live server player counts are still static placeholders unless you add a backend or API source later.
+- The PayPal subscription button is already wired to your provided plan.

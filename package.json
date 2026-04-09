@@ -1,6 +1,6 @@
 {
-  "name": "t-central-hub",
-  "version": "1.0.0",
+  "name": "t-central-hub-ultimate",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

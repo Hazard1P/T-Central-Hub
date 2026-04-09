@@ -1,42 +1,51 @@
 import SectionTitle from '@/components/SectionTitle';
+import DiscordPanel from '@/components/DiscordPanel';
 
-const infoBlocks = [
+const blocks = [
   {
     title: 'Community standards',
-    text: 'Set expectations for fair play, respectful behavior, cheating policy, and event conduct for both communities.',
+    text: 'Use this area for fair-play standards, anti-cheat expectations, comms expectations, and cross-community behavior guidelines.'
   },
   {
     title: 'Announcements and updates',
-    text: 'Use this section for wipe notices, map changes, restart windows, community news, and seasonal events.',
+    text: 'Use this area for wipes, event nights, map changes, restarts, downtime messages, and featured notices.'
   },
   {
-    title: 'Guides and onboarding',
-    text: 'Add quick-start information for Arma3 CTH and Rust Vanilla so new players can join smoothly.',
+    title: 'New player guidance',
+    text: 'Use this section for onboarding, join instructions, quick-start notes, and an overview of how each server is meant to be played.'
   },
   {
-    title: 'Support channels',
-    text: 'Point players toward Discord, moderation contact routes, and issue reporting steps without forcing account creation.',
-  },
+    title: 'Support and moderation',
+    text: 'Point players toward Discord, moderation contact flow, and issue reporting without building any account system.'
+  }
 ];
+
+export const metadata = {
+  title: 'Information',
+  description: 'T-Central information page for updates, onboarding, standards, and community guidance.'
+};
 
 export default function InformationPage() {
   return (
-    <section className="section-block page-top">
-      <div className="container">
-        <SectionTitle
-          eyebrow="Information"
-          title="A page built for clarity, updates, and community trust."
-          text="This page can become the central place for rules, schedules, update notes, onboarding help, and community-facing information across both servers."
-        />
-        <div className="card-grid two">
-          {infoBlocks.map((block) => (
-            <article key={block.title} className="content-card">
-              <h3>{block.title}</h3>
-              <p className="muted">{block.text}</p>
-            </article>
-          ))}
+    <>
+      <section className="section-block page-top">
+        <div className="container">
+          <SectionTitle
+            eyebrow="Information"
+            title="A cleaner central page for trust, updates, and onboarding."
+            text="This page is designed to support both communities with structure for standards, onboarding, and future update posts."
+          />
+          <div className="card-grid two">
+            {blocks.map((block) => (
+              <article key={block.title} className="content-card">
+                <h3>{block.title}</h3>
+                <p className="muted">{block.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <DiscordPanel />
+    </>
   );
 }

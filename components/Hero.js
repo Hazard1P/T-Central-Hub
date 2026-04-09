@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Hero() {
@@ -7,36 +6,36 @@ export default function Hero() {
       <div className="container hero-grid">
         <div>
           <p className="eyebrow">T-Central Hub</p>
-          <h1 className="hero-title">A premium home for Arma3 CTH and Rust Vanilla players.</h1>
+          <h1 className="hero-title">A sharper, more cinematic server hub for Arma3 CTH and Rust Vanilla.</h1>
           <p className="hero-copy">
-            Designed as a sharp, futuristic server hub with room for community growth, donation support, server visibility, and clean onboarding. It now includes your Rust Vanilla Bi-Weekly Wipe details and is organized to scale without a login system.
+            Everything has been upgraded into a cleaner multi-page experience with stronger visuals,
+            support flow, better game separation, and a homepage that feels like an actual system map.
           </p>
           <div className="button-row">
-            <Link href="/server-info" className="button primary">View Server Info</Link>
-            <Link href="/donate" className="button secondary">Support the Hub</Link>
+            <Link href="/servers/arma3-cth" className="button primary">Explore Arma3 CTH</Link>
+            <Link href="/servers/rust-vanilla" className="button secondary">Explore Rust Vanilla</Link>
           </div>
-          <div className="stat-grid compact">
+          <div className="stats-grid compact">
             <div className="stat-card"><span>Games</span><strong>2 Active Servers</strong></div>
-            <div className="stat-card"><span>Rust Wipe</span><strong>Bi-Weekly</strong></div>
-            <div className="stat-card"><span>Rust Players</span><strong>0 / 250</strong></div>
+            <div className="stat-card"><span>Discord</span><strong>Live Community Link</strong></div>
+            <div className="stat-card"><span>Support</span><strong>Subscription Enabled</strong></div>
             <div className="stat-card"><span>Deploy</span><strong>Vercel Ready</strong></div>
           </div>
         </div>
-        <div className="visual-card">
-          <Image
-            src="/cosmic-map.jpg"
-            alt="Cosmic map artwork used as the visual identity for T-Central Hub"
-            width={1200}
-            height={1600}
-            className="hero-image"
-            priority
-          />
-          <div className="overlay-card">
-            <p className="eyebrow">Creative identity</p>
-            <h3>Cosmic, tactical, and built to stand out.</h3>
-            <p className="muted">
-              The visual direction uses your artwork as a signature backdrop to make the site memorable and unique.
-            </p>
+
+        <div className="hero-orb">
+          <div className="orb-backdrop" />
+          <div className="orb-ring ring-a" />
+          <div className="orb-ring ring-b" />
+          <div className="orb-ring ring-c" />
+          <div className="orb-core">
+            <span className="pulse pulse-a" />
+            <span className="pulse pulse-b" />
+            <span className="pulse pulse-c" />
+            <div className="orb-label">
+              <p className="eyebrow">Core hub</p>
+              <h3>System-scale presentation with game-specific routes.</h3>
+            </div>
           </div>
         </div>
       </div>
