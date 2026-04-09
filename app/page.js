@@ -23,8 +23,8 @@ export default function HomePage() {
         <div className="container">
           <SectionTitle
             eyebrow="Interactive navigation"
-            title="A more defined 3D map with sectors, anchors, and warp transitions."
-            text="Rotate, zoom, and click through a more structured constellation. The map now separates the hub into an Arma sector, a Rust sector, and a support sector, while a separate shining star links out to the Government of Canada national security reporting resource."
+            title="A more defined 3D map with sectors, anchors, and free camera control."
+            text="Move through a more structured constellation with full camera freedom. The map now separates the hub into an Arma sector, a Rust sector, and a support sector, while the black holes carry visible orbiting matter and the selection panels make each destination clearer before you open it."
           />
           <InteractiveGalaxyMap />
         </div>

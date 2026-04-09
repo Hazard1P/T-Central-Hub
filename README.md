@@ -103,3 +103,15 @@ Replace `https://t-central.me` in:
 ## External star link
 - Added a standalone shining star on the 3D map
 - The star links to the Government of Canada page for reporting national security information
+
+
+## Interaction redesign
+- Removed anchored camera warp behavior from the map
+- Added free camera navigation with pan, zoom, and rotate controls
+- Added a focus panel interaction flow so node selection and opening feel cleaner
+
+
+## Black hole matter upgrade
+- Added visible orbiting matter streams around the Rust black hole
+- Added visible orbiting matter streams around the Arma black hole
+- Kept free camera navigation and focus-panel interaction flow

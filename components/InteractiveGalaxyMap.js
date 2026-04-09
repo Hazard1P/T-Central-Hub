@@ -1,9 +1,9 @@
 
 'use client';
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, Trail, Text } from '@react-three/drei';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Html, OrbitControls, Stars, Trail } from '@react-three/drei';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as THREE from 'three';
 
@@ -51,16 +51,6 @@ const SERVER_NODES = [
     color: '#ff8a8a',
     href: '/report-player',
     description: 'Report rule violations.'
-  },
-  {
-    label: 'National Security',
-    sublabel: 'Canada reporting page',
-    position: [7.15, 4.2, -0.6],
-    color: '#fff3a0',
-    href: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
-    description: 'External Government of Canada reporting resource.',
-    external: true,
-    special: 'star'
   }
 ];
 
@@ -73,7 +63,7 @@ function SectorRing({ position, radius = 3.8, color = '#4fe6ff', label }) {
     <group position={position}>
       <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radius, 0.02, 10, 220]} />
-        <meshBasicMaterial color={color} transparent opacity={0.35} />
+        <meshBasicMaterial color={color} transparent opacity={0.3} />
       </mesh>
       <Html position={[0, radius + 0.55, 0]} center>
         <div className="sector-label">{label}</div>
@@ -82,7 +72,46 @@ function SectorRing({ position, radius = 3.8, color = '#4fe6ff', label }) {
   );
 }
 
-function BlackHole({ position = [0, -3.1, 0], label = 'Rust Cluster', sublabel = 'Lower singularity anchor', colorA = '#5f3fd5', colorB = '#86e7ff', onClick }) {
+
+function MatterStream({ radius = 2.9, color = '#b78dff', speed = 0.18, tilt = [Math.PI / 2.4, 0, 0], density = 36 }) {
+  const group = useRef();
+  const particles = useMemo(() => {
+    return Array.from({ length: density }, (_, i) => {
+      const angle = (i / density) * Math.PI * 2;
+      const localRadius = radius + (Math.sin(i * 1.7) * 0.18);
+      const y = (Math.cos(i * 0.9) * 0.08);
+      const scale = 0.03 + (i % 5) * 0.008;
+      return {
+        angle,
+        localRadius,
+        y,
+        scale,
+        offset: i * 0.19
+      };
+    });
+  }, [radius, density]);
+
+  useFrame((state, delta) => {
+    if (group.current) group.current.rotation.z += delta * speed;
+  });
+
+  return (
+    <group ref={group} rotation={tilt}>
+      {particles.map((p, i) => {
+        const x = Math.cos(p.angle) * p.localRadius;
+        const z = Math.sin(p.angle) * p.localRadius;
+        return (
+          <mesh key={i} position={[x, p.y, z]} scale={p.scale}>
+            <sphereGeometry args={[1, 8, 8]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.75} transparent opacity={0.75} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function BlackHole({ position = [0, -3.1, 0], label = 'Rust Cluster', sublabel = 'Lower singularity anchor', colorA = '#5f3fd5', colorB = '#86e7ff' }) {
   const group = useRef();
   const disc = useRef();
 
@@ -92,12 +121,14 @@ function BlackHole({ position = [0, -3.1, 0], label = 'Rust Cluster', sublabel =
   });
 
   return (
-    <group ref={group} position={position} onClick={onClick}>
+    <group ref={group} position={position}>
       <mesh>
         <sphereGeometry args={[0.95, 48, 48]} />
         <meshStandardMaterial color="#020409" emissive="#060812" emissiveIntensity={0.9} />
       </mesh>
 
+      <MatterStream radius={2.85} color={colorA} speed={0.12} tilt={[Math.PI / 2.45, 0.1, 0]} density={42} />
+      <MatterStream radius={2.25} color={colorB} speed={-0.2} tilt={[Math.PI / 2.25, -0.15, 0.2]} density={28} />
       <mesh ref={disc} rotation={[Math.PI / 2.3, 0, 0]}>
         <torusGeometry args={[1.8, 0.36, 32, 140]} />
         <meshStandardMaterial color="#17111f" emissive={colorA} emissiveIntensity={1.1} transparent opacity={0.9} />
@@ -110,16 +141,16 @@ function BlackHole({ position = [0, -3.1, 0], label = 'Rust Cluster', sublabel =
 
       <pointLight position={[0, 0, 0]} color={colorA} intensity={35} distance={14} />
       <Html position={[0, -1.9, 0]} center>
-        <button className="map-anchor-label clickable">
+        <div className="map-anchor-label">
           <span className="anchor-title">{label}</span>
           <span className="anchor-copy">{sublabel}</span>
-        </button>
+        </div>
       </Html>
     </group>
   );
 }
 
-function ArmaBlackHole({ onClick, onHover }) {
+function ArmaBlackHole({ onSelect }) {
   const group = useRef();
   const disc = useRef();
 
@@ -134,11 +165,13 @@ function ArmaBlackHole({ onClick, onHover }) {
       position={[-5.6, 2.4, 0.3]}
       onClick={(e) => {
         e.stopPropagation();
-        onClick('/servers/arma3-cth', [-5.6, 2.4, 0.3], true);
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover('Arma3 CTH');
+        onSelect({
+          label: 'Arma3 CTH',
+          href: '/servers/arma3-cth',
+          position: [-5.6, 2.4, 0.3],
+          sublabel: 'tcentral.game.nfoservers.com:2302',
+          description: 'Public tactical hill-control combat.'
+        });
       }}
     >
       <mesh>
@@ -146,6 +179,8 @@ function ArmaBlackHole({ onClick, onHover }) {
         <meshStandardMaterial color="#020409" emissive="#0a1a2a" emissiveIntensity={1.2} />
       </mesh>
 
+      <MatterStream radius={2.55} color="#00eaff" speed={0.16} tilt={[Math.PI / 2.36, 0.2, 0]} density={38} />
+      <MatterStream radius={1.95} color="#8beaff" speed={-0.24} tilt={[Math.PI / 2.18, -0.12, 0.18]} density={24} />
       <mesh ref={disc} rotation={[Math.PI / 2.4, 0, 0]}>
         <torusGeometry args={[1.6, 0.25, 32, 120]} />
         <meshStandardMaterial color="#00eaff" emissive="#00eaff" emissiveIntensity={1.4} />
@@ -158,7 +193,18 @@ function ArmaBlackHole({ onClick, onHover }) {
 
       <pointLight position={[0, 0, 0]} color="#00eaff" intensity={30} distance={12} />
       <Html position={[0, 1.55, 0]} center>
-        <button className="map-anchor-label clickable" onClick={() => onClick('/servers/arma3-cth', [-5.6, 2.4, 0.3], true)}>
+        <button
+          className="map-anchor-label clickable"
+          onClick={() =>
+            onSelect({
+              label: 'Arma3 CTH',
+              href: '/servers/arma3-cth',
+              position: [-5.6, 2.4, 0.3],
+              sublabel: 'tcentral.game.nfoservers.com:2302',
+              description: 'Public tactical hill-control combat.'
+            })
+          }
+        >
           <span className="anchor-title">Arma3 Black Hole</span>
           <span className="anchor-copy">Upper tactical anchor</span>
         </button>
@@ -167,7 +213,7 @@ function ArmaBlackHole({ onClick, onHover }) {
   );
 }
 
-function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
+function DysonSphere({ position = [5.15, 2.5, -0.45], onSelect }) {
   const group = useRef();
   const ringA = useRef();
   const ringB = useRef();
@@ -184,8 +230,17 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
     <group
       ref={group}
       position={position}
-      onClick={(e) => { e.stopPropagation(); onClick('https://synapticsystems.ca', position, false, true); }}
-      onPointerOver={(e) => { e.stopPropagation(); onHover('S.S'); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect({
+          label: 'S.S',
+          href: 'https://synapticsystems.ca',
+          position,
+          sublabel: 'External site',
+          description: 'Opens SynapticSystems.ca.',
+          external: true
+        });
+      }}
     >
       <mesh>
         <sphereGeometry args={[0.42, 28, 28]} />
@@ -207,7 +262,19 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
 
       <pointLight position={[0, 0, 0]} color="#ffd15c" intensity={16} distance={10} />
       <Html position={[0, -1.38, 0]} center>
-        <button className="map-anchor-label clickable" onClick={() => onClick('https://synapticsystems.ca', position, false, true)}>
+        <button
+          className="map-anchor-label clickable"
+          onClick={() =>
+            onSelect({
+              label: 'S.S',
+              href: 'https://synapticsystems.ca',
+              position,
+              sublabel: 'External site',
+              description: 'Opens SynapticSystems.ca.',
+              external: true
+            })
+          }
+        >
           <span className="anchor-title">S.S</span>
           <span className="anchor-copy">Dyson sphere link</span>
         </button>
@@ -216,8 +283,7 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
   );
 }
 
-
-function ShiningStar({ position = [7.15, 4.2, -0.6], onClick, onHover }) {
+function ShiningStar({ position = [7.15, 4.2, -0.6], onSelect }) {
   const core = useRef();
   const flareA = useRef();
   const flareB = useRef();
@@ -237,11 +303,14 @@ function ShiningStar({ position = [7.15, 4.2, -0.6], onClick, onHover }) {
       position={position}
       onClick={(e) => {
         e.stopPropagation();
-        onClick('https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', position, false, true);
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover('National Security');
+        onSelect({
+          label: 'National Security',
+          href: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
+          position,
+          sublabel: 'Canada reporting page',
+          description: 'External Government of Canada reporting resource.',
+          external: true
+        });
       }}
     >
       <mesh ref={core}>
@@ -263,7 +332,16 @@ function ShiningStar({ position = [7.15, 4.2, -0.6], onClick, onHover }) {
       <Html position={[0, 1.15, 0]} center>
         <button
           className="map-anchor-label clickable star-link"
-          onClick={() => onClick('https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', position, false, true)}
+          onClick={() =>
+            onSelect({
+              label: 'National Security',
+              href: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
+              position,
+              sublabel: 'Canada reporting page',
+              description: 'External Government of Canada reporting resource.',
+              external: true
+            })
+          }
         >
           <span className="anchor-title">National Security Star</span>
           <span className="anchor-copy">Canada resource</span>
@@ -297,45 +375,7 @@ function ConstellationLines() {
   );
 }
 
-function WarpController({ warpTarget, setWarpTarget }) {
-  const { camera, controls } = useThree();
-  const progress = useRef(0);
-  const startPos = useRef(camera.position.clone());
-  const temp = useRef(new THREE.Vector3());
-
-  useEffect(() => {
-    if (warpTarget) {
-      progress.current = 0;
-      startPos.current = camera.position.clone();
-    }
-  }, [warpTarget, camera]);
-
-  useFrame((_, delta) => {
-    if (!warpTarget) return;
-    progress.current = Math.min(progress.current + delta * 0.8, 1);
-    const eased = 1 - Math.pow(1 - progress.current, 3);
-
-    const focus = new THREE.Vector3(...warpTarget.focus);
-    const cam = new THREE.Vector3(...warpTarget.camera);
-    temp.current.copy(startPos.current).lerp(cam, eased);
-    camera.position.copy(temp.current);
-    camera.lookAt(focus);
-
-    if (controls) {
-      controls.target.lerp(focus, eased);
-      controls.update();
-    }
-
-    if (progress.current >= 1) {
-      warpTarget.complete();
-      setWarpTarget(null);
-    }
-  });
-
-  return null;
-}
-
-function Node({ node, active, onHover, onLeave, onClick }) {
+function Node({ node, active, onHover, onLeave, onSelect }) {
   const mesh = useRef();
 
   useFrame((state) => {
@@ -351,7 +391,10 @@ function Node({ node, active, onHover, onLeave, onClick }) {
           ref={mesh}
           onPointerOver={(e) => { e.stopPropagation(); onHover(node.label); }}
           onPointerOut={(e) => { e.stopPropagation(); onLeave(); }}
-          onClick={(e) => { e.stopPropagation(); onClick(node.href, node.position); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(node);
+          }}
         >
           <icosahedronGeometry args={[active ? 0.34 : 0.28, 1]} />
           <meshStandardMaterial
@@ -374,7 +417,7 @@ function Node({ node, active, onHover, onLeave, onClick }) {
           className={`map-node-label ${active ? 'active' : ''}`}
           onMouseEnter={() => onHover(node.label)}
           onMouseLeave={onLeave}
-          onClick={() => onClick(node.href, node.position)}
+          onClick={() => onSelect(node)}
         >
           <strong>{node.label}</strong>
           <span>{node.sublabel}</span>
@@ -385,28 +428,8 @@ function Node({ node, active, onHover, onLeave, onClick }) {
   );
 }
 
-function Scene() {
-  const router = useRouter();
+function Scene({ onSelect }) {
   const [active, setActive] = useState('Rust Bi-Weekly');
-  const [warpTarget, setWarpTarget] = useState(null);
-  const controlsRef = useRef();
-
-  const beginWarp = (href, position, blackhole = false, external = false) => {
-    const base = new THREE.Vector3(...position);
-    const offset = blackhole ? new THREE.Vector3(0, 0.08, 3.0) : new THREE.Vector3(0, 0.15, 2.5);
-
-    setWarpTarget({
-      focus: base.toArray(),
-      camera: base.clone().add(offset).toArray(),
-      complete: () => {
-        if (external) {
-          window.open(href, '_blank', 'noopener,noreferrer');
-        } else {
-          router.push(href);
-        }
-      }
-    });
-  };
 
   return (
     <>
@@ -424,59 +447,101 @@ function Scene() {
 
         <ConstellationLines />
 
-        <group
-          onClick={(e) => { e.stopPropagation(); beginWarp('/servers/rust-vanilla', [0, -3.1, 0], true); }}
-          onPointerOver={(e) => { e.stopPropagation(); setActive('Rust Bi-Weekly'); }}
-        >
+        <group onClick={(e) => { e.stopPropagation(); onSelect({ label: 'Rust Cluster', href: '/servers/rust-vanilla', position: [0, -3.1, 0], sublabel: 'Lower singularity anchor', description: 'Rust server cluster anchor.' }); }}>
           <BlackHole />
         </group>
 
-        <ArmaBlackHole onClick={beginWarp} onHover={setActive} />
-        <DysonSphere onClick={beginWarp} onHover={setActive} />
-        <ShiningStar onClick={beginWarp} onHover={setActive} />
+        <ArmaBlackHole onSelect={onSelect} />
+        <DysonSphere onSelect={onSelect} />
+        <ShiningStar onSelect={onSelect} />
 
-        {SERVER_NODES.filter((node) => node.label !== 'Arma3 CTH').map((node) => (
+        {SERVER_NODES.map((node) => (
           <Node
             key={node.label}
             node={node}
             active={active === node.label}
             onHover={setActive}
             onLeave={() => setActive('Rust Bi-Weekly')}
-            onClick={beginWarp}
+            onSelect={onSelect}
           />
         ))}
       </group>
 
       <OrbitControls
-        ref={controlsRef}
-        enablePan={false}
-        minDistance={7}
-        maxDistance={15}
-        autoRotate={!warpTarget}
-        autoRotateSpeed={0.22}
-        maxPolarAngle={Math.PI * 0.72}
-        minPolarAngle={Math.PI * 0.28}
+        enablePan
+        enableZoom
+        enableRotate
+        minDistance={4}
+        maxDistance={24}
+        autoRotate={false}
+        zoomSpeed={0.9}
+        rotateSpeed={0.6}
+        panSpeed={0.6}
+        maxPolarAngle={Math.PI * 0.9}
+        minPolarAngle={Math.PI * 0.1}
       />
-      <WarpController warpTarget={warpTarget} setWarpTarget={setWarpTarget} />
     </>
   );
 }
 
+function FocusPanel({ item, onClose, onOpen }) {
+  if (!item) return null;
+
+  return (
+    <div className="map-focus-panel">
+      <div className="map-focus-header">
+        <div>
+          <p className="eyebrow">Selected node</p>
+          <h4>{item.label}</h4>
+        </div>
+        <button className="focus-close" onClick={onClose}>×</button>
+      </div>
+      <p className="muted">{item.description}</p>
+      <div className="focus-meta">
+        <span>{item.sublabel}</span>
+      </div>
+      <div className="button-column">
+        <button className="button primary" onClick={() => onOpen(item)}>
+          Open destination
+        </button>
+        <button className="button secondary" onClick={onClose}>
+          Clear selection
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function InteractiveGalaxyMap() {
+  const router = useRouter();
+  const [selected, setSelected] = useState(null);
+
+  const openItem = (item) => {
+    if (!item) return;
+    if (item.external) {
+      window.open(item.href, '_blank', 'noopener,noreferrer');
+    } else {
+      router.push(item.href);
+    }
+  };
+
   return (
     <div className="interactive-map-shell">
       <div className="interactive-map-copy">
         <p className="eyebrow">3D system map</p>
-        <h3>A more defined constellation with sectors, anchors, and clearer navigation roles.</h3>
+        <h3>Free camera navigation with a cleaner focus-based interaction flow.</h3>
         <p className="muted">
-          The map is now broken into clearer regions: the upper Arma sector, the lower Rust sector, and the support sector on the right. The Rust servers stay pinned around the lower black hole, Arma uses its own black hole anchor, the Dyson sphere carries the S.S link, and a separate shining star links to the Government of Canada national security reporting resource.
+          The map no longer forces the camera into anchored warp positions. You can move freely, rotate, zoom,
+          and pan through the system yourself. Clicking any anchor or node now opens a focus panel so the
+          interaction feels more deliberate and easier to control.
         </p>
       </div>
 
-      <div className="interactive-map-stage">
-        <Canvas camera={{ position: [0, 0.9, 11], fov: 46 }}>
-          <Scene />
+      <div className="interactive-map-stage redesigned">
+        <Canvas camera={{ position: [0, 1.5, 11], fov: 46 }}>
+          <Scene onSelect={setSelected} />
         </Canvas>
+        <FocusPanel item={selected} onClose={() => setSelected(null)} onOpen={openItem} />
       </div>
     </div>
   );
