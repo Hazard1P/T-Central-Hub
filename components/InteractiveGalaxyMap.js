@@ -1,7 +1,8 @@
+
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, Trail } from '@react-three/drei';
+import { Html, OrbitControls, Stars, Trail, Text } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as THREE from 'three';
@@ -13,40 +14,35 @@ const SERVER_NODES = [
     position: [-5.6, 2.4, 0.3],
     color: '#8beaff',
     href: '/servers/arma3-cth',
-    description: 'Tactical hill battles and public objective warfare.',
+    description: 'Public tactical hill-control combat.',
     type: 'arma'
   },
   {
     label: 'Rust Bi-Weekly',
     sublabel: 'tcentralrust.game.nfoservers.com:28015',
-    position: [0.5, -2.75, 0.7],
+    position: [0.45, -2.7, 0.7],
     color: '#d8ff61',
     href: '/servers/rust-vanilla',
-    description: 'Bi-weekly wipe cycle near the black hole cluster.'
+    description: 'Bi-weekly wipe cycle.',
+    cluster: 'rust'
   },
   {
     label: 'Rust Monthly',
     sublabel: 'tcentralrust3.game.nfoservers.com:28015',
-    position: [-2.35, -3.5, -0.15],
+    position: [-2.35, -3.52, -0.15],
     color: '#ffd15c',
     href: '/servers/rust-monthly',
-    description: 'Longer progression cycle pinned to the lower singularity.'
+    description: 'Monthly progression cycle.',
+    cluster: 'rust'
   },
   {
     label: 'Rust Weekly',
     sublabel: 'tcentralrust2.game.nfoservers.com:28015',
-    position: [2.7, -3.45, -0.3],
+    position: [2.72, -3.42, -0.3],
     color: '#ff9fda',
     href: '/servers/rust-weekly',
-    description: 'Fast reset cycle anchored under the black hole.'
-  },
-  {
-    label: 'Support Hub',
-    sublabel: 'Donate + subscription',
-    position: [5.15, 2.5, -0.45],
-    color: '#b68cff',
-    href: '/donate',
-    description: 'Support the ecosystem and recurring subscription options.'
+    description: 'Weekly fresh-start cycle.',
+    cluster: 'rust'
   },
   {
     label: 'Player Reporting',
@@ -54,21 +50,39 @@ const SERVER_NODES = [
     position: [5.85, -0.25, 0.2],
     color: '#ff8a8a',
     href: '/report-player',
-    description: 'Structured reporting flow for moderation issues.'
+    description: 'Report rule violations.'
   }
 ];
 
-function BlackHole({ position = [0, -3.1, 0], label = 'Black Hole Cluster', sublabel = 'Rust network anchor', colorA = '#5f3fd5', colorB = '#86e7ff' }) {
+function SectorRing({ position, radius = 3.8, color = '#4fe6ff', label }) {
+  const ref = useRef();
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.z += delta * 0.08;
+  });
+  return (
+    <group position={position}>
+      <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[radius, 0.02, 10, 220]} />
+        <meshBasicMaterial color={color} transparent opacity={0.35} />
+      </mesh>
+      <Html position={[0, radius + 0.55, 0]} center>
+        <div className="sector-label">{label}</div>
+      </Html>
+    </group>
+  );
+}
+
+function BlackHole({ position = [0, -3.1, 0], label = 'Rust Cluster', sublabel = 'Lower singularity anchor', colorA = '#5f3fd5', colorB = '#86e7ff', onClick }) {
   const group = useRef();
   const disc = useRef();
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.18;
     if (disc.current) disc.current.rotation.z -= delta * 0.35;
   });
 
   return (
-    <group ref={group} position={position}>
+    <group ref={group} position={position} onClick={onClick}>
       <mesh>
         <sphereGeometry args={[0.95, 48, 48]} />
         <meshStandardMaterial color="#020409" emissive="#060812" emissiveIntensity={0.9} />
@@ -76,13 +90,7 @@ function BlackHole({ position = [0, -3.1, 0], label = 'Black Hole Cluster', subl
 
       <mesh ref={disc} rotation={[Math.PI / 2.3, 0, 0]}>
         <torusGeometry args={[1.8, 0.36, 32, 140]} />
-        <meshStandardMaterial
-          color="#17111f"
-          emissive={colorA}
-          emissiveIntensity={1.1}
-          transparent
-          opacity={0.9}
-        />
+        <meshStandardMaterial color="#17111f" emissive={colorA} emissiveIntensity={1.1} transparent opacity={0.9} />
       </mesh>
 
       <mesh rotation={[Math.PI / 2.3, 0, 0]}>
@@ -91,11 +99,11 @@ function BlackHole({ position = [0, -3.1, 0], label = 'Black Hole Cluster', subl
       </mesh>
 
       <pointLight position={[0, 0, 0]} color={colorA} intensity={35} distance={14} />
-      <Html position={[0, -1.75, 0]} center>
-        <div className="map-anchor-label">
+      <Html position={[0, -1.9, 0]} center>
+        <button className="map-anchor-label clickable">
           <span className="anchor-title">{label}</span>
           <span className="anchor-copy">{sublabel}</span>
-        </div>
+        </button>
       </Html>
     </group>
   );
@@ -105,7 +113,7 @@ function ArmaBlackHole({ onClick, onHover }) {
   const group = useRef();
   const disc = useRef();
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (group.current) group.current.rotation.y -= delta * 0.14;
     if (disc.current) disc.current.rotation.z += delta * 0.42;
   });
@@ -116,7 +124,7 @@ function ArmaBlackHole({ onClick, onHover }) {
       position={[-5.6, 2.4, 0.3]}
       onClick={(e) => {
         e.stopPropagation();
-        onClick('/servers/arma3-cth');
+        onClick('/servers/arma3-cth', [-5.6, 2.4, 0.3], true);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -139,11 +147,10 @@ function ArmaBlackHole({ onClick, onHover }) {
       </mesh>
 
       <pointLight position={[0, 0, 0]} color="#00eaff" intensity={30} distance={12} />
-
       <Html position={[0, 1.55, 0]} center>
-        <button className="map-anchor-label clickable" onClick={() => onClick('/servers/arma3-cth')}>
+        <button className="map-anchor-label clickable" onClick={() => onClick('/servers/arma3-cth', [-5.6, 2.4, 0.3], true)}>
           <span className="anchor-title">Arma3 Black Hole</span>
-          <span className="anchor-copy">Tactical system anchor</span>
+          <span className="anchor-copy">Upper tactical anchor</span>
         </button>
       </Html>
     </group>
@@ -156,7 +163,7 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
   const ringB = useRef();
   const ringC = useRef();
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.18;
     if (ringA.current) ringA.current.rotation.x += delta * 0.45;
     if (ringB.current) ringB.current.rotation.y -= delta * 0.36;
@@ -167,14 +174,8 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
     <group
       ref={group}
       position={position}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick('/donate');
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover('Support Hub');
-      }}
+      onClick={(e) => { e.stopPropagation(); onClick('https://synapticsystems.ca', position, false, true); }}
+      onPointerOver={(e) => { e.stopPropagation(); onHover('S.S'); }}
     >
       <mesh>
         <sphereGeometry args={[0.42, 28, 28]} />
@@ -195,10 +196,10 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
       </mesh>
 
       <pointLight position={[0, 0, 0]} color="#ffd15c" intensity={16} distance={10} />
-      <Html position={[0, -1.35, 0]} center>
-        <button className="map-anchor-label clickable" onClick={() => onClick('/donate')}>
-          <span className="anchor-title">Dyson Sphere</span>
-          <span className="anchor-copy">Support network</span>
+      <Html position={[0, -1.38, 0]} center>
+        <button className="map-anchor-label clickable" onClick={() => onClick('https://synapticsystems.ca', position, false, true)}>
+          <span className="anchor-title">S.S</span>
+          <span className="anchor-copy">Dyson sphere link</span>
         </button>
       </Html>
     </group>
@@ -206,11 +207,7 @@ function DysonSphere({ position = [5.15, 2.5, -0.45], onClick, onHover }) {
 }
 
 function ConstellationLines() {
-  const points = useMemo(
-    () => SERVER_NODES.map((node) => new THREE.Vector3(...node.position)),
-    []
-  );
-
+  const points = useMemo(() => SERVER_NODES.map((node) => new THREE.Vector3(...node.position)), []);
   const geometry = useMemo(() => {
     const ordered = [
       points[1],
@@ -218,7 +215,7 @@ function ConstellationLines() {
       points[3],
       new THREE.Vector3(0, -3.1, 0),
       new THREE.Vector3(-5.6, 2.4, 0.3),
-      points[5],
+      points[4],
       new THREE.Vector3(5.15, 2.5, -0.45)
     ];
     const curve = new THREE.CatmullRomCurve3(ordered, false, 'catmullrom', 0.25);
@@ -245,7 +242,7 @@ function WarpController({ warpTarget, setWarpTarget }) {
     }
   }, [warpTarget, camera]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!warpTarget) return;
     progress.current = Math.min(progress.current + delta * 0.8, 1);
     const eased = 1 - Math.pow(1 - progress.current, 3);
@@ -284,18 +281,9 @@ function Node({ node, active, onHover, onLeave, onClick }) {
       <Trail width={0.4} length={2.5} color={node.color} attenuation={(t) => t * t}>
         <mesh
           ref={mesh}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            onHover(node.label);
-          }}
-          onPointerOut={(e) => {
-            e.stopPropagation();
-            onLeave();
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick(node);
-          }}
+          onPointerOver={(e) => { e.stopPropagation(); onHover(node.label); }}
+          onPointerOut={(e) => { e.stopPropagation(); onLeave(); }}
+          onClick={(e) => { e.stopPropagation(); onClick(node.href, node.position); }}
         >
           <icosahedronGeometry args={[active ? 0.34 : 0.28, 1]} />
           <meshStandardMaterial
@@ -308,7 +296,7 @@ function Node({ node, active, onHover, onLeave, onClick }) {
         </mesh>
       </Trail>
 
-      <mesh position={[0, 0, 0]}>
+      <mesh>
         <sphereGeometry args={[active ? 0.62 : 0.52, 24, 24]} />
         <meshBasicMaterial color={node.color} transparent opacity={active ? 0.18 : 0.1} />
       </mesh>
@@ -318,10 +306,11 @@ function Node({ node, active, onHover, onLeave, onClick }) {
           className={`map-node-label ${active ? 'active' : ''}`}
           onMouseEnter={() => onHover(node.label)}
           onMouseLeave={onLeave}
-          onClick={() => onClick(node)}
+          onClick={() => onClick(node.href, node.position)}
         >
           <strong>{node.label}</strong>
           <span>{node.sublabel}</span>
+          <em>{node.description}</em>
         </button>
       </Html>
     </group>
@@ -334,24 +323,22 @@ function Scene() {
   const [warpTarget, setWarpTarget] = useState(null);
   const controlsRef = useRef();
 
-  const startWarp = (node) => {
-    const base = new THREE.Vector3(...node.position);
-    const isBlackHole = node.type === 'arma' || node.label.includes('Rust');
-    const offset = node.type === 'arma'
-      ? new THREE.Vector3(0, 0.1, 3.0)
-      : node.label.includes('Rust')
-      ? new THREE.Vector3(0, 0.15, 2.8)
-      : new THREE.Vector3(0, 0.15, 2.5);
+  const beginWarp = (href, position, blackhole = false, external = false) => {
+    const base = new THREE.Vector3(...position);
+    const offset = blackhole ? new THREE.Vector3(0, 0.08, 3.0) : new THREE.Vector3(0, 0.15, 2.5);
 
     setWarpTarget({
       focus: base.toArray(),
       camera: base.clone().add(offset).toArray(),
-      complete: () => router.push(node.href)
+      complete: () => {
+        if (external) {
+          window.open(href, '_blank', 'noopener,noreferrer');
+        } else {
+          router.push(href);
+        }
+      }
     });
   };
-
-  const rustAnchorNode = { label: 'Rust Cluster', href: '/servers/rust-vanilla', position: [0, -3.1, 0] };
-  const armaAnchorNode = { label: 'Arma3 CTH', href: '/servers/arma3-cth', position: [-5.6, 2.4, 0.3], type: 'arma' };
 
   return (
     <>
@@ -363,32 +350,30 @@ function Scene() {
       <Stars radius={70} depth={30} count={3200} factor={4.2} saturation={0} fade speed={0.8} />
 
       <group rotation={[-0.15, -0.08, 0]}>
+        <SectorRing position={[-5.6, 2.4, 0.3]} radius={3.15} color="#58dfff" label="Arma Sector" />
+        <SectorRing position={[0, -3.1, 0]} radius={3.8} color="#b78dff" label="Rust Sector" />
+        <SectorRing position={[5.15, 2.5, -0.45]} radius={2.65} color="#ffd15c" label="Support Sector" />
+
         <ConstellationLines />
 
         <group
-          onClick={(e) => {
-            e.stopPropagation();
-            startWarp(rustAnchorNode);
-          }}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            setActive('Rust Bi-Weekly');
-          }}
+          onClick={(e) => { e.stopPropagation(); beginWarp('/servers/rust-vanilla', [0, -3.1, 0], true); }}
+          onPointerOver={(e) => { e.stopPropagation(); setActive('Rust Bi-Weekly'); }}
         >
           <BlackHole />
         </group>
 
-        <ArmaBlackHole onClick={() => startWarp(armaAnchorNode)} onHover={setActive} />
-        <DysonSphere onClick={(href) => startWarp(SERVER_NODES[4])} onHover={setActive} />
+        <ArmaBlackHole onClick={beginWarp} onHover={setActive} />
+        <DysonSphere onClick={beginWarp} onHover={setActive} />
 
-        {SERVER_NODES.filter((node) => node.label !== 'Arma3 CTH' && node.label !== 'Support Hub').map((node) => (
+        {SERVER_NODES.filter((node) => node.label !== 'Arma3 CTH').map((node) => (
           <Node
             key={node.label}
             node={node}
             active={active === node.label}
             onHover={setActive}
             onLeave={() => setActive('Rust Bi-Weekly')}
-            onClick={startWarp}
+            onClick={beginWarp}
           />
         ))}
       </group>
@@ -413,11 +398,11 @@ export default function InteractiveGalaxyMap() {
     <div className="interactive-map-shell">
       <div className="interactive-map-copy">
         <p className="eyebrow">3D system map</p>
-        <h3>Orbit the hub, inspect the constellation, and warp directly into the server you want.</h3>
+        <h3>A more defined constellation with sectors, anchors, and clearer navigation roles.</h3>
         <p className="muted">
-          The lower singularity acts as the Rust anchor cluster. The monthly, weekly, and bi-weekly servers are
-          pinned around the black hole, Arma3 now has its own interactive black hole anchor, and the Dyson sphere
-          spins across the support side of the system.
+          The map is now broken into clearer regions: the upper Arma sector, the lower Rust sector, and the
+          support sector on the right. The Rust servers stay pinned around the lower black hole, Arma uses its
+          own black hole anchor, and the Dyson sphere now carries the S.S link.
         </p>
       </div>
 

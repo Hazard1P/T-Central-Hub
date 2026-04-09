@@ -88,3 +88,13 @@ Replace `https://t-central.me` in:
 - Added warp zoom transitions into Arma3 and Rust routes from the 3D homepage map
 - Upgraded Arma3 into its own interactive black hole anchor
 - Added a spinning Dyson sphere on the support side of the map
+
+
+## Map definition upgrade
+- Dyson sphere label changed to `S.S`
+- 3D map now uses clearer sectors:
+  - Arma Sector
+  - Rust Sector
+  - Support Sector
+- Node labels now include short role descriptions
+- Rust servers remain pinned to the lower black hole cluster

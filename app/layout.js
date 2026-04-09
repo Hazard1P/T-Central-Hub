@@ -37,6 +37,7 @@ const nav = [
   ['/servers/rust-vanilla', 'Rust Vanilla'],
   ['/information', 'Information'],
   ['/report-player', 'Report Player'],
+  ['https://synapticsystems.ca', 'S.S'],
   ['/donate', 'Donate']
 ];
 
@@ -52,9 +53,17 @@ export default function RootLayout({ children }) {
                 <Link href="/" className="brand">Arma3 CTH + Rust Vanilla</Link>
               </div>
               <nav className="nav">
-                {nav.map(([href, label]) => (
-                  <Link key={href} href={href} className="nav-link">{label}</Link>
-                ))}
+                {nav.map(([href, label]) =>
+                  href.startsWith('http') ? (
+                    <a key={href} href={href} className="nav-link" target="_blank" rel="noreferrer">
+                      {label}
+                    </a>
+                  ) : (
+                    <Link key={href} href={href} className="nav-link">
+                      {label}
+                    </Link>
+                  )
+                )}
               </nav>
             </div>
           </header>

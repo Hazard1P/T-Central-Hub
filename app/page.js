@@ -23,8 +23,8 @@ export default function HomePage() {
         <div className="container">
           <SectionTitle
             eyebrow="Interactive navigation"
-            title="A real 3D map with warp transitions and system anchors."
-            text="Rotate, zoom, and click through the constellation. The Rust servers remain pinned around the lower black hole cluster, Arma3 now has its own black hole system, and the support side is represented by a spinning Dyson sphere."
+            title="A more defined 3D map with sectors, anchors, and warp transitions."
+            text="Rotate, zoom, and click through a more structured constellation. The map now separates the hub into an Arma sector, a Rust sector, and a support sector, with clearer anchor points and more readable navigation."
           />
           <InteractiveGalaxyMap />
         </div>
