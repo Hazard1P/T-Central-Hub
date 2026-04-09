@@ -3,96 +3,84 @@ import Script from 'next/script';
 
 export const metadata = { title: 'Donate' };
 
-const supportReasons = [
-  'Help keep the servers online and stable.',
-  'Support site upgrades, polish, and future features.',
-  'Contribute toward events, media, and community growth.',
-  'Back a hub built for long-term players and repeat sessions.'
-];
-
-const supportTiers = [
-  {
-    name: 'Field Supporter',
-    text: 'A lighter recurring support option for players who want to contribute to upkeep and steady improvements.'
-  },
-  {
-    name: 'Community Backer',
-    text: 'A stronger recurring option for regular players who want to help sustain events, polish, and long-term quality.'
-  },
-  {
-    name: 'Hub Patron',
-    text: 'A premium recurring support option for players who want to contribute more directly to the ecosystem and its future upgrades.'
-  }
-];
-
 export default function DonatePage() {
   return (
     <PageShell
       eyebrow="Support the hub"
-      title="Back the system and help it keep growing."
-      text="Thanks for helping grow our universe!."
+      title="Back the system and keep it running."
+      text="Support the servers, upgrades, and future expansion through a recurring subscription."
     >
       <div className="donate-layout">
+        {/* LEFT: PAYPAL */}
         <section className="content-card donate-hero-card">
-          <p className="eyebrow">Recurring support</p>
-          <h3>PayPal subscription</h3>
+          <p className="eyebrow">Recurring Support</p>
+          <h3>Subscribe via PayPal</h3>
           <p className="muted">
-            Use the subscription button below to support the hub through your PayPal plan. This is wired to the
-            subscription setup you provided.
+            Use the secure PayPal subscription below to support the T-Central Hub.
           </p>
 
           <div className="paypal-shell donate-paypal-shell">
+            {/* PayPal Button */}
             <div id="paypal-button-container-P-95R19588AD368713ENHLWFNY" />
-          </div>
 
-          <div className="donate-note">
-            <strong>Plan ID</strong>
-            <span>P-95R19588AD368713ENHLWFNY</span>
+            {/* Direct Link (Fallback) */}
+            <a
+              href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-95R19588AD368713ENHLWFNY"
+              target="_blank"
+              rel="noreferrer"
+              className="button primary"
+              style={{
+                marginTop: "14px",
+                display: "inline-block",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              Subscribe via PayPal (Direct Link)
+            </a>
+
+            {/* Helper note */}
+            <p className="muted" style={{ marginTop: "8px" }}>
+              If the button doesn’t load, use the direct PayPal link above.
+            </p>
           </div>
         </section>
 
+        {/* RIGHT: INFO */}
         <section className="content-card">
-          <p className="eyebrow">Why support matters</p>
-          <h3>Help sustain uptime, improvements, and growth.</h3>
+          <p className="eyebrow">Why Support?</p>
+          <h3>Keep the system running</h3>
+
           <div className="step-list donate-list">
-            {supportReasons.map((reason) => (
-              <div key={reason} className="step-item">
-                <span className="dot" />
-                <p>{reason}</p>
-              </div>
-            ))}
+            <div className="step-item">
+              <span className="dot" />
+              <p>Maintain server uptime and performance</p>
+            </div>
+            <div className="step-item">
+              <span className="dot" />
+              <p>Fund new features and upgrades</p>
+            </div>
+            <div className="step-item">
+              <span className="dot" />
+              <p>Support events and community growth</p>
+            </div>
+            <div className="step-item">
+              <span className="dot" />
+              <p>Keep the ecosystem expanding long-term</p>
+            </div>
           </div>
         </section>
       </div>
 
-      <div className="info-grid three donate-tier-grid">
-        {supportTiers.map((tier) => (
-          <article key={tier.name} className="content-card donate-tier-card">
-            <p className="eyebrow">Support tier</p>
-            <h3>{tier.name}</h3>
-            <p className="muted">{tier.text}</p>
-          </article>
-        ))}
-      </div>
-
-      <section className="content-card donate-footer-card">
-        <p className="eyebrow">Community route</p>
-        <h3>Questions before supporting?</h3>
-        <p className="muted">
-          If you want to ask questions first, open the Discord and speak with the community before subscribing.
-        </p>
-        <a href="https://discord.gg/8bJAEau9" target="_blank" rel="noreferrer" className="button secondary">
-          Open Discord
-        </a>
-      </section>
-
+      {/* PAYPAL SDK */}
       <Script
         src="https://www.paypal.com/sdk/js?client-id=AXqHQLIJ608RS7GkyIvA5I-jFk-xJQueoSaKSfl3UWVkK6BtHmd0971SA2snZlJxSV-WIHFh5K-uut0Q&vault=true&intent=subscription"
         data-sdk-integration-source="button-factory"
         strategy="afterInteractive"
       />
 
-      <Script id="paypal-subscription-init" strategy="afterInteractive">
+      {/* PAYPAL INIT */}
+      <Script id="paypal-init" strategy="afterInteractive">
         {`
           if (window.paypal) {
             window.paypal.Buttons({
@@ -108,7 +96,7 @@ export default function DonatePage() {
                 });
               },
               onApprove: function(data, actions) {
-                alert(data.subscriptionID);
+                alert('Subscription successful: ' + data.subscriptionID);
               }
             }).render('#paypal-button-container-P-95R19588AD368713ENHLWFNY');
           }
