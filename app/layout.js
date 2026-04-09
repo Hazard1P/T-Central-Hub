@@ -76,6 +76,8 @@ export default function RootLayout({ children }) {
                 <ul>
                   <li>Arma3 Capture the Hill</li>
                   <li>Rust Vanilla Bi-Weekly Wipe</li>
+                  <li>Rust Vanilla Monthly Wipe</li>
+                  <li>Rust Vanilla Weekly Wipe</li>
                   <li>Discord community hub</li>
                 </ul>
               </div>

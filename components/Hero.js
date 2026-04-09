@@ -15,7 +15,7 @@ export default function Hero() {
             <Link href="/servers/rust-vanilla" className="button secondary">Explore Rust Vanilla</Link>
           </div>
           <div className="stats-grid compact">
-            <div className="stat-card"><span>Games</span><strong>2 Active Servers</strong></div>
+            <div className="stat-card"><span>Games</span><strong>4 Active Servers</strong></div>
             <div className="stat-card"><span>Discord</span><strong>Join the community</strong></div>
             <div className="stat-card"><span>Support</span><strong>Support available</strong></div>
             <div className="stat-card"><span>Deploy</span><strong>Vercel Ready</strong></div>

@@ -3,9 +3,11 @@
 Fully upgraded premium multi-page Next.js website for:
 - Arma3 Capture the Hill
 - Rust Vanilla Bi-Weekly Wipe
+- Rust Vanilla Monthly Wipe
+- Rust Vanilla Weekly Wipe
 
 ## Included
-- Interactive cosmic map homepage
+- Interactive 3D cosmic map homepage
 - Dedicated Arma3 page
 - Dedicated Rust page
 - Information page
@@ -57,3 +59,26 @@ Replace `https://t-central.me` in:
 ## Player reporting
 - Added a dedicated `/report-player` page
 - Reports currently route through Discord for moderation follow-up
+
+
+### Rust Monthly
+- Server name: `T-Central Rust Vanilla Monthly Wipe`
+- Address: `tcentralrust3.game.nfoservers.com:28015`
+- Current map: `Procedural Map`
+- Current players: `0 / 250`
+
+### Rust Weekly
+- Server name: `T-Central Rust Vanilla Weekly Wipe`
+- Address: `tcentralrust2.game.nfoservers.com:28015`
+- Current map: `Procedural Map`
+- Current players: `0 / 250`
+- Currently locked: `No`
+
+
+## 3D map notes
+- Added a Vercel-compatible 3D homepage map using:
+  - `three`
+  - `@react-three/fiber`
+  - `@react-three/drei`
+- Rust servers are pinned around the black hole cluster on the lower section of the map
+- The remaining hub routes are mapped across the constellation for navigation

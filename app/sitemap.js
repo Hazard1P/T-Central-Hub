@@ -1,4 +1,4 @@
-const routes = ['', '/servers/arma3-cth', '/servers/rust-vanilla', '/information', '/report-player', '/donate'];
+const routes = ['', '/servers/arma3-cth', '/servers/rust-vanilla', '/servers/rust-monthly', '/servers/rust-weekly', '/information', '/report-player', '/donate'];
 
 export default function sitemap() {
   return routes.map((route) => ({
