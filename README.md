@@ -68,3 +68,22 @@ Open:
 - Reduced the large front-facing intro layer
 - Kept the central 3D system as the main experience
 - Left status pill visible without the oversized homepage heading
+
+
+## Donate page rebuild
+- Rebuilt the donate page layout
+- Uses the provided PayPal subscription button scheme
+- Keeps the provided PayPal client ID and plan ID in the Next.js page
+
+
+## Donate page expansion
+- Rebuilt the donate page with a stronger multi-tier visual structure
+- Kept the current PayPal plan as the only live payment path
+- Added direct PayPal subscription link plus embedded PayPal button
+- Added tier cards for future expansion without faking extra plan IDs
+
+
+## S&Box black hole
+- Added a dedicated S&Box black hole
+- Links directly to `https://sbox.game/`
+- Added an S&Box sector ring to the 3D system

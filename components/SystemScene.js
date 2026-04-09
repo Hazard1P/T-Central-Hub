@@ -64,6 +64,17 @@ const NODES = [
     kind: 'node'
   },
   {
+    key: 'sbox',
+    label: 'S&Box',
+    address: 'sbox.game',
+    description: 'External S&Box black hole route.',
+    position: [0.1, 3.85, -0.3],
+    color: '#67d7ff',
+    route: 'https://sbox.game/',
+    external: true,
+    kind: 'blackhole'
+  },
+  {
     key: 'ss',
     label: 'S.S',
     address: 'synapticsystems.ca',
@@ -287,6 +298,7 @@ function ConstellationLines() {
       new THREE.Vector3(...NODES.find((n) => n.key === 'rust_weekly').position),
       new THREE.Vector3(...NODES.find((n) => n.key === 'rust_anchor').position),
       new THREE.Vector3(...NODES.find((n) => n.key === 'arma3').position),
+      new THREE.Vector3(...NODES.find((n) => n.key === 'sbox').position),
       new THREE.Vector3(...NODES.find((n) => n.key === 'report').position),
       new THREE.Vector3(...NODES.find((n) => n.key === 'ss').position),
       new THREE.Vector3(...NODES.find((n) => n.key === 'ns').position),
@@ -376,7 +388,8 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
 
       <group rotation={[-0.15, -0.08, 0]}>
         <SectorRing position={[-5.7, 2.25, 0.2]} radius={3.1} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[0, -3.05, 0]} radius={3.85} color="#b78dff" label="T-Central Hub" />
+        <SectorRing position={[0, -3.05, 0]} radius={3.85} color="#b78dff" label="Rust Sector" />
+        <SectorRing position={[0.1, 3.85, -0.3]} radius={2.55} color="#67d7ff" label="S&Box Sector" />
         <SectorRing position={[5.15, 2.5, -0.45]} radius={2.7} color="#ffd15c" label="Support Sector" />
 
         <ConstellationLines />
@@ -397,6 +410,14 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
           sublabel="Upper tactical anchor"
           coreColor="#00eaff"
           ringColor="#8beaff"
+        />
+        <BlackHole
+          node={NODES.find((n) => n.key === 'sbox')}
+          onSelect={onSelect}
+          label="S&Box Black Hole"
+          sublabel="Upper sandbox anchor"
+          coreColor="#5ed8ff"
+          ringColor="#b6f3ff"
         />
         <DysonSphere node={NODES.find((n) => n.key === 'ss')} onSelect={onSelect} />
         <StarNode node={NODES.find((n) => n.key === 'ns')} onSelect={onSelect} />
