@@ -94,3 +94,9 @@ Open:
 - Opened the camera out to fit the larger map layout
 - Relaxed OrbitControls so the camera feels less fixed and more freely explorable
 - Renamed the lower main sector ring to `T-Central Hub`
+
+
+## Deep black hole and solar replica
+- Added a standalone Deep Black Hole as its own anchor
+- Added a Solar Replica with a procedural sun and 9 orbiting planets
+- Both are integrated into the 3D system without inventing fake destination links

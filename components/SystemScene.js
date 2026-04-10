@@ -2,121 +2,29 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, Trail } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Html, OrbitControls, Stars, Trail, Line } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
-  { label: 'Center', type: 'reset', position: [-1.3, 5.0, 0], note: 'Reset system view' },
-  { label: 'Donate', href: '/donate', position: [0.8, 5.1, 0], note: 'Support system' },
-  { label: 'Report', href: '/report-player', position: [2.9, 4.95, 0], note: 'Player reporting' }
+  { label: 'Center', type: 'reset', position: [-2.2, 7.0, 0], note: 'Reset system view' },
+  { label: 'Donate', href: '/donate', position: [0, 7.25, 0], note: 'Support system' },
+  { label: 'Report', href: '/report-player', position: [2.2, 7.0, 0], note: 'Player reporting' }
 ];
 
 const NODES = [
-  {
-    key: 'arma3',
-    label: 'Arma3 CTH',
-    address: 'tcentral.game.nfoservers.com:2302',
-    description: 'Public tactical hill-control combat.',
-    position: [-8.4, 2.9, 0.5],
-    color: '#84ebff',
-    route: '/servers/arma3-cth',
-    kind: 'blackhole'
-  },
-  {
-    key: 'rust_anchor',
-    label: 'Rust Cluster',
-    address: 'Lower singularity anchor',
-    description: 'Main Rust cluster anchor.',
-    position: [0, -4.6, 0],
-    color: '#9b74ff',
-    route: '/servers/rust-biweekly',
-    kind: 'blackhole'
-  },
-  {
-    key: 'rust_biweekly',
-    label: 'Rust Bi-Weekly',
-    address: 'tcentralrust.game.nfoservers.com:28015',
-    description: 'Bi-weekly wipe cycle.',
-    position: [0.8, -4.0, 1.3],
-    color: '#d8ff61',
-    route: '/servers/rust-biweekly',
-    kind: 'node'
-  },
-  {
-    key: 'rust_weekly',
-    label: 'Rust Weekly',
-    address: 'tcentralrust2.game.nfoservers.com:28015',
-    description: 'Weekly fresh-start cycle.',
-    position: [4.6, -4.8, -0.6],
-    color: '#ff9fd9',
-    route: '/servers/rust-weekly',
-    kind: 'node'
-  },
-  {
-    key: 'rust_monthly',
-    label: 'Rust Monthly',
-    address: 'tcentralrust3.game.nfoservers.com:28015',
-    description: 'Monthly progression cycle.',
-    position: [-4.8, -5.0, -0.4],
-    color: '#ffd35c',
-    route: '/servers/rust-monthly',
-    kind: 'node'
-  },
-  {
-    key: 'sbox',
-    label: 'S&Box',
-    address: 'sbox.game',
-    description: 'External S&Box black hole route.',
-    position: [0.3, 6.2, -0.6],
-    color: '#67d7ff',
-    route: 'https://sbox.game/',
-    external: true,
-    kind: 'blackhole'
-  },
-  {
-    key: 'ss',
-    label: 'S.S',
-    address: 'synapticsystems.ca',
-    description: 'Core systems link.',
-    position: [8.2, 2.4, -0.8],
-    color: '#ffd15c',
-    route: 'https://synapticsystems.ca',
-    external: true,
-    kind: 'dyson'
-  },
-  {
-    key: 'nfo',
-    label: 'Affiliate Star',
-    address: 'nfoservers.com',
-    description: 'Hosting affiliate and provider link.',
-    position: [10.8, -4.4, 0.5],
-    color: '#6affc4',
-    route: 'https://www.nfoservers.com/?aff=A-J4QVQU',
-    external: true,
-    kind: 'star'
-  },
-  {
-    key: 'ns',
-    label: 'National Security Star',
-    address: 'canada.ca',
-    description: 'Government of Canada reporting resource.',
-    position: [10.1, 6.0, -0.8],
-    color: '#fff3a0',
-    route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html',
-    external: true,
-    kind: 'star'
-  },
-  {
-    key: 'report',
-    label: 'Player Reporting',
-    address: 'Moderation route',
-    description: 'Player misconduct and rule-reporting route.',
-    position: [8.8, -0.5, 0.35],
-    color: '#ff8a8a',
-    route: '/report-player',
-    kind: 'node'
-  }
+  { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-7.2, 2.4, 0], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
+  { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [0, 6.1, 0], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
+  { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [0, -4.35, 0], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
+  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole inspired by the cosmic map.', position: [-9.4, -4.2, -0.2], color: '#c4d4ff', kind: 'blackhole' },
+  { key: 'solar_replica', label: 'Solar Replica', address: 'Sun + 9 planets', description: 'Procedural solar system replica with nine orbiting planets.', position: [9.2, -4.3, -0.2], color: '#ffd46b', kind: 'solar' },
+  { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [0, -2.4, 1.0], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
+  { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [3.6, -4.9, -0.3], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
+  { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-3.6, -4.9, -0.3], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
+  { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [7.2, 2.4, 0], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
+  { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [6.4, -2.1, 0.2], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
+  { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [6.2, 6.0, -0.2], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
+  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [8.5, -1.0, 0.1], color: '#ff8a8a', route: '/report-player', kind: 'node' }
 ];
 
 function formatStatus(status) {
@@ -126,19 +34,31 @@ function formatStatus(status) {
   return 'Status unavailable';
 }
 
-function MatterStream({ radius = 2.7, color = '#8a69ff', speed = 0.2, tilt = [Math.PI / 2.4, 0, 0], density = 40 }) {
+function CameraReset({ tick }) {
+  const { camera, controls } = useThree();
+  useEffect(() => {
+    camera.position.set(0, 0.8, 20);
+    camera.lookAt(0, 0, 0);
+    if (controls) {
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+  }, [camera, controls, tick]);
+  return null;
+}
+
+function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [Math.PI / 2.4, 0, 0], count = 44, spread = 0.16 }) {
   const ref = useRef();
   const particles = useMemo(() => {
-    return Array.from({ length: density }, (_, i) => {
-      const angle = (i / density) * Math.PI * 2;
+    return Array.from({ length: count }, (_, i) => {
+      const angle = (i / count) * Math.PI * 2;
+      const r = radius + Math.sin(i * 1.87) * spread;
       return {
-        x: Math.cos(angle) * (radius + Math.sin(i * 1.7) * 0.18),
-        y: Math.cos(i * 0.8) * 0.08,
-        z: Math.sin(angle) * (radius + Math.sin(i * 1.7) * 0.18),
-        s: 0.04 + (i % 4) * 0.008
+        position: [Math.cos(angle) * r, Math.cos(i * 0.8) * 0.08, Math.sin(angle) * r],
+        scale: 0.03 + (i % 4) * 0.008,
       };
     });
-  }, [density, radius]);
+  }, [count, radius, spread]);
 
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.z += delta * speed;
@@ -147,7 +67,7 @@ function MatterStream({ radius = 2.7, color = '#8a69ff', speed = 0.2, tilt = [Ma
   return (
     <group ref={ref} rotation={tilt}>
       {particles.map((p, i) => (
-        <mesh key={i} position={[p.x, p.y, p.z]} scale={p.s}>
+        <mesh key={i} position={p.position} scale={p.scale}>
           <sphereGeometry args={[1, 8, 8]} />
           <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.85} transparent opacity={0.72} />
         </mesh>
@@ -156,43 +76,36 @@ function MatterStream({ radius = 2.7, color = '#8a69ff', speed = 0.2, tilt = [Ma
   );
 }
 
-function BlackHole({ node, onSelect, label, sublabel, coreColor, ringColor }) {
+function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor, labelOffset = [0, 1.55, 0], matterRadius = 3.2 }) {
   const group = useRef();
   const disc = useRef();
 
   useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.18;
-    if (disc.current) disc.current.rotation.z += delta * 0.4;
+    if (group.current) group.current.rotation.y += delta * 0.12;
+    if (disc.current) disc.current.rotation.z += delta * 0.36;
   });
 
   return (
-    <group
-      ref={group}
-      position={node.position}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(node);
-      }}
-    >
-      <MatterStream radius={3.45} color={coreColor} speed={0.12} tilt={[Math.PI / 2.46, 0.1, 0]} density={42} />
-      <MatterStream radius={2.75} color={ringColor} speed={-0.18} tilt={[Math.PI / 2.25, -0.18, 0.18]} density={28} />
+    <group position={node.position} ref={group} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
+      <OrbitalMatter radius={matterRadius} color={coreColor} speed={0.10} tilt={[Math.PI / 2.46, 0.12, 0]} count={44} />
+      <OrbitalMatter radius={matterRadius - 0.8} color={ringColor} speed={-0.16} tilt={[Math.PI / 2.22, -0.15, 0.18]} count={28} spread={0.12} />
       <mesh>
-        <sphereGeometry args={[0.92, 48, 48]} />
-        <meshStandardMaterial color="#020409" emissive="#09111d" emissiveIntensity={1.0} />
+        <sphereGeometry args={[0.95, 56, 56]} />
+        <meshStandardMaterial color="#020409" emissive="#0b1220" emissiveIntensity={1.0} />
       </mesh>
-      <mesh ref={disc} rotation={[Math.PI / 2.35, 0, 0]}>
-        <torusGeometry args={[1.7, 0.25, 22, 140]} />
-        <meshStandardMaterial color={ringColor} emissive={ringColor} emissiveIntensity={1.25} />
+      <mesh ref={disc} rotation={[Math.PI / 2.34, 0, 0]}>
+        <torusGeometry args={[1.8, 0.2, 20, 140]} />
+        <meshStandardMaterial color={ringColor} emissive={ringColor} emissiveIntensity={1.2} />
       </mesh>
-      <mesh rotation={[Math.PI / 2.35, 0, 0]}>
-        <torusGeometry args={[2.22, 0.07, 16, 140]} />
-        <meshStandardMaterial color={coreColor} emissive={coreColor} emissiveIntensity={0.7} />
+      <mesh rotation={[Math.PI / 2.34, 0, 0]}>
+        <torusGeometry args={[2.35, 0.06, 16, 140]} />
+        <meshStandardMaterial color={coreColor} emissive={coreColor} emissiveIntensity={0.72} />
       </mesh>
-      <pointLight position={[0, 0, 0]} color={coreColor} intensity={18} distance={12} />
-      <Html position={[0, node.key === 'rust_anchor' ? -1.95 : 1.55, 0]} center distanceFactor={10}>
+      <pointLight position={[0, 0, 0]} color={coreColor} intensity={18} distance={14} />
+      <Html position={labelOffset} center distanceFactor={11}>
         <button className="map-anchor-label clickable" onClick={() => onSelect(node)}>
-          <span className="anchor-title">{label}</span>
-          <span className="anchor-copy">{sublabel}</span>
+          <span className="anchor-title">{title}</span>
+          <span className="anchor-copy">{subtitle}</span>
         </button>
       </Html>
     </group>
@@ -206,31 +119,31 @@ function DysonSphere({ node, onSelect }) {
   const ringC = useRef();
 
   useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.18;
-    if (ringA.current) ringA.current.rotation.x += delta * 0.44;
-    if (ringB.current) ringB.current.rotation.y -= delta * 0.32;
-    if (ringC.current) ringC.current.rotation.z += delta * 0.52;
+    if (group.current) group.current.rotation.y += delta * 0.16;
+    if (ringA.current) ringA.current.rotation.x += delta * 0.42;
+    if (ringB.current) ringB.current.rotation.y -= delta * 0.3;
+    if (ringC.current) ringC.current.rotation.z += delta * 0.48;
   });
 
   return (
     <group position={node.position} ref={group} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
       <mesh>
         <sphereGeometry args={[0.42, 24, 24]} />
-        <meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={1.9} />
+        <meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={1.95} />
       </mesh>
       <mesh ref={ringA}>
-        <torusGeometry args={[0.9, 0.03, 12, 120]} />
+        <torusGeometry args={[0.95, 0.03, 12, 120]} />
         <meshStandardMaterial color="#ffe694" emissive="#ffe694" emissiveIntensity={1.1} />
       </mesh>
-      <mesh ref={ringB} rotation={[1.08, 0.25, 0.18]}>
-        <torusGeometry args={[1.18, 0.025, 12, 120]} />
+      <mesh ref={ringB} rotation={[1.05, 0.25, 0.16]}>
+        <torusGeometry args={[1.22, 0.024, 12, 120]} />
         <meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={0.95} />
       </mesh>
-      <mesh ref={ringC} rotation={[0.22, 0.74, 1.0]}>
-        <torusGeometry args={[1.46, 0.02, 12, 120]} />
+      <mesh ref={ringC} rotation={[0.2, 0.72, 1.0]}>
+        <torusGeometry args={[1.48, 0.02, 12, 120]} />
         <meshStandardMaterial color="#fff4c1" emissive="#fff4c1" emissiveIntensity={0.85} />
       </mesh>
-      <Html position={[0, -1.36, 0]} center distanceFactor={10}>
+      <Html position={[0, -1.4, 0]} center distanceFactor={10}>
         <button className="map-anchor-label clickable" onClick={() => onSelect(node)}>
           <span className="anchor-title">S.S</span>
           <span className="anchor-copy">Dyson sphere link</span>
@@ -247,7 +160,7 @@ function StarNode({ node, onSelect }) {
   useFrame((state, delta) => {
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 2.3) * 0.12;
     if (core.current) core.current.scale.setScalar(pulse);
-    if (halo.current) halo.current.rotation.y += delta * 0.55;
+    if (halo.current) halo.current.rotation.y += delta * 0.44;
   });
 
   return (
@@ -257,8 +170,8 @@ function StarNode({ node, onSelect }) {
         <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={1.95} />
       </mesh>
       <mesh ref={halo} rotation={[0.4, 0.2, 0]}>
-        <torusGeometry args={[1.0, 0.024, 12, 100]} />
-        <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={1.0} />
+        <torusGeometry args={[1.0, 0.022, 12, 100]} />
+        <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.95} />
       </mesh>
       <pointLight position={[0, 0, 0]} color={node.color} intensity={10} distance={9} />
       <Html position={[0, 1.14, 0]} center distanceFactor={10}>
@@ -271,19 +184,100 @@ function StarNode({ node, onSelect }) {
   );
 }
 
+function Planet({ planet, index }) {
+  const planetRef = useRef();
+  const ringRef = useRef();
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime * planet.speed + index;
+    const x = Math.cos(t) * planet.orbit;
+    const z = Math.sin(t) * planet.orbit;
+    if (planetRef.current) {
+      planetRef.current.position.set(x, 0, z);
+      planetRef.current.rotation.y += 0.02;
+    }
+    if (ringRef.current) {
+      ringRef.current.position.set(x, 0, z);
+      ringRef.current.rotation.z += 0.01;
+    }
+  });
+
+  return (
+    <>
+      <mesh ref={planetRef}>
+        <sphereGeometry args={[planet.radius, 20, 20]} />
+        <meshStandardMaterial color={planet.color} emissive={planet.color} emissiveIntensity={0.35} />
+      </mesh>
+      {planet.ring ? (
+        <mesh ref={ringRef} rotation={[Math.PI / 2.5, 0, 0]}>
+          <torusGeometry args={[planet.radius * 1.65, planet.radius * 0.18, 10, 80]} />
+          <meshStandardMaterial color="#e8d7ab" emissive="#e8d7ab" emissiveIntensity={0.25} />
+        </mesh>
+      ) : null}
+    </>
+  );
+}
+
+function SolarReplica({ node, onSelect }) {
+  const group = useRef();
+  const sunRef = useRef();
+
+  const planets = useMemo(() => ([
+    { name: 'Mercury', radius: 0.06, orbit: 0.9, speed: 1.3, color: '#c7b39a' },
+    { name: 'Venus', radius: 0.09, orbit: 1.25, speed: 1.05, color: '#d8b47a' },
+    { name: 'Earth', radius: 0.1, orbit: 1.65, speed: 0.88, color: '#5fb7ff' },
+    { name: 'Mars', radius: 0.08, orbit: 2.0, speed: 0.76, color: '#d86d54' },
+    { name: 'Jupiter', radius: 0.2, orbit: 2.55, speed: 0.54, color: '#d9b48b' },
+    { name: 'Saturn', radius: 0.16, orbit: 3.15, speed: 0.43, color: '#e0c582', ring: true },
+    { name: 'Uranus', radius: 0.12, orbit: 3.75, speed: 0.34, color: '#9ce3ff' },
+    { name: 'Neptune', radius: 0.12, orbit: 4.25, speed: 0.28, color: '#628dff' },
+    { name: 'Pluto', radius: 0.05, orbit: 4.8, speed: 0.22, color: '#b3b3c9' },
+  ]), []);
+
+  useFrame((_, delta) => {
+    if (group.current) group.current.rotation.y += delta * 0.04;
+    if (sunRef.current) sunRef.current.rotation.y += delta * 0.18;
+  });
+
+  return (
+    <group position={node.position} ref={group} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
+      <mesh ref={sunRef}>
+        <sphereGeometry args={[0.42, 32, 32]} />
+        <meshStandardMaterial color="#ffd46b" emissive="#ffd46b" emissiveIntensity={2.2} />
+      </mesh>
+      {planets.map((planet, i) => (
+        <group key={planet.name}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[planet.orbit, 0.008, 8, 120]} />
+            <meshBasicMaterial color="white" transparent opacity={0.12} />
+          </mesh>
+          <Planet planet={planet} index={i} />
+        </group>
+      ))}
+      <pointLight position={[0, 0, 0]} color="#ffd46b" intensity={18} distance={10} />
+      <Html position={[0, -1.25, 0]} center distanceFactor={11}>
+        <button className="map-anchor-label clickable" onClick={() => onSelect(node)}>
+          <span className="anchor-title">Solar Replica</span>
+          <span className="anchor-copy">Sun + 9 planets</span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
 function SectorRing({ position, radius, color, label }) {
   const ref = useRef();
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.z += delta * 0.08;
+    if (ref.current) ref.current.rotation.z += delta * 0.06;
   });
 
   return (
     <group position={position}>
       <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[radius, 0.02, 10, 220]} />
-        <meshBasicMaterial color={color} transparent opacity={0.3} />
+        <torusGeometry args={[radius, 0.018, 10, 220]} />
+        <meshBasicMaterial color={color} transparent opacity={0.26} />
       </mesh>
-      <Html position={[0, radius + 0.55, 0]} center>
+      <Html position={[0, radius + 0.65, 0]} center>
         <div className="sector-label">{label}</div>
       </Html>
     </group>
@@ -291,27 +285,19 @@ function SectorRing({ position, radius, color, label }) {
 }
 
 function ConstellationLines() {
-  const geometry = useMemo(() => {
-    const ordered = [
-      new THREE.Vector3(...NODES.find((n) => n.key === 'rust_biweekly').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'rust_monthly').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'rust_weekly').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'rust_anchor').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'arma3').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'sbox').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'report').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'ss').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'ns').position),
-      new THREE.Vector3(...NODES.find((n) => n.key === 'nfo').position)
-    ];
-    const curve = new THREE.CatmullRomCurve3(ordered, false, 'catmullrom', 0.22);
-    return new THREE.BufferGeometry().setFromPoints(curve.getPoints(300));
-  }, []);
+  const pointGroups = useMemo(() => ([
+    [NODES.find((n) => n.key === 'arma3').position, NODES.find((n) => n.key === 'sbox').position, NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'ns').position],
+    [NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'rust_biweekly').position, NODES.find((n) => n.key === 'rust_weekly').position, NODES.find((n) => n.key === 'rust_monthly').position],
+    [NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'report').position, NODES.find((n) => n.key === 'nfo').position],
+    [NODES.find((n) => n.key === 'deep_blackhole').position, NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'solar_replica').position]
+  ]), []);
 
   return (
-    <line geometry={geometry}>
-      <lineBasicMaterial color="#71e9ff" transparent opacity={0.35} />
-    </line>
+    <>
+      {pointGroups.map((group, i) => (
+        <Line key={i} points={group} color="#71e9ff" transparent opacity={0.22} lineWidth={1} />
+      ))}
+    </>
   );
 }
 
@@ -319,7 +305,7 @@ function BubbleNav({ onBubble }) {
   return (
     <>
       {NAV_BUBBLES.map((bubble) => (
-        <Html key={bubble.label} position={bubble.position} center distanceFactor={10}>
+        <Html key={bubble.label} position={bubble.position} center distanceFactor={11}>
           <button className="bubble-nav" onClick={() => onBubble(bubble)}>
             <strong>{bubble.label}</strong>
             <span>{bubble.note}</span>
@@ -336,28 +322,28 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
 
   useFrame((state) => {
     if (!mesh.current) return;
-    mesh.current.position.y = node.position[1] + Math.sin(state.clock.elapsedTime * 1.15 + node.position[0]) * 0.08;
-    mesh.current.rotation.y += 0.012;
+    mesh.current.position.y = node.position[1] + Math.sin(state.clock.elapsedTime * 1.05 + node.position[0]) * 0.06;
+    mesh.current.rotation.y += 0.01;
   });
 
   return (
     <group position={node.position}>
-      <Trail width={0.42} length={2.4} color={glowColor} attenuation={(t) => t * t}>
+      <Trail width={0.4} length={2.2} color={glowColor} attenuation={(t) => t * t}>
         <mesh
           ref={mesh}
           onPointerOver={(e) => { e.stopPropagation(); onHover(node.key); }}
           onPointerOut={(e) => { e.stopPropagation(); onLeave(); }}
           onClick={(e) => { e.stopPropagation(); onSelect(node); }}
         >
-          <icosahedronGeometry args={[selected ? 0.33 : 0.28, 1]} />
-          <meshStandardMaterial color={glowColor} emissive={glowColor} emissiveIntensity={selected ? 1.6 : 1.05} />
+          <icosahedronGeometry args={[selected ? 0.32 : 0.27, 1]} />
+          <meshStandardMaterial color={glowColor} emissive={glowColor} emissiveIntensity={selected ? 1.55 : 1.0} />
         </mesh>
       </Trail>
       <mesh>
-        <sphereGeometry args={[selected ? 0.62 : 0.52, 20, 20]} />
-        <meshBasicMaterial color={glowColor} transparent opacity={selected ? 0.16 : 0.09} />
+        <sphereGeometry args={[selected ? 0.60 : 0.50, 20, 20]} />
+        <meshBasicMaterial color={glowColor} transparent opacity={selected ? 0.15 : 0.08} />
       </mesh>
-      <Html center distanceFactor={8.5} position={[0, selected ? 0.96 : 0.82, 0]}>
+      <Html center distanceFactor={8.8} position={[0, selected ? 0.92 : 0.78, 0]}>
         <button
           className={`map-node-label ${selected ? 'active' : ''}`}
           onMouseEnter={() => onHover(node.key)}
@@ -379,47 +365,31 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
 
   return (
     <>
-      <ambientLight intensity={1.1} />
-      <directionalLight position={[5, 6, 4]} intensity={1.45} color="#b9efff" />
-      <pointLight position={[-6, 3, 4]} intensity={14} color="#6fdfff" distance={18} />
-      <pointLight position={[6, 2, -2]} intensity={10} color="#b78dff" distance={18} />
-      <fog attach="fog" args={['#060e16', 12, 28]} />
-      <Stars radius={70} depth={30} count={3000} factor={4.2} saturation={0} fade speed={0.8} />
+      <ambientLight intensity={1.05} />
+      <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
+      <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
+      <pointLight position={[7, 3, -2]} intensity={8} color="#b78dff" distance={18} />
+      <fog attach="fog" args={['#060e16', 18, 36]} />
+      <Stars radius={96} depth={44} count={3800} factor={4.2} saturation={0} fade speed={0.8} />
 
-      <group rotation={[-0.15, -0.08, 0]}>
-        <SectorRing position={[-5.7, 2.25, 0.2]} radius={4.4} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[0, -3.05, 0]} radius={5.6} color="#b78dff" label="T-Central Hub" />
-        <SectorRing position={[0.1, 3.85, -0.3]} radius={3.8} color="#67d7ff" label="S&Box Sector" />
-        <SectorRing position={[5.15, 2.5, -0.45]} radius={4.0} color="#ffd15c" label="Support Sector" />
+      <group rotation={[-0.10, -0.03, 0]}>
+        <SectorRing position={[-7.2, 2.4, 0]} radius={4.2} color="#58dfff" label="Arma Sector" />
+        <SectorRing position={[0, 6.1, 0]} radius={3.2} color="#67d7ff" label="S&Box Sector" />
+        <SectorRing position={[0, -4.35, 0]} radius={5.2} color="#9f7cff" label="T-Central Hub" />
+        <SectorRing position={[7.2, 2.4, 0]} radius={4.2} color="#ffd15c" label="Support Sector" />
+        <SectorRing position={[-9.4, -4.2, -0.2]} radius={3.6} color="#c4d4ff" label="Deep Anchor" />
+        <SectorRing position={[9.2, -4.3, -0.2]} radius={5.4} color="#ffd46b" label="Solar Replica" />
 
         <ConstellationLines />
         <BubbleNav onBubble={onBubble} />
 
-        <BlackHole
-          node={NODES.find((n) => n.key === 'rust_anchor')}
-          onSelect={onSelect}
-          label="Rust Cluster"
-          sublabel="Lower singularity anchor"
-          coreColor="#8e71ff"
-          ringColor="#86e7ff"
-        />
-        <BlackHole
-          node={NODES.find((n) => n.key === 'arma3')}
-          onSelect={onSelect}
-          label="Arma3 Black Hole"
-          sublabel="Upper tactical anchor"
-          coreColor="#00eaff"
-          ringColor="#8beaff"
-        />
-        <BlackHole
-          node={NODES.find((n) => n.key === 'sbox')}
-          onSelect={onSelect}
-          label="S&Box Black Hole"
-          sublabel="Upper sandbox anchor"
-          coreColor="#5ed8ff"
-          ringColor="#b6f3ff"
-        />
+        <BlackHoleAnchor node={NODES.find((n) => n.key === 'arma3')} onSelect={onSelect} title="Arma3 Black Hole" subtitle="Tactical anchor" coreColor="#00eaff" ringColor="#8beaff" labelOffset={[0, 1.55, 0]} matterRadius={3.1} />
+        <BlackHoleAnchor node={NODES.find((n) => n.key === 'sbox')} onSelect={onSelect} title="S&Box Black Hole" subtitle="Sandbox anchor" coreColor="#67d7ff" ringColor="#b6f3ff" labelOffset={[0, 1.55, 0]} matterRadius={2.7} />
+        <BlackHoleAnchor node={NODES.find((n) => n.key === 'rust_anchor')} onSelect={onSelect} title="T-Central Hub" subtitle="Lower singularity anchor" coreColor="#8e71ff" ringColor="#86e7ff" labelOffset={[0, -1.95, 0]} matterRadius={3.4} />
+        <BlackHoleAnchor node={NODES.find((n) => n.key === 'deep_blackhole')} onSelect={onSelect} title="Deep Black Hole" subtitle="Standalone anchor" coreColor="#d8e0ff" ringColor="#a8b8ff" labelOffset={[0, -1.9, 0]} matterRadius={2.8} />
+
         <DysonSphere node={NODES.find((n) => n.key === 'ss')} onSelect={onSelect} />
+        <SolarReplica node={NODES.find((n) => n.key === 'solar_replica')} onSelect={onSelect} />
         <StarNode node={NODES.find((n) => n.key === 'ns')} onSelect={onSelect} />
         <StarNode node={NODES.find((n) => n.key === 'nfo')} onSelect={onSelect} />
 
@@ -441,46 +411,24 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
         enablePan
         enableZoom
         enableRotate
-        minDistance={2.5}
-        maxDistance={40}
+        minDistance={7}
+        maxDistance={38}
         autoRotate={false}
-        zoomSpeed={1.0}
-        rotateSpeed={0.7}
-        panSpeed={0.8}
-        maxPolarAngle={Math.PI * 0.98}
-        minPolarAngle={0.02}
+        zoomSpeed={0.9}
+        rotateSpeed={0.56}
+        panSpeed={0.7}
+        maxPolarAngle={Math.PI * 0.95}
+        minPolarAngle={0.04}
       />
       <CameraReset tick={resetTick} />
     </>
   );
 }
 
-function CameraReset({ tick }) {
-  const { camera, controls } = useThreeBridge();
-  useEffectReset(camera, controls, tick);
-  return null;
-}
-
-function useThreeBridge() {
-  const state = require('@react-three/fiber').useThree();
-  return state;
-}
-
-function useEffectReset(camera, controls, tick) {
-  const React = require('react');
-  React.useEffect(() => {
-    camera.position.set(0, 1.9, 17);
-    camera.lookAt(0, 0, 0);
-    if (controls) {
-      controls.target.set(0, 0, 0);
-      controls.update();
-    }
-  }, [camera, controls, tick]);
-}
-
 function FocusPanel({ item, statuses, onClose, onOpen }) {
   if (!item) return null;
   const status = item.key ? statuses?.[item.key] : null;
+  const openable = Boolean(item.route || item.href);
 
   return (
     <div className="map-focus-panel">
@@ -497,30 +445,15 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
       </div>
       {item.key && status ? (
         <div className="focus-status">
-          <div className="status-row">
-            <span>Status</span>
-            <strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong>
-          </div>
-          <div className="status-row">
-            <span>Players</span>
-            <strong>{formatStatus(status)}</strong>
-          </div>
-          {status.map ? (
-            <div className="status-row">
-              <span>Map</span>
-              <strong>{status.map}</strong>
-            </div>
-          ) : null}
+          <div className="status-row"><span>Status</span><strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong></div>
+          <div className="status-row"><span>Players</span><strong>{formatStatus(status)}</strong></div>
+          {status.map ? <div className="status-row"><span>Map</span><strong>{status.map}</strong></div> : null}
           {status.source ? <div className="status-note">{status.source}</div> : null}
         </div>
       ) : null}
       <div className="button-column">
-        <button className="button primary" onClick={() => onOpen(item)}>
-          Open destination
-        </button>
-        <button className="button secondary" onClick={onClose}>
-          Clear selection
-        </button>
+        {openable ? <button className="button primary" onClick={() => onOpen(item)}>Open destination</button> : null}
+        <button className="button secondary" onClick={onClose}>Clear selection</button>
       </div>
     </div>
   );
@@ -573,6 +506,7 @@ export default function SystemScene() {
 
   const openNode = (item) => {
     const href = item.route || item.href;
+    if (!href) return;
     setTransition(item.label);
     setTimeout(() => {
       if (item.external) {
@@ -580,7 +514,7 @@ export default function SystemScene() {
       } else {
         router.push(href);
       }
-    }, 900);
+    }, 850);
   };
 
   const onBubble = (bubble) => {
@@ -589,31 +523,17 @@ export default function SystemScene() {
       setResetTick((n) => n + 1);
       return;
     }
-
-    setSelected({
-      label: bubble.label,
-      address: bubble.note,
-      description: bubble.note,
-      href: bubble.href,
-      route: bubble.href
-    });
+    setSelected({ label: bubble.label, address: bubble.note, description: bubble.note, href: bubble.href, route: bubble.href });
   };
 
   return (
-    <div className="system-page">
+    <div className="system-page refined">
       <SystemOverlay loading={loading} mode={mode} />
-      <div className="interactive-map-stage full">
-        <Canvas camera={{ position: [0, 1.45, 11], fov: 46 }}>
-          <Scene
-            statuses={statuses}
-            onSelect={setSelected}
-            onBubble={onBubble}
-            resetTick={resetTick}
-          />
+      <div className="interactive-map-stage full refined-stage">
+        <Canvas camera={{ position: [0, 0.8, 20], fov: 40 }}>
+          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} />
         </Canvas>
-
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
-
         {transition ? (
           <div className="transition-overlay">
             <div className="transition-core" />
