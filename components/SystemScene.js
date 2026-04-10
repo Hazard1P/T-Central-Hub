@@ -299,7 +299,7 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
 
 
   return (
-    <group ref={shipRef} visible={false} scale={0.62}>
+    <group ref={shipRef} visible={false} scale={0.62} rotation={[Math.PI/2, 0, 0]}>
       <group>
         {/* nose and forward fuselage */}
         <mesh position={[0, 0.02, 1.22]}>
