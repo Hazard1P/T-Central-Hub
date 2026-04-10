@@ -125,3 +125,10 @@ Open:
 - Added a small flyable ship for Free Fly mode
 - Free Fly now uses ship-style movement with mouse steering
 - Kept the warp entry overlay for server travel
+
+
+## Space sim flight upgrade
+- Upgraded Free Fly into a more game-like space sim mode
+- Rebuilt the ship silhouette to feel more like an actual spacecraft
+- Added inertial chase-camera movement
+- Added Control key boost

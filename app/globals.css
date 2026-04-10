@@ -829,3 +829,18 @@ button { font: inherit; }
 .interactive-map-stage.full.refined-stage canvas:active {
   cursor: grabbing;
 }
+
+
+.system-page.refined,
+.interactive-map-stage.full.refined-stage {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(91,63,210,0.26), transparent 20%),
+    radial-gradient(circle at 80% 20%, rgba(35,168,216,0.22), transparent 18%),
+    radial-gradient(circle at 54% 6%, rgba(255,184,77,0.11), transparent 16%),
+    radial-gradient(circle at 32% 82%, rgba(139,70,255,0.12), transparent 20%),
+    radial-gradient(circle at 70% 70%, rgba(126,231,255,0.06), transparent 18%),
+    linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px),
+    var(--bg);
+  background-size: auto, auto, auto, auto, auto, 56px 56px, 56px 56px, auto;
+}

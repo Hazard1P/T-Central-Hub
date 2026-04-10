@@ -93,16 +93,19 @@ function CameraReset({ tick }) {
   return null;
 }
 
+
 function FlyShipRig({ enabled, resetTick }) {
   const { camera, controls } = useThree();
   const shipRef = useRef(null);
-  const flameL = useRef(null);
-  const flameR = useRef(null);
+  const flameCore = useRef(null);
+  const flameLeft = useRef(null);
+  const flameRight = useRef(null);
   const keys = useRef({});
   const velocity = useRef(new THREE.Vector3());
+  const shipPos = useRef(new THREE.Vector3(0, 1.4, 26));
   const yaw = useRef(0);
   const pitch = useRef(-0.02);
-  const shipPos = useRef(new THREE.Vector3(0, 1.4, 26));
+  const roll = useRef(0);
   const dragging = useRef(false);
   const prevMouse = useRef({ x: 0, y: 0 });
 
@@ -120,9 +123,9 @@ function FlyShipRig({ enabled, resetTick }) {
       const dx = e.clientX - prevMouse.current.x;
       const dy = e.clientY - prevMouse.current.y;
       prevMouse.current = { x: e.clientX, y: e.clientY };
-      yaw.current -= dx * 0.0032;
-      pitch.current -= dy * 0.0022;
-      const limit = Math.PI / 2.25;
+      yaw.current -= dx * 0.0028;
+      pitch.current -= dy * 0.0019;
+      const limit = Math.PI / 2.35;
       pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
     };
 
@@ -131,7 +134,6 @@ function FlyShipRig({ enabled, resetTick }) {
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
-
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
@@ -146,6 +148,7 @@ function FlyShipRig({ enabled, resetTick }) {
     velocity.current.set(0, 0, 0);
     yaw.current = 0;
     pitch.current = -0.02;
+    roll.current = 0;
     if (controls) controls.enabled = !enabled;
   }, [enabled, resetTick, controls]);
 
@@ -159,72 +162,122 @@ function FlyShipRig({ enabled, resetTick }) {
 
     shipRef.current.visible = true;
 
-    const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ'));
+    const boost = keys.current['ControlLeft'] || keys.current['ControlRight'];
+    const maxSpeed = boost ? 26 : 15;
+    const accel = boost ? 0.18 : 0.12;
+
+    const quat = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(pitch.current, yaw.current, roll.current, 'YXZ')
+    );
+
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(quat).normalize();
     const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat).normalize();
-    const up = new THREE.Vector3(0, 1, 0);
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quat).normalize();
 
     const move = new THREE.Vector3();
     if (keys.current['KeyW']) move.add(forward);
-    if (keys.current['KeyS']) move.addScaledVector(forward, -1);
+    if (keys.current['KeyS']) move.addScaledVector(forward, -0.8);
     if (keys.current['KeyD']) move.add(right);
     if (keys.current['KeyA']) move.addScaledVector(right, -1);
     if (keys.current['Space']) move.add(up);
     if (keys.current['ShiftLeft'] || keys.current['ShiftRight']) move.addScaledVector(up, -1);
 
+    const rollTarget =
+      (keys.current['KeyD'] ? -0.28 : 0) +
+      (keys.current['KeyA'] ? 0.28 : 0);
+
+    roll.current += (rollTarget - roll.current) * 0.08;
+
     if (move.lengthSq() > 0) {
       move.normalize();
-      velocity.current.lerp(move.multiplyScalar(13), 0.14);
+      velocity.current.lerp(move.multiplyScalar(maxSpeed), accel);
     } else {
-      velocity.current.lerp(new THREE.Vector3(), 0.1);
+      velocity.current.lerp(new THREE.Vector3(), 0.04);
     }
 
     shipPos.current.addScaledVector(velocity.current, delta);
 
     shipRef.current.position.copy(shipPos.current);
-    shipRef.current.quaternion.copy(quat);
+    shipRef.current.quaternion.copy(
+      new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(pitch.current, yaw.current, roll.current, 'YXZ')
+      )
+    );
 
-    if (flameL.current && flameR.current) {
-      const thrust = Math.min(1, velocity.current.length() / 10);
-      const pulse = 0.7 + Math.sin(state.clock.elapsedTime * 30) * 0.12;
-      flameL.current.scale.set(1, 1, pulse * thrust + 0.2);
-      flameR.current.scale.set(1, 1, pulse * thrust + 0.2);
-    }
+    const thrust = Math.min(1.6, velocity.current.length() / maxSpeed + (boost ? 0.35 : 0));
+    const pulse = 0.85 + Math.sin(state.clock.elapsedTime * 26) * 0.12;
+    if (flameCore.current) flameCore.current.scale.set(1, 1, pulse * thrust + 0.22);
+    if (flameLeft.current) flameLeft.current.scale.set(1, 1, pulse * thrust + 0.18);
+    if (flameRight.current) flameRight.current.scale.set(1, 1, pulse * thrust + 0.18);
 
-    camera.position.copy(shipPos.current).add(new THREE.Vector3(0, 0.35, 1.3).applyQuaternion(quat));
-    camera.quaternion.copy(quat);
+    const camOffset = new THREE.Vector3(0, 1.0, 3.4).applyQuaternion(shipRef.current.quaternion);
+    const desiredCam = shipPos.current.clone().add(camOffset);
+    camera.position.lerp(desiredCam, 0.12);
+
+    const lookTarget = shipPos.current.clone().add(forward.clone().multiplyScalar(10));
+    camera.lookAt(lookTarget);
 
     if (controls) {
-      controls.target.copy(shipPos.current).add(forward.clone().multiplyScalar(14));
+      controls.target.copy(lookTarget);
       controls.update();
     }
   });
 
   return (
     <group ref={shipRef} visible={false}>
-      <mesh position={[0, 0, 0.2]}>
-        <coneGeometry args={[0.18, 0.8, 8]} />
-        <meshStandardMaterial color="#d9ecff" emissive="#7ee7ff" emissiveIntensity={0.4} />
+      <mesh position={[0, 0.02, 0.68]}>
+        <coneGeometry args={[0.22, 1.15, 10]} />
+        <meshStandardMaterial color="#d7ecff" emissive="#7ee7ff" emissiveIntensity={0.35} metalness={0.55} roughness={0.3} />
       </mesh>
-      <mesh position={[0, 0.05, -0.1]}>
-        <sphereGeometry args={[0.16, 16, 16]} />
-        <meshStandardMaterial color="#4a5568" />
+
+      <mesh position={[0, 0.02, 0.02]}>
+        <capsuleGeometry args={[0.22, 0.9, 8, 14]} />
+        <meshStandardMaterial color="#5e6f86" metalness={0.45} roughness={0.35} />
       </mesh>
-      <mesh position={[-0.22, -0.03, -0.02]} rotation={[0, 0, 0.35]}>
-        <boxGeometry args={[0.24, 0.03, 0.4]} />
-        <meshStandardMaterial color="#8fa8c8" />
+
+      <mesh position={[0, 0.16, 0.05]} scale={[0.78, 0.5, 0.95]}>
+        <sphereGeometry args={[0.22, 18, 18]} />
+        <meshStandardMaterial color="#9fdcff" emissive="#8ddfff" emissiveIntensity={0.45} transparent opacity={0.78} />
       </mesh>
-      <mesh position={[0.22, -0.03, -0.02]} rotation={[0, 0, -0.35]}>
-        <boxGeometry args={[0.24, 0.03, 0.4]} />
-        <meshStandardMaterial color="#8fa8c8" />
+
+      <mesh position={[-0.55, -0.02, -0.05]} rotation={[0, 0, 0.24]}>
+        <boxGeometry args={[0.72, 0.05, 0.42]} />
+        <meshStandardMaterial color="#8da3bf" metalness={0.35} roughness={0.4} />
       </mesh>
-      <mesh ref={flameL} position={[-0.08, -0.01, -0.48]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.045, 0.22, 8]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.9} />
+
+      <mesh position={[0.55, -0.02, -0.05]} rotation={[0, 0, -0.24]}>
+        <boxGeometry args={[0.72, 0.05, 0.42]} />
+        <meshStandardMaterial color="#8da3bf" metalness={0.35} roughness={0.4} />
       </mesh>
-      <mesh ref={flameR} position={[0.08, -0.01, -0.48]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.045, 0.22, 8]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.9} />
+
+      <mesh position={[-0.18, 0.22, -0.5]} rotation={[0.2, 0, 0.04]}>
+        <boxGeometry args={[0.08, 0.34, 0.38]} />
+        <meshStandardMaterial color="#77889f" metalness={0.32} roughness={0.45} />
+      </mesh>
+
+      <mesh position={[0.18, 0.22, -0.5]} rotation={[0.2, 0, -0.04]}>
+        <boxGeometry args={[0.08, 0.34, 0.38]} />
+        <meshStandardMaterial color="#77889f" metalness={0.32} roughness={0.45} />
+      </mesh>
+
+      <mesh position={[0, -0.16, -0.18]}>
+        <boxGeometry args={[0.22, 0.06, 0.5]} />
+        <meshStandardMaterial color="#6f8299" metalness={0.28} roughness={0.45} />
+      </mesh>
+
+      <mesh ref={flameCore} position={[0, -0.02, -0.86]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.085, 0.46, 12]} />
+        <meshBasicMaterial color="#90e8ff" transparent opacity={0.92} />
+      </mesh>
+
+      <mesh ref={flameLeft} position={[-0.16, -0.02, -0.78]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.04, 0.24, 10]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.82} />
+      </mesh>
+
+      <mesh ref={flameRight} position={[0.16, -0.02, -0.78]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.04, 0.24, 10]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.82} />
       </mesh>
     </group>
   );
@@ -604,7 +657,7 @@ function SystemOverlay({ loading, mode, freeFly }) {
       <div className="overlay-status">
         <span>
           {loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}
-          {freeFly ? ' • Ship Flight active' : ''}
+          {freeFly ? ' • Space Sim active' : ''}
         </span>
       </div>
     </div>
@@ -670,8 +723,8 @@ export default function SystemScene() {
       setFreeFly((v) => !v);
       setSelected({
         label: 'Ship Flight Mode',
-        address: 'WASD + mouse drag + Space/Shift',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, and hold the mouse button while dragging to steer the ship.',
+        address: 'WASD + mouse drag + Space/Shift + Ctrl boost',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, and hold Control to boost.',
       });
       return;
     }
