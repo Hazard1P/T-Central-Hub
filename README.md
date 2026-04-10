@@ -165,3 +165,9 @@ Open:
 ## Ship wiremesh expansion
 - Added more wireframe edge detailing across canopy, fins, stabilizers, and engine housings
 - Increased the technical panel-line feel of the spacecraft without changing the working flight system
+
+
+## Domain alignment
+- Project metadata and canonical base are aligned to `https://t-central.me`
+- This package is prepared to use T-central.me as the primary site slot
+- Live inspection of the current domain contents was not possible during packaging because the site returned HTTP 403 to direct fetches

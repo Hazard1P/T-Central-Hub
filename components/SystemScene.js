@@ -269,7 +269,7 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
     if (flameLeft.current) flameLeft.current.scale.set(1, 1, pulse * thrust + 0.14);
     if (flameRight.current) flameRight.current.scale.set(1, 1, pulse * thrust + 0.14);
 
-    const camOffset = new THREE.Vector3(0, 0.55, 2.85).applyQuaternion(quat);
+    const camOffset = new THREE.Vector3(0, 0.72, 3.65).applyQuaternion(quat);
     const desiredCam = shipPos.current.clone().add(camOffset);
     camera.position.lerp(desiredCam, 0.08);
 
@@ -299,21 +299,21 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
 
 
   return (
-    <group ref={shipRef} visible={false} scale={0.8}>
+    <group ref={shipRef} visible={false} scale={0.62}>
       <group>
         {/* nose and forward fuselage */}
         <mesh position={[0, 0.02, 1.22]}>
-          <coneGeometry args={[0.18, 1.85, 20]} />
+          <coneGeometry args={[0.18, 1.85, 32]} />
           <meshStandardMaterial color="#eef7ff" emissive="#9be7ff" emissiveIntensity={0.16} metalness={0.78} roughness={0.2} />
         </mesh>
         <mesh position={[0, 0.02, 0.24]}>
-          <capsuleGeometry args={[0.22, 1.95, 10, 18]} />
+          <capsuleGeometry args={[0.22, 1.95, 16, 28]} />
           <meshStandardMaterial color="#63788f" metalness={0.6} roughness={0.24} />
         </mesh>
 
         {/* canopy */}
         <mesh position={[0, 0.23, 0.46]} scale={[0.72, 0.34, 1.28]}>
-          <sphereGeometry args={[0.26, 22, 22]} />
+          <sphereGeometry args={[0.26, 28, 28]} />
           <meshStandardMaterial color="#b8ebff" emissive="#8fe1ff" emissiveIntensity={0.24} transparent opacity={0.72} />
         </mesh>
 
@@ -369,81 +369,81 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
           <meshStandardMaterial color="#576a80" metalness={0.52} roughness={0.28} />
         </mesh>
         <mesh position={[0, -0.08, -1.34]} rotation={[0.08, 0, 0]}>
-          <cylinderGeometry args={[0.095, 0.13, 0.5, 16]} />
+          <cylinderGeometry args={[0.095, 0.13, 0.5, 24]} />
           <meshStandardMaterial color="#5c6f85" metalness={0.54} roughness={0.28} />
         </mesh>
 
         {/* thrusters */}
         <mesh ref={flameCore} position={[0, -0.08, -1.74]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.09, 0.56, 14]} />
+          <coneGeometry args={[0.09, 0.56, 18]} />
           <meshBasicMaterial color="#90e8ff" transparent opacity={0.94} />
         </mesh>
         <mesh ref={flameLeft} position={[-0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.046, 0.3, 12]} />
+          <coneGeometry args={[0.046, 0.3, 16]} />
           <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
         </mesh>
         <mesh ref={flameRight} position={[0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.046, 0.3, 12]} />
+          <coneGeometry args={[0.046, 0.3, 16]} />
           <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
         </mesh>
 
         {/* wireframe / edge accents */}
         <lineSegments position={[0, 0.02, 0.24]}>
           <edgesGeometry args={[new THREE.CapsuleGeometry(0.225, 1.98, 8, 16)]} />
-          <lineBasicMaterial color="#9ceaff" transparent opacity={0.28} />
+          <lineBasicMaterial color="#9ceaff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[0, 0.02, 1.22]}>
           <edgesGeometry args={[new THREE.ConeGeometry(0.18, 1.85, 20)]} />
-          <lineBasicMaterial color="#d7f7ff" transparent opacity={0.22} />
+          <lineBasicMaterial color="#d7f7ff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[-0.72, -0.02, 0.08]} rotation={[0.04, 0.08, 0.18]}>
           <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.24} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.16} />
         </lineSegments>
         <lineSegments position={[0.72, -0.02, 0.08]} rotation={[0.04, -0.08, -0.18]}>
           <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.24} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.16} />
         </lineSegments>
         <lineSegments position={[0, 0.28, -0.12]} rotation={[0.18, 0, 0]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.1, 0.54, 1.36)]} />
-          <lineBasicMaterial color="#9fe9ff" transparent opacity={0.2} />
+          <lineBasicMaterial color="#9fe9ff" transparent opacity={0.16} />
         </lineSegments>
 
         <lineSegments position={[0, 0.21, 0.28]} scale={[0.68, 0.34, 1.12]}>
           <edgesGeometry args={[new THREE.SphereGeometry(0.24, 16, 16)]} />
-          <lineBasicMaterial color="#c8f4ff" transparent opacity={0.18} />
+          <lineBasicMaterial color="#c8f4ff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[-0.48, -0.01, 0.78]} rotation={[0.02, 0.1, 0.38]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
-          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.22} />
+          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[0.48, -0.01, 0.78]} rotation={[0.02, -0.1, -0.38]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
-          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.22} />
+          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[-0.34, 0.32, -0.92]} rotation={[0.46, 0.02, 0.08]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.22} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[0.34, 0.32, -0.92]} rotation={[0.46, -0.02, -0.08]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.22} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[-0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
           <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
-          <lineBasicMaterial color="#b5efff" transparent opacity={0.18} />
+          <lineBasicMaterial color="#b5efff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
           <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
-          <lineBasicMaterial color="#b5efff" transparent opacity={0.18} />
+          <lineBasicMaterial color="#b5efff" transparent opacity={0.14} />
         </lineSegments>
         <lineSegments position={[0, -0.1, -1.14]} rotation={[0.08, 0, 0]}>
           <edgesGeometry args={[new THREE.CylinderGeometry(0.085, 0.11, 0.38, 12)]} />
-          <lineBasicMaterial color="#d3f7ff" transparent opacity={0.2} />
+          <lineBasicMaterial color="#d3f7ff" transparent opacity={0.16} />
         </lineSegments>
         <lineSegments position={[0, -0.2, -0.08]}>
           <edgesGeometry args={[new THREE.BoxGeometry(0.22, 0.06, 0.72)]} />
-          <lineBasicMaterial color="#8fe3ff" transparent opacity={0.18} />
+          <lineBasicMaterial color="#8fe3ff" transparent opacity={0.14} />
         </lineSegments>
       </group>
     </group>
@@ -663,7 +663,7 @@ function ConstellationLines() {
   return (
     <>
       {pointGroups.map((group, i) => (
-        <Line key={i} points={group} color="#71e9ff" transparent opacity={0.22} lineWidth={1} />
+        <Line key={i} points={group} color="#71e9ff" transparent opacity={0.14} lineWidth={1} />
       ))}
     </>
   );

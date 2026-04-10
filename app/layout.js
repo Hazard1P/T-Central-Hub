@@ -2,25 +2,18 @@ import './globals.css';
 
 export const metadata = {
   metadataBase: new URL('https://t-central.me'),
-  title: {
-    default: 'T-Central Hub',
-    template: '%s | T-Central Hub'
+  title: 'T-Central Hub',
+  description: 'Interactive game server and web-game hub for T-Central.',
+  alternates: {
+    canonical: '/',
   },
-  description:
-    'Interactive 3D hub for T-Central Arma3 CTH and Rust servers with community links, support options, and future-ready deployment on Vercel.',
   openGraph: {
     title: 'T-Central Hub',
-    description:
-      'Interactive 3D hub for Arma3 CTH and Rust servers.',
-    images: ['/cosmic-map.jpg']
+    description: 'Interactive game server and web-game hub for T-Central.',
+    url: 'https://t-central.me',
+    siteName: 'T-Central Hub',
+    type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'T-Central Hub',
-    description:
-      'Interactive 3D hub for Arma3 CTH and Rust servers.',
-    images: ['/cosmic-map.jpg']
-  }
 };
 
 export default function RootLayout({ children }) {
