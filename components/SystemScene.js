@@ -7,17 +7,18 @@ import { Html, OrbitControls, Stars, Trail, Line } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
-  { label: 'Center', type: 'reset', position: [-3.0, 9.6, 0], note: 'Reset system view' },
-  { label: 'Donate', href: '/donate', position: [0, 10.0, 0], note: 'Support system' },
-  { label: 'Report', href: '/report-player', position: [3.0, 9.6, 0], note: 'Player reporting' }
+  { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
+  { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
+  { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
+  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle WASD flight' }
 ];
 
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-9.4, 3.0, 0], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
   { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [0, 8.2, 0], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
   { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [0, -6.0, 0], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
-  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole inspired by the cosmic map.', position: [-12.2, -5.8, -0.3], color: '#c4d4ff', kind: 'blackhole' },
-  { key: 'solar_replica', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [0, 0.2, 1.0], color: '#ffd46b', kind: 'solar' },
+  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole added from the map concept.', position: [-12.2, -5.8, -0.3], color: '#c4d4ff', kind: 'blackhole' },
+  { key: 'solar_system', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [0, 0.2, 1.0], color: '#ffd46b', kind: 'solar' },
   { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [0, -3.8, 1.35], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
   { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [4.9, -6.7, -0.45], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
   { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-4.9, -6.7, -0.45], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
@@ -34,16 +35,112 @@ function formatStatus(status) {
   return 'Status unavailable';
 }
 
+function DynamicBackgroundField() {
+  const group = useRef();
+  const a = useRef();
+  const b = useRef();
+  const c = useRef();
+
+  useFrame((_, delta) => {
+    if (group.current) group.current.rotation.y += delta * 0.006;
+    if (a.current) a.current.rotation.z += delta * 0.01;
+    if (b.current) b.current.rotation.z -= delta * 0.008;
+    if (c.current) c.current.rotation.y += delta * 0.007;
+  });
+
+  return (
+    <group ref={group}>
+      <mesh ref={a} position={[-18, 10, -18]}>
+        <sphereGeometry args={[8.5, 32, 32]} />
+        <meshBasicMaterial color="#6748d7" transparent opacity={0.08} />
+      </mesh>
+      <mesh ref={b} position={[16, -8, -20]}>
+        <sphereGeometry args={[11, 32, 32]} />
+        <meshBasicMaterial color="#3fc4ea" transparent opacity={0.065} />
+      </mesh>
+      <mesh ref={c} position={[0, 18, -28]}>
+        <sphereGeometry args={[12.5, 32, 32]} />
+        <meshBasicMaterial color="#f4cf6a" transparent opacity={0.04} />
+      </mesh>
+    </group>
+  );
+}
+
 function CameraReset({ tick }) {
   const { camera, controls } = useThree();
   useEffect(() => {
-    camera.position.set(0, 1.0, 25);
+    camera.position.set(0, 1.4, 26);
     camera.lookAt(0, 0, 0);
     if (controls) {
       controls.target.set(0, 0, 0);
       controls.update();
     }
   }, [camera, controls, tick]);
+  return null;
+}
+
+function FreeFlyRig({ enabled, resetTick }) {
+  const { camera, controls } = useThree();
+  const keys = useRef({});
+  const velocity = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    const onKeyDown = (e) => { keys.current[e.code] = true; };
+    const onKeyUp = (e) => { keys.current[e.code] = false; };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    velocity.current.set(0, 0, 0);
+  }, [resetTick]);
+
+  useEffect(() => {
+    if (controls) controls.enablePan = !enabled;
+  }, [enabled, controls]);
+
+  useFrame((_, delta) => {
+    if (!enabled) return;
+
+    const input = new THREE.Vector3(
+      (keys.current['KeyD'] ? 1 : 0) - (keys.current['KeyA'] ? 1 : 0),
+      (keys.current['Space'] ? 1 : 0) - (keys.current['ShiftLeft'] || keys.current['ShiftRight'] ? 1 : 0),
+      (keys.current['KeyS'] ? 1 : 0) - (keys.current['KeyW'] ? 1 : 0)
+    );
+
+    if (input.lengthSq() > 0) {
+      input.normalize();
+
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.normalize();
+
+      const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
+
+      const move = new THREE.Vector3();
+      move.addScaledVector(right, input.x);
+      move.addScaledVector(camera.up, input.y);
+      move.addScaledVector(forward, input.z);
+
+      velocity.current.lerp(move.normalize().multiplyScalar(13), 0.14);
+    } else {
+      velocity.current.lerp(new THREE.Vector3(), 0.1);
+    }
+
+    camera.position.addScaledVector(velocity.current, delta);
+
+    if (controls) {
+      const look = new THREE.Vector3();
+      camera.getWorldDirection(look);
+      controls.target.copy(camera.position).add(look.multiplyScalar(10));
+      controls.update();
+    }
+  });
+
   return null;
 }
 
@@ -218,7 +315,7 @@ function Planet({ planet, index }) {
   );
 }
 
-function SolarReplica({ node, onSelect }) {
+function SolarSystem({ node, onSelect }) {
   const group = useRef();
   const sunRef = useRef();
 
@@ -289,7 +386,7 @@ function ConstellationLines() {
     [NODES.find((n) => n.key === 'arma3').position, NODES.find((n) => n.key === 'sbox').position, NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'ns').position],
     [NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'rust_biweekly').position, NODES.find((n) => n.key === 'rust_weekly').position, NODES.find((n) => n.key === 'rust_monthly').position],
     [NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'report').position, NODES.find((n) => n.key === 'nfo').position],
-    [NODES.find((n) => n.key === 'deep_blackhole').position, NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'solar_replica').position]
+    [NODES.find((n) => n.key === 'deep_blackhole').position, NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'solar_system').position]
   ]), []);
 
   return (
@@ -360,17 +457,18 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, onBubble, resetTick }) {
+function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
     <>
+      <DynamicBackgroundField />
       <ambientLight intensity={1.05} />
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
       <pointLight position={[7, 3, -2]} intensity={8} color="#b78dff" distance={18} />
       <fog attach="fog" args={['#060e16', 18, 36]} />
-      <Stars radius={96} depth={44} count={3800} factor={4.2} saturation={0} fade speed={0.8} />
+      <Stars radius={96} depth={44} count={4200} factor={4.2} saturation={0} fade speed={0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>
         <SectorRing position={[-9.4, 3.0, 0]} radius={4.8} color="#58dfff" label="Arma Sector" />
@@ -389,7 +487,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
         <BlackHoleAnchor node={NODES.find((n) => n.key === 'deep_blackhole')} onSelect={onSelect} title="Deep Black Hole" subtitle="Standalone anchor" coreColor="#d8e0ff" ringColor="#a8b8ff" labelOffset={[0, -1.9, 0]} matterRadius={2.8} />
 
         <DysonSphere node={NODES.find((n) => n.key === 'ss')} onSelect={onSelect} />
-        <SolarReplica node={NODES.find((n) => n.key === 'solar_replica')} onSelect={onSelect} />
+        <SolarSystem node={NODES.find((n) => n.key === 'solar_system')} onSelect={onSelect} />
         <StarNode node={NODES.find((n) => n.key === 'ns')} onSelect={onSelect} />
         <StarNode node={NODES.find((n) => n.key === 'nfo')} onSelect={onSelect} />
 
@@ -408,19 +506,21 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
 
       <OrbitControls
         makeDefault
-        enablePan
+        enablePan={!freeFly}
         enableZoom
         enableRotate
-        minDistance={8}
-        maxDistance={48}
+        minDistance={2}
+        maxDistance={100}
         autoRotate={false}
-        zoomSpeed={0.9}
-        rotateSpeed={0.56}
-        panSpeed={0.7}
-        maxPolarAngle={Math.PI * 0.95}
-        minPolarAngle={0.04}
+        zoomSpeed={1.0}
+        rotateSpeed={0.8}
+        panSpeed={0.9}
+        screenSpacePanning
+        maxPolarAngle={Math.PI}
+        minPolarAngle={0}
       />
       <CameraReset tick={resetTick} />
+      <FreeFlyRig enabled={freeFly} resetTick={resetTick} />
     </>
   );
 }
@@ -459,11 +559,23 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
   );
 }
 
-function SystemOverlay({ loading, mode }) {
+function WarpOverlay({ label }) {
+  return (
+    <div className="transition-overlay warp-enter">
+      <div className="warp-rings"><span /><span /><span /></div>
+      <div className="transition-copy">Warping into {label}</div>
+    </div>
+  );
+}
+
+function SystemOverlay({ loading, mode, freeFly }) {
   return (
     <div className="system-overlay minimal">
       <div className="overlay-status">
-        <span>{loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}</span>
+        <span>
+          {loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}
+          {freeFly ? ' • Free Fly active' : ''}
+        </span>
       </div>
     </div>
   );
@@ -477,6 +589,7 @@ export default function SystemScene() {
   const [mode, setMode] = useState('unconfigured');
   const [transition, setTransition] = useState(null);
   const [resetTick, setResetTick] = useState(0);
+  const [freeFly, setFreeFly] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -514,7 +627,7 @@ export default function SystemScene() {
       } else {
         router.push(href);
       }
-    }, 850);
+    }, 900);
   };
 
   const onBubble = (bubble) => {
@@ -523,23 +636,27 @@ export default function SystemScene() {
       setResetTick((n) => n + 1);
       return;
     }
+    if (bubble.type === 'freefly') {
+      setFreeFly((v) => !v);
+      setSelected({
+        label: 'Free Fly Mode',
+        address: 'WASD + drag mouse + Space/Shift',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, and drag the mouse to steer your view.',
+      });
+      return;
+    }
     setSelected({ label: bubble.label, address: bubble.note, description: bubble.note, href: bubble.href, route: bubble.href });
   };
 
   return (
     <div className="system-page refined">
-      <SystemOverlay loading={loading} mode={mode} />
+      <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <div className="interactive-map-stage full refined-stage">
-        <Canvas camera={{ position: [0, 1.0, 25], fov: 38 }}>
-          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} />
+        <Canvas camera={{ position: [0, 1.4, 26], fov: 38 }}>
+          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} freeFly={freeFly} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
-        {transition ? (
-          <div className="transition-overlay">
-            <div className="transition-core" />
-            <div className="transition-copy">Entering {transition}</div>
-          </div>
-        ) : null}
+        {transition ? <WarpOverlay label={transition} /> : null}
       </div>
     </div>
   );

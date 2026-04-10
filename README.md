@@ -113,8 +113,8 @@ Open:
 - Locked it into the same T-Central Hub positional zone at a cleaner vertical level
 
 
-## Camera unlock and solar system update
-- Relaxed camera controls much further for freer mouse-driven exploration
-- Renamed the Solar Replica presentation into Solar System
-- Kept the procedural sun and 9 planets
-- Moved the solar system farther upward in the T-Central Hub zone
+## Dynamic background, free fly, and warp
+- Added a dynamic procedural nebula-style background layer
+- Added a Free Fly toggle bubble
+- Free Fly supports WASD movement plus Space and Shift for vertical travel
+- Rebuilt the server-entry overlay into a stronger warp experience
