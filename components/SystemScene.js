@@ -10,7 +10,7 @@ const NAV_BUBBLES = [
   { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
   { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
   { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle rocket flight' },
+  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle ship flight' },
 ];
 
 const NODES = [
@@ -298,155 +298,172 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
   });
 
 
+
   return (
-    <group ref={shipRef} visible={false} scale={0.62} rotation={[Math.PI/2, 0, 0]}>
+    <group ref={shipRef} visible={false} scale={0.58} rotation={[Math.PI / 2, 0, 0]}>
       <group>
-        {/* nose and forward fuselage */}
-        <mesh position={[0, 0.02, 1.22]}>
-          <coneGeometry args={[0.18, 1.85, 32]} />
-          <meshStandardMaterial color="#eef7ff" emissive="#9be7ff" emissiveIntensity={0.16} metalness={0.78} roughness={0.2} />
+        {/* main nose cone */}
+        <mesh position={[0, 0.02, 1.35]}>
+          <coneGeometry args={[0.17, 2.0, 36]} />
+          <meshStandardMaterial color="#eff8ff" emissive="#9de8ff" emissiveIntensity={0.14} metalness={0.76} roughness={0.2} />
         </mesh>
-        <mesh position={[0, 0.02, 0.24]}>
-          <capsuleGeometry args={[0.22, 1.95, 16, 28]} />
-          <meshStandardMaterial color="#63788f" metalness={0.6} roughness={0.24} />
+
+        {/* front body */}
+        <mesh position={[0, 0.02, 0.55]}>
+          <cylinderGeometry args={[0.19, 0.22, 1.3, 28]} />
+          <meshStandardMaterial color="#667c95" metalness={0.58} roughness={0.28} />
+        </mesh>
+
+        {/* rear fuselage */}
+        <mesh position={[0, 0.02, -0.45]}>
+          <cylinderGeometry args={[0.24, 0.24, 1.4, 28]} />
+          <meshStandardMaterial color="#60748b" metalness={0.56} roughness={0.3} />
         </mesh>
 
         {/* canopy */}
-        <mesh position={[0, 0.23, 0.46]} scale={[0.72, 0.34, 1.28]}>
+        <mesh position={[0, 0.2, 0.52]} scale={[0.72, 0.34, 1.4]}>
           <sphereGeometry args={[0.26, 28, 28]} />
-          <meshStandardMaterial color="#b8ebff" emissive="#8fe1ff" emissiveIntensity={0.24} transparent opacity={0.72} />
+          <meshStandardMaterial color="#b9edff" emissive="#8fe2ff" emissiveIntensity={0.24} transparent opacity={0.72} />
         </mesh>
 
-        {/* central dorsal spine */}
-        <mesh position={[0, 0.28, -0.12]} rotation={[0.18, 0, 0]}>
-          <boxGeometry args={[0.1, 0.54, 1.36]} />
-          <meshStandardMaterial color="#7589a0" metalness={0.4} roughness={0.38} />
+        {/* dorsal spine */}
+        <mesh position={[0, 0.28, -0.05]} rotation={[0.1, 0, 0]}>
+          <boxGeometry args={[0.1, 0.62, 1.95]} />
+          <meshStandardMaterial color="#788ca2" metalness={0.4} roughness={0.36} />
         </mesh>
 
-        {/* wing roots */}
-        <mesh position={[-0.72, -0.02, 0.08]} rotation={[0.04, 0.08, 0.18]}>
-          <boxGeometry args={[1.02, 0.05, 0.62]} />
-          <meshStandardMaterial color="#96aac5" metalness={0.44} roughness={0.34} />
+        {/* side intakes */}
+        <mesh position={[-0.28, 0.03, -0.08]} rotation={[0, 0, 0.08]}>
+          <boxGeometry args={[0.18, 0.2, 0.72]} />
+          <meshStandardMaterial color="#55697f" metalness={0.44} roughness={0.34} />
         </mesh>
-        <mesh position={[0.72, -0.02, 0.08]} rotation={[0.04, -0.08, -0.18]}>
-          <boxGeometry args={[1.02, 0.05, 0.62]} />
-          <meshStandardMaterial color="#96aac5" metalness={0.44} roughness={0.34} />
-        </mesh>
-
-        {/* forward fins */}
-        <mesh position={[-0.48, -0.01, 0.78]} rotation={[0.02, 0.1, 0.38]}>
-          <boxGeometry args={[0.54, 0.035, 0.42]} />
-          <meshStandardMaterial color="#a5b9d0" metalness={0.42} roughness={0.34} />
-        </mesh>
-        <mesh position={[0.48, -0.01, 0.78]} rotation={[0.02, -0.1, -0.38]}>
-          <boxGeometry args={[0.54, 0.035, 0.42]} />
-          <meshStandardMaterial color="#a5b9d0" metalness={0.42} roughness={0.34} />
+        <mesh position={[0.28, 0.03, -0.08]} rotation={[0, 0, -0.08]}>
+          <boxGeometry args={[0.18, 0.2, 0.72]} />
+          <meshStandardMaterial color="#55697f" metalness={0.44} roughness={0.34} />
         </mesh>
 
-        {/* rear stabilizers */}
-        <mesh position={[-0.34, 0.32, -0.92]} rotation={[0.46, 0.02, 0.08]}>
-          <boxGeometry args={[0.09, 0.68, 0.78]} />
-          <meshStandardMaterial color="#7a8ca2" metalness={0.34} roughness={0.4} />
+        {/* main wings */}
+        <mesh position={[-0.85, -0.02, -0.02]} rotation={[0.05, 0.08, 0.14]}>
+          <boxGeometry args={[1.18, 0.05, 0.78]} />
+          <meshStandardMaterial color="#95aac3" metalness={0.44} roughness={0.34} />
         </mesh>
-        <mesh position={[0.34, 0.32, -0.92]} rotation={[0.46, -0.02, -0.08]}>
-          <boxGeometry args={[0.09, 0.68, 0.78]} />
-          <meshStandardMaterial color="#7a8ca2" metalness={0.34} roughness={0.4} />
-        </mesh>
-
-        {/* belly intake / keel */}
-        <mesh position={[0, -0.22, -0.04]}>
-          <boxGeometry args={[0.24, 0.08, 0.96]} />
-          <meshStandardMaterial color="#708398" metalness={0.32} roughness={0.42} />
+        <mesh position={[0.85, -0.02, -0.02]} rotation={[0.05, -0.08, -0.14]}>
+          <boxGeometry args={[1.18, 0.05, 0.78]} />
+          <meshStandardMaterial color="#95aac3" metalness={0.44} roughness={0.34} />
         </mesh>
 
-        {/* engine housings */}
-        <mesh position={[-0.22, -0.1, -1.18]} rotation={[0.12, 0, 0]}>
-          <cylinderGeometry args={[0.075, 0.11, 0.46, 16]} />
-          <meshStandardMaterial color="#576a80" metalness={0.52} roughness={0.28} />
+        {/* front winglets */}
+        <mesh position={[-0.52, -0.01, 0.95]} rotation={[0.03, 0.1, 0.34]}>
+          <boxGeometry args={[0.58, 0.035, 0.46]} />
+          <meshStandardMaterial color="#a8bbd0" metalness={0.42} roughness={0.34} />
         </mesh>
-        <mesh position={[0.22, -0.1, -1.18]} rotation={[0.12, 0, 0]}>
-          <cylinderGeometry args={[0.075, 0.11, 0.46, 16]} />
-          <meshStandardMaterial color="#576a80" metalness={0.52} roughness={0.28} />
+        <mesh position={[0.52, -0.01, 0.95]} rotation={[0.03, -0.1, -0.34]}>
+          <boxGeometry args={[0.58, 0.035, 0.46]} />
+          <meshStandardMaterial color="#a8bbd0" metalness={0.42} roughness={0.34} />
         </mesh>
-        <mesh position={[0, -0.08, -1.34]} rotation={[0.08, 0, 0]}>
-          <cylinderGeometry args={[0.095, 0.13, 0.5, 24]} />
-          <meshStandardMaterial color="#5c6f85" metalness={0.54} roughness={0.28} />
+
+        {/* twin rear fins */}
+        <mesh position={[-0.38, 0.35, -1.15]} rotation={[0.52, 0.03, 0.08]}>
+          <boxGeometry args={[0.09, 0.82, 0.92]} />
+          <meshStandardMaterial color="#7a8da3" metalness={0.36} roughness={0.42} />
+        </mesh>
+        <mesh position={[0.38, 0.35, -1.15]} rotation={[0.52, -0.03, -0.08]}>
+          <boxGeometry args={[0.09, 0.82, 0.92]} />
+          <meshStandardMaterial color="#7a8da3" metalness={0.36} roughness={0.42} />
+        </mesh>
+
+        {/* ventral fin / keel */}
+        <mesh position={[0, -0.28, -0.35]}>
+          <boxGeometry args={[0.2, 0.08, 1.22]} />
+          <meshStandardMaterial color="#6f8399" metalness={0.32} roughness={0.42} />
+        </mesh>
+
+        {/* engine pods */}
+        <mesh position={[-0.24, -0.09, -1.42]} rotation={[0.12, 0, 0]}>
+          <cylinderGeometry args={[0.085, 0.12, 0.56, 20]} />
+          <meshStandardMaterial color="#566a81" metalness={0.54} roughness={0.28} />
+        </mesh>
+        <mesh position={[0.24, -0.09, -1.42]} rotation={[0.12, 0, 0]}>
+          <cylinderGeometry args={[0.085, 0.12, 0.56, 20]} />
+          <meshStandardMaterial color="#566a81" metalness={0.54} roughness={0.28} />
+        </mesh>
+        <mesh position={[0, -0.05, -1.58]} rotation={[0.08, 0, 0]}>
+          <cylinderGeometry args={[0.11, 0.14, 0.62, 20]} />
+          <meshStandardMaterial color="#5b6f85" metalness={0.56} roughness={0.28} />
+        </mesh>
+
+        {/* engine glows */}
+        <mesh position={[-0.24, -0.09, -1.6]}>
+          <sphereGeometry args={[0.09, 20, 20]} />
+          <meshBasicMaterial color="#79e6ff" transparent opacity={0.55} />
+        </mesh>
+        <mesh position={[0.24, -0.09, -1.6]}>
+          <sphereGeometry args={[0.09, 20, 20]} />
+          <meshBasicMaterial color="#79e6ff" transparent opacity={0.55} />
+        </mesh>
+        <mesh position={[0, -0.05, -1.76]}>
+          <sphereGeometry args={[0.1, 20, 20]} />
+          <meshBasicMaterial color="#9aefff" transparent opacity={0.6} />
         </mesh>
 
         {/* thrusters */}
-        <mesh ref={flameCore} position={[0, -0.08, -1.74]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.09, 0.56, 18]} />
+        <mesh ref={flameCore} position={[0, -0.05, -2.0]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.095, 0.64, 18]} />
           <meshBasicMaterial color="#90e8ff" transparent opacity={0.94} />
         </mesh>
-        <mesh ref={flameLeft} position={[-0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.046, 0.3, 16]} />
+        <mesh ref={flameLeft} position={[-0.24, -0.09, -1.78]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.05, 0.34, 16]} />
           <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
         </mesh>
-        <mesh ref={flameRight} position={[0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[0.046, 0.3, 16]} />
+        <mesh ref={flameRight} position={[0.24, -0.09, -1.78]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.05, 0.34, 16]} />
           <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
         </mesh>
 
-        {/* wireframe / edge accents */}
-        <lineSegments position={[0, 0.02, 0.24]}>
-          <edgesGeometry args={[new THREE.CapsuleGeometry(0.225, 1.98, 8, 16)]} />
-          <lineBasicMaterial color="#9ceaff" transparent opacity={0.14} />
+        {/* wireframe overlay */}
+        <lineSegments position={[0, 0.02, 0.55]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.19, 0.22, 1.3, 20)]} />
+          <lineBasicMaterial color="#bceeff" transparent opacity={0.16} />
         </lineSegments>
-        <lineSegments position={[0, 0.02, 1.22]}>
-          <edgesGeometry args={[new THREE.ConeGeometry(0.18, 1.85, 20)]} />
-          <lineBasicMaterial color="#d7f7ff" transparent opacity={0.14} />
+        <lineSegments position={[0, 0.02, -0.45]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.24, 0.24, 1.4, 20)]} />
+          <lineBasicMaterial color="#9de7ff" transparent opacity={0.14} />
         </lineSegments>
-        <lineSegments position={[-0.72, -0.02, 0.08]} rotation={[0.04, 0.08, 0.18]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.16} />
+        <lineSegments position={[0, 0.02, 1.35]}>
+          <edgesGeometry args={[new THREE.ConeGeometry(0.17, 2.0, 20)]} />
+          <lineBasicMaterial color="#d5f7ff" transparent opacity={0.14} />
         </lineSegments>
-        <lineSegments position={[0.72, -0.02, 0.08]} rotation={[0.04, -0.08, -0.18]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.16} />
+        <lineSegments position={[0, 0.2, 0.52]} scale={[0.72, 0.34, 1.4]}>
+          <edgesGeometry args={[new THREE.SphereGeometry(0.26, 18, 18)]} />
+          <lineBasicMaterial color="#c8f5ff" transparent opacity={0.12} />
         </lineSegments>
-        <lineSegments position={[0, 0.28, -0.12]} rotation={[0.18, 0, 0]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.1, 0.54, 1.36)]} />
-          <lineBasicMaterial color="#9fe9ff" transparent opacity={0.16} />
+        <lineSegments position={[-0.85, -0.02, -0.02]} rotation={[0.05, 0.08, 0.14]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(1.18, 0.05, 0.78)]} />
+          <lineBasicMaterial color="#89ddff" transparent opacity={0.14} />
         </lineSegments>
-
-        <lineSegments position={[0, 0.21, 0.28]} scale={[0.68, 0.34, 1.12]}>
-          <edgesGeometry args={[new THREE.SphereGeometry(0.24, 16, 16)]} />
-          <lineBasicMaterial color="#c8f4ff" transparent opacity={0.14} />
+        <lineSegments position={[0.85, -0.02, -0.02]} rotation={[0.05, -0.08, -0.14]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(1.18, 0.05, 0.78)]} />
+          <lineBasicMaterial color="#89ddff" transparent opacity={0.14} />
         </lineSegments>
-        <lineSegments position={[-0.48, -0.01, 0.78]} rotation={[0.02, 0.1, 0.38]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
-          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.14} />
+        <lineSegments position={[-0.38, 0.35, -1.15]} rotation={[0.52, 0.03, 0.08]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.82, 0.92)]} />
+          <lineBasicMaterial color="#8ce4ff" transparent opacity={0.14} />
         </lineSegments>
-        <lineSegments position={[0.48, -0.01, 0.78]} rotation={[0.02, -0.1, -0.38]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
-          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.14} />
+        <lineSegments position={[0.38, 0.35, -1.15]} rotation={[0.52, -0.03, -0.08]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.82, 0.92)]} />
+          <lineBasicMaterial color="#8ce4ff" transparent opacity={0.14} />
         </lineSegments>
-        <lineSegments position={[-0.34, 0.32, -0.92]} rotation={[0.46, 0.02, 0.08]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.14} />
+        <lineSegments position={[-0.24, -0.09, -1.42]} rotation={[0.12, 0, 0]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.085, 0.12, 0.56, 16)]} />
+          <lineBasicMaterial color="#c9f5ff" transparent opacity={0.12} />
         </lineSegments>
-        <lineSegments position={[0.34, 0.32, -0.92]} rotation={[0.46, -0.02, -0.08]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
-          <lineBasicMaterial color="#86ddff" transparent opacity={0.14} />
-        </lineSegments>
-        <lineSegments position={[-0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
-          <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
-          <lineBasicMaterial color="#b5efff" transparent opacity={0.14} />
-        </lineSegments>
-        <lineSegments position={[0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
-          <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
-          <lineBasicMaterial color="#b5efff" transparent opacity={0.14} />
-        </lineSegments>
-        <lineSegments position={[0, -0.1, -1.14]} rotation={[0.08, 0, 0]}>
-          <edgesGeometry args={[new THREE.CylinderGeometry(0.085, 0.11, 0.38, 12)]} />
-          <lineBasicMaterial color="#d3f7ff" transparent opacity={0.16} />
-        </lineSegments>
-        <lineSegments position={[0, -0.2, -0.08]}>
-          <edgesGeometry args={[new THREE.BoxGeometry(0.22, 0.06, 0.72)]} />
-          <lineBasicMaterial color="#8fe3ff" transparent opacity={0.14} />
+        <lineSegments position={[0.24, -0.09, -1.42]} rotation={[0.12, 0, 0]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.085, 0.12, 0.56, 16)]} />
+          <lineBasicMaterial color="#c9f5ff" transparent opacity={0.12} />
         </lineSegments>
       </group>
     </group>
+  );
   );
 }
 

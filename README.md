@@ -171,3 +171,9 @@ Open:
 - Project metadata and canonical base are aligned to `https://t-central.me`
 - This package is prepared to use T-central.me as the primary site slot
 - Live inspection of the current domain contents was not possible during packaging because the site returned HTTP 403 to direct fetches
+
+
+## Complete ship pass
+- Rebuilt the ship into a fuller futuristic spaceship form
+- Added more complete fuselage, intakes, wing, fin, and engine-pod structure
+- Preserved the current working web-game flight stack
