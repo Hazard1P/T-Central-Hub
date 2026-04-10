@@ -844,3 +844,18 @@ button { font: inherit; }
     var(--bg);
   background-size: auto, auto, auto, auto, auto, 56px 56px, 56px 56px, auto;
 }
+
+
+.system-page.refined,
+.interactive-map-stage.full.refined-stage {
+  background:
+    radial-gradient(circle at 16% 12%, rgba(91,63,210,0.28), transparent 20%),
+    radial-gradient(circle at 82% 18%, rgba(31,200,255,0.22), transparent 18%),
+    radial-gradient(circle at 52% 4%, rgba(255,187,87,0.12), transparent 16%),
+    radial-gradient(circle at 26% 78%, rgba(141,78,255,0.13), transparent 21%),
+    radial-gradient(circle at 74% 68%, rgba(126,231,255,0.08), transparent 18%),
+    linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px),
+    var(--bg);
+  background-size: auto, auto, auto, auto, auto, 56px 56px, 56px 56px, auto;
+}

@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, Trail, Line } from '@react-three/drei';
+import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
   { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
   { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
   { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle ship flight' },
+  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle space sim' },
 ];
 
 const NODES = [
@@ -35,46 +35,59 @@ function formatStatus(status) {
   return 'Status unavailable';
 }
 
+
 function DynamicBackgroundField() {
   const group = useRef(null);
-  const a = useRef(null);
-  const b = useRef(null);
-  const c = useRef(null);
-  const d = useRef(null);
-  const e = useRef(null);
+  const nebulaA = useRef(null);
+  const nebulaB = useRef(null);
+  const nebulaC = useRef(null);
+  const nebulaD = useRef(null);
 
   useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.004;
-    if (a.current) a.current.rotation.z += delta * 0.008;
-    if (b.current) b.current.rotation.z -= delta * 0.006;
-    if (c.current) c.current.rotation.y += delta * 0.005;
-    if (d.current) d.current.rotation.x -= delta * 0.004;
-    if (e.current) e.current.rotation.y -= delta * 0.003;
+    if (group.current) group.current.rotation.y += delta * 0.0035;
+    if (nebulaA.current) nebulaA.current.rotation.z += delta * 0.006;
+    if (nebulaB.current) nebulaB.current.rotation.z -= delta * 0.004;
+    if (nebulaC.current) nebulaC.current.rotation.y += delta * 0.004;
+    if (nebulaD.current) nebulaD.current.rotation.x -= delta * 0.003;
   });
 
   return (
     <group ref={group}>
-      <mesh ref={a} position={[-22, 12, -24]}>
-        <sphereGeometry args={[10.5, 36, 36]} />
-        <meshBasicMaterial color="#5b3fd2" transparent opacity={0.11} />
+      <mesh ref={nebulaA} position={[-28, 16, -34]}>
+        <sphereGeometry args={[16, 48, 48]} />
+        <meshBasicMaterial color="#5d3ff1" transparent opacity={0.12} />
       </mesh>
-      <mesh ref={b} position={[20, -10, -24]}>
-        <sphereGeometry args={[13.5, 36, 36]} />
-        <meshBasicMaterial color="#23a8d8" transparent opacity={0.09} />
+      <mesh ref={nebulaB} position={[24, -12, -30]}>
+        <sphereGeometry args={[18, 48, 48]} />
+        <meshBasicMaterial color="#1fc8ff" transparent opacity={0.09} />
       </mesh>
-      <mesh ref={c} position={[0, 20, -34]}>
-        <sphereGeometry args={[14.5, 36, 36]} />
-        <meshBasicMaterial color="#ffb84d" transparent opacity={0.05} />
+      <mesh ref={nebulaC} position={[2, 24, -42]}>
+        <sphereGeometry args={[22, 48, 48]} />
+        <meshBasicMaterial color="#ffbb57" transparent opacity={0.05} />
       </mesh>
-      <mesh ref={d} position={[-9, -18, -30]}>
-        <sphereGeometry args={[12.5, 36, 36]} />
-        <meshBasicMaterial color="#8b46ff" transparent opacity={0.05} />
+      <mesh ref={nebulaD} position={[-10, -20, -38]}>
+        <sphereGeometry args={[18, 48, 48]} />
+        <meshBasicMaterial color="#8d4eff" transparent opacity={0.06} />
       </mesh>
-      <mesh ref={e} position={[14, 8, -38]}>
-        <sphereGeometry args={[16, 36, 36]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.035} />
-      </mesh>
+
+      <Billboard position={[0, 6, -26]} follow>
+        <mesh>
+          <planeGeometry args={[16, 24]} />
+          <meshBasicMaterial color="#6fdfff" transparent opacity={0.06} />
+        </mesh>
+      </Billboard>
     </group>
+  );
+}
+
+function MapHologram() {
+  return (
+    <Billboard position={[13, 9, -12]} follow={false}>
+      <mesh rotation={[0, -0.35, 0]}>
+        <planeGeometry args={[5.2, 7.2]} />
+        <meshBasicMaterial color="#8fe9ff" transparent opacity={0.06} />
+      </mesh>
+    </Billboard>
   );
 }
 
@@ -92,6 +105,7 @@ function CameraReset({ tick }) {
 
   return null;
 }
+
 
 
 function FlyShipRig({ enabled, resetTick }) {
@@ -123,9 +137,9 @@ function FlyShipRig({ enabled, resetTick }) {
       const dx = e.clientX - prevMouse.current.x;
       const dy = e.clientY - prevMouse.current.y;
       prevMouse.current = { x: e.clientX, y: e.clientY };
-      yaw.current -= dx * 0.0028;
-      pitch.current -= dy * 0.0019;
-      const limit = Math.PI / 2.35;
+      yaw.current -= dx * 0.0025;
+      pitch.current -= dy * 0.0018;
+      const limit = Math.PI / 2.45;
       pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
     };
 
@@ -134,6 +148,7 @@ function FlyShipRig({ enabled, resetTick }) {
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
+
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
@@ -163,8 +178,16 @@ function FlyShipRig({ enabled, resetTick }) {
     shipRef.current.visible = true;
 
     const boost = keys.current['ControlLeft'] || keys.current['ControlRight'];
-    const maxSpeed = boost ? 26 : 15;
-    const accel = boost ? 0.18 : 0.12;
+    const maxSpeed = boost ? 24 : 12;
+    const accel = boost ? 0.16 : 0.10;
+
+    const targetRoll =
+      (keys.current['KeyD'] ? -0.22 : 0) +
+      (keys.current['KeyA'] ? 0.22 : 0) +
+      (keys.current['KeyQ'] ? 0.16 : 0) +
+      (keys.current['KeyE'] ? -0.16 : 0);
+
+    roll.current += (targetRoll - roll.current) * 0.08;
 
     const quat = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(pitch.current, yaw.current, roll.current, 'YXZ')
@@ -176,46 +199,37 @@ function FlyShipRig({ enabled, resetTick }) {
 
     const move = new THREE.Vector3();
     if (keys.current['KeyW']) move.add(forward);
-    if (keys.current['KeyS']) move.addScaledVector(forward, -0.8);
+    if (keys.current['KeyS']) move.addScaledVector(forward, -0.7);
     if (keys.current['KeyD']) move.add(right);
     if (keys.current['KeyA']) move.addScaledVector(right, -1);
     if (keys.current['Space']) move.add(up);
     if (keys.current['ShiftLeft'] || keys.current['ShiftRight']) move.addScaledVector(up, -1);
 
-    const rollTarget =
-      (keys.current['KeyD'] ? -0.28 : 0) +
-      (keys.current['KeyA'] ? 0.28 : 0);
-
-    roll.current += (rollTarget - roll.current) * 0.08;
-
     if (move.lengthSq() > 0) {
       move.normalize();
       velocity.current.lerp(move.multiplyScalar(maxSpeed), accel);
     } else {
-      velocity.current.lerp(new THREE.Vector3(), 0.04);
+      velocity.current.lerp(new THREE.Vector3(), 0.035);
     }
 
     shipPos.current.addScaledVector(velocity.current, delta);
 
     shipRef.current.position.copy(shipPos.current);
-    shipRef.current.quaternion.copy(
-      new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(pitch.current, yaw.current, roll.current, 'YXZ')
-      )
-    );
+    shipRef.current.quaternion.copy(quat);
 
-    const thrust = Math.min(1.6, velocity.current.length() / maxSpeed + (boost ? 0.35 : 0));
-    const pulse = 0.85 + Math.sin(state.clock.elapsedTime * 26) * 0.12;
-    if (flameCore.current) flameCore.current.scale.set(1, 1, pulse * thrust + 0.22);
-    if (flameLeft.current) flameLeft.current.scale.set(1, 1, pulse * thrust + 0.18);
-    if (flameRight.current) flameRight.current.scale.set(1, 1, pulse * thrust + 0.18);
+    const thrust = Math.min(1.75, velocity.current.length() / maxSpeed + (boost ? 0.35 : 0));
+    const pulse = 0.9 + Math.sin(state.clock.elapsedTime * 26) * 0.1;
+    if (flameCore.current) flameCore.current.scale.set(1, 1, pulse * thrust + 0.18);
+    if (flameLeft.current) flameLeft.current.scale.set(1, 1, pulse * thrust + 0.14);
+    if (flameRight.current) flameRight.current.scale.set(1, 1, pulse * thrust + 0.14);
 
-    const camOffset = new THREE.Vector3(0, 1.0, 3.4).applyQuaternion(shipRef.current.quaternion);
+    const camOffset = new THREE.Vector3(0, 0.55, 2.85).applyQuaternion(quat);
     const desiredCam = shipPos.current.clone().add(camOffset);
-    camera.position.lerp(desiredCam, 0.12);
+    camera.position.lerp(desiredCam, 0.08);
 
-    const lookTarget = shipPos.current.clone().add(forward.clone().multiplyScalar(10));
-    camera.lookAt(lookTarget);
+    const lookTarget = shipPos.current.clone().add(forward.clone().multiplyScalar(12));
+    const lookQuat = new THREE.Matrix4().lookAt(camera.position, lookTarget, camera.up);
+    camera.quaternion.slerp(new THREE.Quaternion().setFromRotationMatrix(lookQuat), 0.18);
 
     if (controls) {
       controls.target.copy(lookTarget);
@@ -224,60 +238,60 @@ function FlyShipRig({ enabled, resetTick }) {
   });
 
   return (
-    <group ref={shipRef} visible={false}>
-      <mesh position={[0, 0.02, 0.68]}>
-        <coneGeometry args={[0.22, 1.15, 10]} />
-        <meshStandardMaterial color="#d7ecff" emissive="#7ee7ff" emissiveIntensity={0.35} metalness={0.55} roughness={0.3} />
+    <group ref={shipRef} visible={false} scale={0.72}>
+      <mesh position={[0, 0.02, 0.84]}>
+        <coneGeometry args={[0.18, 1.25, 12]} />
+        <meshStandardMaterial color="#dbeeff" emissive="#8adfff" emissiveIntensity={0.22} metalness={0.65} roughness={0.28} />
       </mesh>
 
-      <mesh position={[0, 0.02, 0.02]}>
-        <capsuleGeometry args={[0.22, 0.9, 8, 14]} />
-        <meshStandardMaterial color="#5e6f86" metalness={0.45} roughness={0.35} />
+      <mesh position={[0, 0.02, 0.18]}>
+        <capsuleGeometry args={[0.18, 1.05, 8, 14]} />
+        <meshStandardMaterial color="#5d6f86" metalness={0.48} roughness={0.34} />
       </mesh>
 
-      <mesh position={[0, 0.16, 0.05]} scale={[0.78, 0.5, 0.95]}>
+      <mesh position={[0, 0.15, 0.18]} scale={[0.72, 0.42, 1.0]}>
         <sphereGeometry args={[0.22, 18, 18]} />
-        <meshStandardMaterial color="#9fdcff" emissive="#8ddfff" emissiveIntensity={0.45} transparent opacity={0.78} />
+        <meshStandardMaterial color="#a8e0ff" emissive="#8adfff" emissiveIntensity={0.28} transparent opacity={0.72} />
       </mesh>
 
-      <mesh position={[-0.55, -0.02, -0.05]} rotation={[0, 0, 0.24]}>
-        <boxGeometry args={[0.72, 0.05, 0.42]} />
-        <meshStandardMaterial color="#8da3bf" metalness={0.35} roughness={0.4} />
+      <mesh position={[-0.62, -0.02, 0.06]} rotation={[0, 0, 0.16]}>
+        <boxGeometry args={[0.82, 0.04, 0.44]} />
+        <meshStandardMaterial color="#93a7c2" metalness={0.36} roughness={0.4} />
       </mesh>
 
-      <mesh position={[0.55, -0.02, -0.05]} rotation={[0, 0, -0.24]}>
-        <boxGeometry args={[0.72, 0.05, 0.42]} />
-        <meshStandardMaterial color="#8da3bf" metalness={0.35} roughness={0.4} />
+      <mesh position={[0.62, -0.02, 0.06]} rotation={[0, 0, -0.16]}>
+        <boxGeometry args={[0.82, 0.04, 0.44]} />
+        <meshStandardMaterial color="#93a7c2" metalness={0.36} roughness={0.4} />
       </mesh>
 
-      <mesh position={[-0.18, 0.22, -0.5]} rotation={[0.2, 0, 0.04]}>
-        <boxGeometry args={[0.08, 0.34, 0.38]} />
-        <meshStandardMaterial color="#77889f" metalness={0.32} roughness={0.45} />
+      <mesh position={[-0.26, 0.18, -0.62]} rotation={[0.24, 0, 0.05]}>
+        <boxGeometry args={[0.08, 0.36, 0.42]} />
+        <meshStandardMaterial color="#73849a" metalness={0.34} roughness={0.45} />
       </mesh>
 
-      <mesh position={[0.18, 0.22, -0.5]} rotation={[0.2, 0, -0.04]}>
-        <boxGeometry args={[0.08, 0.34, 0.38]} />
-        <meshStandardMaterial color="#77889f" metalness={0.32} roughness={0.45} />
+      <mesh position={[0.26, 0.18, -0.62]} rotation={[0.24, 0, -0.05]}>
+        <boxGeometry args={[0.08, 0.36, 0.42]} />
+        <meshStandardMaterial color="#73849a" metalness={0.34} roughness={0.45} />
       </mesh>
 
-      <mesh position={[0, -0.16, -0.18]}>
-        <boxGeometry args={[0.22, 0.06, 0.5]} />
-        <meshStandardMaterial color="#6f8299" metalness={0.28} roughness={0.45} />
+      <mesh position={[0, -0.18, -0.1]}>
+        <boxGeometry args={[0.24, 0.05, 0.56]} />
+        <meshStandardMaterial color="#6d7f95" metalness={0.28} roughness={0.44} />
       </mesh>
 
-      <mesh ref={flameCore} position={[0, -0.02, -0.86]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.085, 0.46, 12]} />
+      <mesh ref={flameCore} position={[0, -0.02, -1.0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.075, 0.42, 12]} />
         <meshBasicMaterial color="#90e8ff" transparent opacity={0.92} />
       </mesh>
 
-      <mesh ref={flameLeft} position={[-0.16, -0.02, -0.78]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.04, 0.24, 10]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.82} />
+      <mesh ref={flameLeft} position={[-0.17, -0.02, -0.9]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.038, 0.22, 10]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.8} />
       </mesh>
 
-      <mesh ref={flameRight} position={[0.16, -0.02, -0.78]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.04, 0.24, 10]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.82} />
+      <mesh ref={flameRight} position={[0.17, -0.02, -0.9]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.038, 0.22, 10]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.8} />
       </mesh>
     </group>
   );
@@ -559,6 +573,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
   return (
     <>
       <DynamicBackgroundField />
+      <MapHologram />
       <ambientLight intensity={1.05} />
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
@@ -722,9 +737,9 @@ export default function SystemScene() {
     if (bubble.type === 'freefly') {
       setFreeFly((v) => !v);
       setSelected({
-        label: 'Ship Flight Mode',
-        address: 'WASD + mouse drag + Space/Shift + Ctrl boost',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, and hold Control to boost.',
+        label: 'Space Sim Flight',
+        address: 'WASD + drag + Space/Shift + Ctrl boost + Q/E roll',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll.',
       });
       return;
     }

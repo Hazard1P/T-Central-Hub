@@ -132,3 +132,11 @@ Open:
 - Rebuilt the ship silhouette to feel more like an actual spacecraft
 - Added inertial chase-camera movement
 - Added Control key boost
+
+
+## Cinematic web space navigation
+- Tuned the experience toward a more cinematic web-space-sim feel
+- Reduced the ship's on-screen footprint
+- Added smoother chase-camera handling
+- Added Q/E roll alongside boost
+- Added a faint hologram panel inspired by the uploaded cosmic map
