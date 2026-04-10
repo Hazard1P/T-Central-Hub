@@ -10,7 +10,7 @@ const NAV_BUBBLES = [
   { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
   { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
   { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle WASD flight' }
+  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle ship flight' },
 ];
 
 const NODES = [
@@ -25,7 +25,7 @@ const NODES = [
   { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [9.4, 3.0, 0], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
   { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [9.8, -2.8, 0.25], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
   { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [9.6, 8.0, -0.25], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
-  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [12.0, -1.2, 0.15], color: '#ff8a8a', route: '/report-player', kind: 'node' }
+  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [12.0, -1.2, 0.15], color: '#ff8a8a', route: '/report-player', kind: 'node' },
 ];
 
 function formatStatus(status) {
@@ -36,31 +36,43 @@ function formatStatus(status) {
 }
 
 function DynamicBackgroundField() {
-  const group = useRef();
-  const a = useRef();
-  const b = useRef();
-  const c = useRef();
+  const group = useRef(null);
+  const a = useRef(null);
+  const b = useRef(null);
+  const c = useRef(null);
+  const d = useRef(null);
+  const e = useRef(null);
 
   useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.006;
-    if (a.current) a.current.rotation.z += delta * 0.01;
-    if (b.current) b.current.rotation.z -= delta * 0.008;
-    if (c.current) c.current.rotation.y += delta * 0.007;
+    if (group.current) group.current.rotation.y += delta * 0.004;
+    if (a.current) a.current.rotation.z += delta * 0.008;
+    if (b.current) b.current.rotation.z -= delta * 0.006;
+    if (c.current) c.current.rotation.y += delta * 0.005;
+    if (d.current) d.current.rotation.x -= delta * 0.004;
+    if (e.current) e.current.rotation.y -= delta * 0.003;
   });
 
   return (
     <group ref={group}>
-      <mesh ref={a} position={[-18, 10, -18]}>
-        <sphereGeometry args={[8.5, 32, 32]} />
-        <meshBasicMaterial color="#6748d7" transparent opacity={0.08} />
+      <mesh ref={a} position={[-22, 12, -24]}>
+        <sphereGeometry args={[10.5, 36, 36]} />
+        <meshBasicMaterial color="#5b3fd2" transparent opacity={0.11} />
       </mesh>
-      <mesh ref={b} position={[16, -8, -20]}>
-        <sphereGeometry args={[11, 32, 32]} />
-        <meshBasicMaterial color="#3fc4ea" transparent opacity={0.065} />
+      <mesh ref={b} position={[20, -10, -24]}>
+        <sphereGeometry args={[13.5, 36, 36]} />
+        <meshBasicMaterial color="#23a8d8" transparent opacity={0.09} />
       </mesh>
-      <mesh ref={c} position={[0, 18, -28]}>
-        <sphereGeometry args={[12.5, 32, 32]} />
-        <meshBasicMaterial color="#f4cf6a" transparent opacity={0.04} />
+      <mesh ref={c} position={[0, 20, -34]}>
+        <sphereGeometry args={[14.5, 36, 36]} />
+        <meshBasicMaterial color="#ffb84d" transparent opacity={0.05} />
+      </mesh>
+      <mesh ref={d} position={[-9, -18, -30]}>
+        <sphereGeometry args={[12.5, 36, 36]} />
+        <meshBasicMaterial color="#8b46ff" transparent opacity={0.05} />
+      </mesh>
+      <mesh ref={e} position={[14, 8, -38]}>
+        <sphereGeometry args={[16, 36, 36]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.035} />
       </mesh>
     </group>
   );
@@ -68,6 +80,7 @@ function DynamicBackgroundField() {
 
 function CameraReset({ tick }) {
   const { camera, controls } = useThree();
+
   useEffect(() => {
     camera.position.set(0, 1.4, 26);
     camera.lookAt(0, 0, 0);
@@ -76,86 +89,154 @@ function CameraReset({ tick }) {
       controls.update();
     }
   }, [camera, controls, tick]);
+
   return null;
 }
 
-function FreeFlyRig({ enabled, resetTick }) {
+function FlyShipRig({ enabled, resetTick }) {
   const { camera, controls } = useThree();
+  const shipRef = useRef(null);
+  const flameL = useRef(null);
+  const flameR = useRef(null);
   const keys = useRef({});
   const velocity = useRef(new THREE.Vector3());
+  const yaw = useRef(0);
+  const pitch = useRef(-0.02);
+  const shipPos = useRef(new THREE.Vector3(0, 1.4, 26));
+  const dragging = useRef(false);
+  const prevMouse = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const onKeyDown = (e) => { keys.current[e.code] = true; };
     const onKeyUp = (e) => { keys.current[e.code] = false; };
+    const onMouseDown = (e) => {
+      if (!enabled) return;
+      dragging.current = true;
+      prevMouse.current = { x: e.clientX, y: e.clientY };
+    };
+    const onMouseUp = () => { dragging.current = false; };
+    const onMouseMove = (e) => {
+      if (!enabled || !dragging.current) return;
+      const dx = e.clientX - prevMouse.current.x;
+      const dy = e.clientY - prevMouse.current.y;
+      prevMouse.current = { x: e.clientX, y: e.clientY };
+      yaw.current -= dx * 0.0032;
+      pitch.current -= dy * 0.0022;
+      const limit = Math.PI / 2.25;
+      pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
+    };
+
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('mousemove', onMouseMove);
+
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('mousemove', onMouseMove);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
+    shipPos.current.set(0, 1.4, 26);
     velocity.current.set(0, 0, 0);
-  }, [resetTick]);
+    yaw.current = 0;
+    pitch.current = -0.02;
+    if (controls) controls.enabled = !enabled;
+  }, [enabled, resetTick, controls]);
 
-  useEffect(() => {
-    if (controls) controls.enablePan = !enabled;
-  }, [enabled, controls]);
+  useFrame((state, delta) => {
+    if (!shipRef.current) return;
 
-  useFrame((_, delta) => {
-    if (!enabled) return;
+    if (!enabled) {
+      shipRef.current.visible = false;
+      return;
+    }
 
-    const input = new THREE.Vector3(
-      (keys.current['KeyD'] ? 1 : 0) - (keys.current['KeyA'] ? 1 : 0),
-      (keys.current['Space'] ? 1 : 0) - (keys.current['ShiftLeft'] || keys.current['ShiftRight'] ? 1 : 0),
-      (keys.current['KeyS'] ? 1 : 0) - (keys.current['KeyW'] ? 1 : 0)
-    );
+    shipRef.current.visible = true;
 
-    if (input.lengthSq() > 0) {
-      input.normalize();
+    const quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ'));
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(quat).normalize();
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quat).normalize();
+    const up = new THREE.Vector3(0, 1, 0);
 
-      const forward = new THREE.Vector3();
-      camera.getWorldDirection(forward);
-      forward.normalize();
+    const move = new THREE.Vector3();
+    if (keys.current['KeyW']) move.add(forward);
+    if (keys.current['KeyS']) move.addScaledVector(forward, -1);
+    if (keys.current['KeyD']) move.add(right);
+    if (keys.current['KeyA']) move.addScaledVector(right, -1);
+    if (keys.current['Space']) move.add(up);
+    if (keys.current['ShiftLeft'] || keys.current['ShiftRight']) move.addScaledVector(up, -1);
 
-      const right = new THREE.Vector3().crossVectors(forward, camera.up).normalize();
-
-      const move = new THREE.Vector3();
-      move.addScaledVector(right, input.x);
-      move.addScaledVector(camera.up, input.y);
-      move.addScaledVector(forward, input.z);
-
-      velocity.current.lerp(move.normalize().multiplyScalar(13), 0.14);
+    if (move.lengthSq() > 0) {
+      move.normalize();
+      velocity.current.lerp(move.multiplyScalar(13), 0.14);
     } else {
       velocity.current.lerp(new THREE.Vector3(), 0.1);
     }
 
-    camera.position.addScaledVector(velocity.current, delta);
+    shipPos.current.addScaledVector(velocity.current, delta);
+
+    shipRef.current.position.copy(shipPos.current);
+    shipRef.current.quaternion.copy(quat);
+
+    if (flameL.current && flameR.current) {
+      const thrust = Math.min(1, velocity.current.length() / 10);
+      const pulse = 0.7 + Math.sin(state.clock.elapsedTime * 30) * 0.12;
+      flameL.current.scale.set(1, 1, pulse * thrust + 0.2);
+      flameR.current.scale.set(1, 1, pulse * thrust + 0.2);
+    }
+
+    camera.position.copy(shipPos.current).add(new THREE.Vector3(0, 0.35, 1.3).applyQuaternion(quat));
+    camera.quaternion.copy(quat);
 
     if (controls) {
-      const look = new THREE.Vector3();
-      camera.getWorldDirection(look);
-      controls.target.copy(camera.position).add(look.multiplyScalar(10));
+      controls.target.copy(shipPos.current).add(forward.clone().multiplyScalar(14));
       controls.update();
     }
   });
 
-  return null;
+  return (
+    <group ref={shipRef} visible={false}>
+      <mesh position={[0, 0, 0.2]}>
+        <coneGeometry args={[0.18, 0.8, 8]} />
+        <meshStandardMaterial color="#d9ecff" emissive="#7ee7ff" emissiveIntensity={0.4} />
+      </mesh>
+      <mesh position={[0, 0.05, -0.1]}>
+        <sphereGeometry args={[0.16, 16, 16]} />
+        <meshStandardMaterial color="#4a5568" />
+      </mesh>
+      <mesh position={[-0.22, -0.03, -0.02]} rotation={[0, 0, 0.35]}>
+        <boxGeometry args={[0.24, 0.03, 0.4]} />
+        <meshStandardMaterial color="#8fa8c8" />
+      </mesh>
+      <mesh position={[0.22, -0.03, -0.02]} rotation={[0, 0, -0.35]}>
+        <boxGeometry args={[0.24, 0.03, 0.4]} />
+        <meshStandardMaterial color="#8fa8c8" />
+      </mesh>
+      <mesh ref={flameL} position={[-0.08, -0.01, -0.48]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.045, 0.22, 8]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.9} />
+      </mesh>
+      <mesh ref={flameR} position={[0.08, -0.01, -0.48]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.045, 0.22, 8]} />
+        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.9} />
+      </mesh>
+    </group>
+  );
 }
 
 function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [Math.PI / 2.4, 0, 0], count = 44, spread = 0.16 }) {
-  const ref = useRef();
-  const particles = useMemo(() => {
-    return Array.from({ length: count }, (_, i) => {
-      const angle = (i / count) * Math.PI * 2;
-      const r = radius + Math.sin(i * 1.87) * spread;
-      return {
-        position: [Math.cos(angle) * r, Math.cos(i * 0.8) * 0.08, Math.sin(angle) * r],
-        scale: 0.03 + (i % 4) * 0.008,
-      };
-    });
-  }, [count, radius, spread]);
+  const ref = useRef(null);
+  const particles = useMemo(() => Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * Math.PI * 2;
+    const r = radius + Math.sin(i * 1.87) * spread;
+    return { position: [Math.cos(angle) * r, Math.cos(i * 0.8) * 0.08, Math.sin(angle) * r], scale: 0.03 + (i % 4) * 0.008 };
+  }), [count, radius, spread]);
 
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.z += delta * speed;
@@ -174,8 +255,8 @@ function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [
 }
 
 function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor, labelOffset = [0, 1.55, 0], matterRadius = 3.2 }) {
-  const group = useRef();
-  const disc = useRef();
+  const group = useRef(null);
+  const disc = useRef(null);
 
   useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.12;
@@ -210,10 +291,10 @@ function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor
 }
 
 function DysonSphere({ node, onSelect }) {
-  const group = useRef();
-  const ringA = useRef();
-  const ringB = useRef();
-  const ringC = useRef();
+  const group = useRef(null);
+  const ringA = useRef(null);
+  const ringB = useRef(null);
+  const ringC = useRef(null);
 
   useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.16;
@@ -224,22 +305,10 @@ function DysonSphere({ node, onSelect }) {
 
   return (
     <group position={node.position} ref={group} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
-      <mesh>
-        <sphereGeometry args={[0.42, 24, 24]} />
-        <meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={1.95} />
-      </mesh>
-      <mesh ref={ringA}>
-        <torusGeometry args={[0.95, 0.03, 12, 120]} />
-        <meshStandardMaterial color="#ffe694" emissive="#ffe694" emissiveIntensity={1.1} />
-      </mesh>
-      <mesh ref={ringB} rotation={[1.05, 0.25, 0.16]}>
-        <torusGeometry args={[1.22, 0.024, 12, 120]} />
-        <meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={0.95} />
-      </mesh>
-      <mesh ref={ringC} rotation={[0.2, 0.72, 1.0]}>
-        <torusGeometry args={[1.48, 0.02, 12, 120]} />
-        <meshStandardMaterial color="#fff4c1" emissive="#fff4c1" emissiveIntensity={0.85} />
-      </mesh>
+      <mesh><sphereGeometry args={[0.42, 24, 24]} /><meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={1.95} /></mesh>
+      <mesh ref={ringA}><torusGeometry args={[0.95, 0.03, 12, 120]} /><meshStandardMaterial color="#ffe694" emissive="#ffe694" emissiveIntensity={1.1} /></mesh>
+      <mesh ref={ringB} rotation={[1.05, 0.25, 0.16]}><torusGeometry args={[1.22, 0.024, 12, 120]} /><meshStandardMaterial color="#ffd15c" emissive="#ffd15c" emissiveIntensity={0.95} /></mesh>
+      <mesh ref={ringC} rotation={[0.2, 0.72, 1.0]}><torusGeometry args={[1.48, 0.02, 12, 120]} /><meshStandardMaterial color="#fff4c1" emissive="#fff4c1" emissiveIntensity={0.85} /></mesh>
       <Html position={[0, -1.4, 0]} center distanceFactor={10}>
         <button className="map-anchor-label clickable" onClick={() => onSelect(node)}>
           <span className="anchor-title">S.S</span>
@@ -251,8 +320,8 @@ function DysonSphere({ node, onSelect }) {
 }
 
 function StarNode({ node, onSelect }) {
-  const core = useRef();
-  const halo = useRef();
+  const core = useRef(null);
+  const halo = useRef(null);
 
   useFrame((state, delta) => {
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 2.3) * 0.12;
@@ -262,14 +331,8 @@ function StarNode({ node, onSelect }) {
 
   return (
     <group position={node.position} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
-      <mesh ref={core}>
-        <dodecahedronGeometry args={[0.35, 0]} />
-        <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={1.95} />
-      </mesh>
-      <mesh ref={halo} rotation={[0.4, 0.2, 0]}>
-        <torusGeometry args={[1.0, 0.022, 12, 100]} />
-        <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.95} />
-      </mesh>
+      <mesh ref={core}><dodecahedronGeometry args={[0.35, 0]} /><meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={1.95} /></mesh>
+      <mesh ref={halo} rotation={[0.4, 0.2, 0]}><torusGeometry args={[1.0, 0.022, 12, 100]} /><meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.95} /></mesh>
       <pointLight position={[0, 0, 0]} color={node.color} intensity={10} distance={9} />
       <Html position={[0, 1.14, 0]} center distanceFactor={10}>
         <button className="map-anchor-label clickable" onClick={() => onSelect(node)}>
@@ -282,8 +345,8 @@ function StarNode({ node, onSelect }) {
 }
 
 function Planet({ planet, index }) {
-  const planetRef = useRef();
-  const ringRef = useRef();
+  const planetRef = useRef(null);
+  const ringRef = useRef(null);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime * planet.speed + index;
@@ -301,10 +364,7 @@ function Planet({ planet, index }) {
 
   return (
     <>
-      <mesh ref={planetRef}>
-        <sphereGeometry args={[planet.radius, 20, 20]} />
-        <meshStandardMaterial color={planet.color} emissive={planet.color} emissiveIntensity={0.35} />
-      </mesh>
+      <mesh ref={planetRef}><sphereGeometry args={[planet.radius, 20, 20]} /><meshStandardMaterial color={planet.color} emissive={planet.color} emissiveIntensity={0.35} /></mesh>
       {planet.ring ? (
         <mesh ref={ringRef} rotation={[Math.PI / 2.5, 0, 0]}>
           <torusGeometry args={[planet.radius * 1.65, planet.radius * 0.18, 10, 80]} />
@@ -316,10 +376,9 @@ function Planet({ planet, index }) {
 }
 
 function SolarSystem({ node, onSelect }) {
-  const group = useRef();
-  const sunRef = useRef();
-
-  const planets = useMemo(() => ([
+  const group = useRef(null);
+  const sunRef = useRef(null);
+  const planets = useMemo(() => [
     { name: 'Mercury', radius: 0.06, orbit: 0.9, speed: 1.3, color: '#c7b39a' },
     { name: 'Venus', radius: 0.09, orbit: 1.25, speed: 1.05, color: '#d8b47a' },
     { name: 'Earth', radius: 0.1, orbit: 1.65, speed: 0.88, color: '#5fb7ff' },
@@ -329,7 +388,7 @@ function SolarSystem({ node, onSelect }) {
     { name: 'Uranus', radius: 0.12, orbit: 3.75, speed: 0.34, color: '#9ce3ff' },
     { name: 'Neptune', radius: 0.12, orbit: 4.25, speed: 0.28, color: '#628dff' },
     { name: 'Pluto', radius: 0.05, orbit: 4.8, speed: 0.22, color: '#b3b3c9' },
-  ]), []);
+  ], []);
 
   useFrame((_, delta) => {
     if (group.current) group.current.rotation.y += delta * 0.04;
@@ -338,16 +397,10 @@ function SolarSystem({ node, onSelect }) {
 
   return (
     <group position={node.position} ref={group} onClick={(e) => { e.stopPropagation(); onSelect(node); }}>
-      <mesh ref={sunRef}>
-        <sphereGeometry args={[0.42, 32, 32]} />
-        <meshStandardMaterial color="#ffd46b" emissive="#ffd46b" emissiveIntensity={2.2} />
-      </mesh>
+      <mesh ref={sunRef}><sphereGeometry args={[0.42, 32, 32]} /><meshStandardMaterial color="#ffd46b" emissive="#ffd46b" emissiveIntensity={2.2} /></mesh>
       {planets.map((planet, i) => (
         <group key={planet.name}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[planet.orbit, 0.008, 8, 120]} />
-            <meshBasicMaterial color="white" transparent opacity={0.12} />
-          </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[planet.orbit, 0.008, 8, 120]} /><meshBasicMaterial color="white" transparent opacity={0.12} /></mesh>
           <Planet planet={planet} index={i} />
         </group>
       ))}
@@ -363,7 +416,7 @@ function SolarSystem({ node, onSelect }) {
 }
 
 function SectorRing({ position, radius, color, label }) {
-  const ref = useRef();
+  const ref = useRef(null);
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.z += delta * 0.06;
   });
@@ -374,20 +427,18 @@ function SectorRing({ position, radius, color, label }) {
         <torusGeometry args={[radius, 0.018, 10, 220]} />
         <meshBasicMaterial color={color} transparent opacity={0.26} />
       </mesh>
-      <Html position={[0, radius + 0.65, 0]} center>
-        <div className="sector-label">{label}</div>
-      </Html>
+      <Html position={[0, radius + 0.65, 0]} center><div className="sector-label">{label}</div></Html>
     </group>
   );
 }
 
 function ConstellationLines() {
-  const pointGroups = useMemo(() => ([
+  const pointGroups = useMemo(() => [
     [NODES.find((n) => n.key === 'arma3').position, NODES.find((n) => n.key === 'sbox').position, NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'ns').position],
     [NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'rust_biweekly').position, NODES.find((n) => n.key === 'rust_weekly').position, NODES.find((n) => n.key === 'rust_monthly').position],
     [NODES.find((n) => n.key === 'ss').position, NODES.find((n) => n.key === 'report').position, NODES.find((n) => n.key === 'nfo').position],
-    [NODES.find((n) => n.key === 'deep_blackhole').position, NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'solar_system').position]
-  ]), []);
+    [NODES.find((n) => n.key === 'deep_blackhole').position, NODES.find((n) => n.key === 'rust_anchor').position, NODES.find((n) => n.key === 'solar_system').position],
+  ], []);
 
   return (
     <>
@@ -414,7 +465,7 @@ function BubbleNav({ onBubble }) {
 }
 
 function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
-  const mesh = useRef();
+  const mesh = useRef(null);
   const glowColor = status?.online === true ? '#73ff9e' : status?.online === false ? '#ff7d7d' : node.color;
 
   useFrame((state) => {
@@ -436,17 +487,9 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
           <meshStandardMaterial color={glowColor} emissive={glowColor} emissiveIntensity={selected ? 1.55 : 1.0} />
         </mesh>
       </Trail>
-      <mesh>
-        <sphereGeometry args={[selected ? 0.60 : 0.50, 20, 20]} />
-        <meshBasicMaterial color={glowColor} transparent opacity={selected ? 0.15 : 0.08} />
-      </mesh>
+      <mesh><sphereGeometry args={[selected ? 0.6 : 0.5, 20, 20]} /><meshBasicMaterial color={glowColor} transparent opacity={selected ? 0.15 : 0.08} /></mesh>
       <Html center distanceFactor={8.8} position={[0, selected ? 0.92 : 0.78, 0]}>
-        <button
-          className={`map-node-label ${selected ? 'active' : ''}`}
-          onMouseEnter={() => onHover(node.key)}
-          onMouseLeave={onLeave}
-          onClick={() => onSelect(node)}
-        >
+        <button className={`map-node-label ${selected ? 'active' : ''}`} onMouseEnter={() => onHover(node.key)} onMouseLeave={onLeave} onClick={() => onSelect(node)}>
           <strong>{node.label}</strong>
           <span>{node.address}</span>
           <em>{node.description}</em>
@@ -492,15 +535,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
         <StarNode node={NODES.find((n) => n.key === 'nfo')} onSelect={onSelect} />
 
         {NODES.filter((n) => n.kind === 'node').map((node) => (
-          <StatusNode
-            key={node.key}
-            node={node}
-            status={statuses?.[node.key]}
-            selected={hovered === node.key}
-            onHover={setHovered}
-            onLeave={() => setHovered('rust_biweekly')}
-            onSelect={onSelect}
-          />
+          <StatusNode key={node.key} node={node} status={statuses?.[node.key]} selected={hovered === node.key} onHover={setHovered} onLeave={() => setHovered('rust_biweekly')} onSelect={onSelect} />
         ))}
       </group>
 
@@ -520,7 +555,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
         minPolarAngle={0}
       />
       <CameraReset tick={resetTick} />
-      <FreeFlyRig enabled={freeFly} resetTick={resetTick} />
+      <FlyShipRig enabled={freeFly} resetTick={resetTick} />
     </>
   );
 }
@@ -533,16 +568,11 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
   return (
     <div className="map-focus-panel">
       <div className="map-focus-header">
-        <div>
-          <p className="eyebrow">Selected node</p>
-          <h4>{item.label}</h4>
-        </div>
+        <div><p className="eyebrow">Selected node</p><h4>{item.label}</h4></div>
         <button className="focus-close" onClick={onClose}>×</button>
       </div>
       <p className="muted">{item.description}</p>
-      <div className="focus-meta">
-        <span>{item.address || item.sublabel}</span>
-      </div>
+      <div className="focus-meta"><span>{item.address || item.sublabel}</span></div>
       {item.key && status ? (
         <div className="focus-status">
           <div className="status-row"><span>Status</span><strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong></div>
@@ -574,7 +604,7 @@ function SystemOverlay({ loading, mode, freeFly }) {
       <div className="overlay-status">
         <span>
           {loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}
-          {freeFly ? ' • Free Fly active' : ''}
+          {freeFly ? ' • Ship Flight active' : ''}
         </span>
       </div>
     </div>
@@ -639,9 +669,9 @@ export default function SystemScene() {
     if (bubble.type === 'freefly') {
       setFreeFly((v) => !v);
       setSelected({
-        label: 'Free Fly Mode',
-        address: 'WASD + drag mouse + Space/Shift',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, and drag the mouse to steer your view.',
+        label: 'Ship Flight Mode',
+        address: 'WASD + mouse drag + Space/Shift',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, and hold the mouse button while dragging to steer the ship.',
       });
       return;
     }

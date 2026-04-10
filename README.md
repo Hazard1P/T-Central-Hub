@@ -118,3 +118,10 @@ Open:
 - Added a Free Fly toggle bubble
 - Free Fly supports WASD movement plus Space and Shift for vertical travel
 - Rebuilt the server-entry overlay into a stronger warp experience
+
+
+## Cosmic background and ship flight
+- Upgraded the background into a richer cosmic nebula look
+- Added a small flyable ship for Free Fly mode
+- Free Fly now uses ship-style movement with mouse steering
+- Kept the warp entry overlay for server travel
