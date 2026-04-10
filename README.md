@@ -106,3 +106,8 @@ Open:
 - Moved the Solar Replica into the T-Central Hub zone
 - Spread the overall system farther apart for a more staged composition
 - Opened the camera farther back to fit the larger system layout
+
+
+## Solar lock position fix
+- Moved the Solar Replica upward so it no longer sits inside the Rust black hole
+- Locked it into the same T-Central Hub positional zone at a cleaner vertical level

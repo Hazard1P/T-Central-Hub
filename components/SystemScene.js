@@ -17,7 +17,7 @@ const NODES = [
   { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [0, 8.2, 0], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
   { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [0, -6.0, 0], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
   { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole inspired by the cosmic map.', position: [-12.2, -5.8, -0.3], color: '#c4d4ff', kind: 'blackhole' },
-  { key: 'solar_replica', label: 'Solar Replica', address: 'Sun + 9 planets', description: 'Solar replica stationed at the T-Central Hub anchor with nine orbiting planets.', position: [0, -6.0, 1.15], color: '#ffd46b', kind: 'solar' },
+  { key: 'solar_replica', label: 'Solar Replica', address: 'Sun + 9 planets', description: 'Solar replica locked into the T-Central Hub zone with nine orbiting planets.', position: [0, -1.8, 0.9], color: '#ffd46b', kind: 'solar' },
   { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [0, -3.8, 1.35], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
   { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [4.9, -6.7, -0.45], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
   { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-4.9, -6.7, -0.45], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
@@ -378,7 +378,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick }) {
         <SectorRing position={[0, -6.0, 0]} radius={6.6} color="#9f7cff" label="T-Central Hub" />
         <SectorRing position={[9.4, 3.0, 0]} radius={4.8} color="#ffd15c" label="Support Sector" />
         <SectorRing position={[-12.2, -5.8, -0.3]} radius={4.2} color="#c4d4ff" label="Deep Anchor" />
-        <SectorRing position={[0, -6.0, 1.15]} radius={4.9} color="#ffd46b" label="Solar Replica" />
+        <SectorRing position={[0, -1.8, 0.9]} radius={4.4} color="#ffd46b" label="Solar Replica" />
 
         <ConstellationLines />
         <BubbleNav onBubble={onBubble} />
