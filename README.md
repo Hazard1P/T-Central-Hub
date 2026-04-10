@@ -100,3 +100,9 @@ Open:
 - Added a standalone Deep Black Hole as its own anchor
 - Added a Solar Replica with a procedural sun and 9 orbiting planets
 - Both are integrated into the 3D system without inventing fake destination links
+
+
+## Solar staging update
+- Moved the Solar Replica into the T-Central Hub zone
+- Spread the overall system farther apart for a more staged composition
+- Opened the camera farther back to fit the larger system layout
