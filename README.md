@@ -140,3 +140,23 @@ Open:
 - Added smoother chase-camera handling
 - Added Q/E roll alongside boost
 - Added a faint hologram panel inspired by the uploaded cosmic map
+
+
+## Futuristic rocket ship rebuild
+- Rebuilt the flyable craft into a more futuristic rocket-style silhouette
+- Added wireframe edge detailing on the spacecraft
+- Kept the entire system Vercel-deployable
+- Used the uploaded map as visual language inspiration, not as a fake backend claim
+
+
+## Web game layer expansion
+- Added a game-style HUD with speed, boost, gravity pull, and zone readouts
+- Added browser-safe cinematic intro and stronger docking/travel presentation
+- Added black-hole proximity gravity pull during flight
+- Kept the entire experience deployable on Vercel as a web game
+
+
+## Spaceship visual upgrade
+- Reworked the craft into a more recognizable futuristic spaceship form
+- Improved nose, fuselage, canopy, wings, stabilizers, and engine layout
+- Kept wireframe edge accents for a tech-heavy visual style

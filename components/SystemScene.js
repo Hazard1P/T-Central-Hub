@@ -10,7 +10,7 @@ const NAV_BUBBLES = [
   { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
   { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
   { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle space sim' },
+  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle rocket flight' },
 ];
 
 const NODES = [
@@ -95,6 +95,11 @@ function CameraReset({ tick }) {
   const { camera, controls } = useThree();
 
   useEffect(() => {
+    const t = setTimeout(() => setIntroVisible(false), 2200);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     camera.position.set(0, 1.4, 26);
     camera.lookAt(0, 0, 0);
     if (controls) {
@@ -108,7 +113,8 @@ function CameraReset({ tick }) {
 
 
 
-function FlyShipRig({ enabled, resetTick }) {
+
+function FlyShipRig({ enabled, resetTick, onFlightStats }) {
   const { camera, controls } = useThree();
   const shipRef = useRef(null);
   const flameCore = useRef(null);
@@ -122,6 +128,7 @@ function FlyShipRig({ enabled, resetTick }) {
   const roll = useRef(0);
   const dragging = useRef(false);
   const prevMouse = useRef({ x: 0, y: 0 });
+  const boostMeter = useRef(100);
 
   useEffect(() => {
     const onKeyDown = (e) => { keys.current[e.code] = true; };
@@ -164,22 +171,39 @@ function FlyShipRig({ enabled, resetTick }) {
     yaw.current = 0;
     pitch.current = -0.02;
     roll.current = 0;
+    boostMeter.current = 100;
     if (controls) controls.enabled = !enabled;
   }, [enabled, resetTick, controls]);
+
 
   useFrame((state, delta) => {
     if (!shipRef.current) return;
 
     if (!enabled) {
       shipRef.current.visible = false;
+      onFlightStats?.({
+        speed: 0,
+        boosting: false,
+        boostLevel: boostMeter.current,
+        gravityTarget: 'None',
+        zone: 'Navigation',
+      });
       return;
     }
 
     shipRef.current.visible = true;
 
-    const boost = keys.current['ControlLeft'] || keys.current['ControlRight'];
+    const rawBoost = keys.current['ControlLeft'] || keys.current['ControlRight'];
+    const canBoost = boostMeter.current > 4;
+    const boost = rawBoost && canBoost;
     const maxSpeed = boost ? 24 : 12;
     const accel = boost ? 0.16 : 0.10;
+
+    if (boost) {
+      boostMeter.current = Math.max(0, boostMeter.current - delta * 20);
+    } else {
+      boostMeter.current = Math.min(100, boostMeter.current + delta * 10);
+    }
 
     const targetRoll =
       (keys.current['KeyD'] ? -0.22 : 0) +
@@ -212,6 +236,28 @@ function FlyShipRig({ enabled, resetTick }) {
       velocity.current.lerp(new THREE.Vector3(), 0.035);
     }
 
+    let gravityTarget = 'None';
+    let strongestPull = 0;
+    const gravityAnchors = [
+      { label: 'Arma3', pos: [-9.4, 3.0, 0], radius: 6.5, pull: 1.6 },
+      { label: 'S&Box', pos: [0, 8.2, 0], radius: 5.4, pull: 1.2 },
+      { label: 'T-Central Hub', pos: [0, -6.0, 0], radius: 8.5, pull: 2.2 },
+      { label: 'Deep Black Hole', pos: [-12.2, -5.8, -0.3], radius: 7.0, pull: 1.9 },
+    ];
+
+    for (const anchor of gravityAnchors) {
+      const d = distance3(anchor.pos, shipPos.current);
+      if (d < anchor.radius) {
+        const pullFactor = (1 - d / anchor.radius) * anchor.pull;
+        if (pullFactor > strongestPull) {
+          strongestPull = pullFactor;
+          gravityTarget = anchor.label;
+        }
+        const dir = new THREE.Vector3(anchor.pos[0], anchor.pos[1], anchor.pos[2]).sub(shipPos.current).normalize();
+        velocity.current.addScaledVector(dir, pullFactor * delta);
+      }
+    }
+
     shipPos.current.addScaledVector(velocity.current, delta);
 
     shipRef.current.position.copy(shipPos.current);
@@ -228,72 +274,143 @@ function FlyShipRig({ enabled, resetTick }) {
     camera.position.lerp(desiredCam, 0.08);
 
     const lookTarget = shipPos.current.clone().add(forward.clone().multiplyScalar(12));
-    const lookQuat = new THREE.Matrix4().lookAt(camera.position, lookTarget, camera.up);
-    camera.quaternion.slerp(new THREE.Quaternion().setFromRotationMatrix(lookQuat), 0.18);
+    const lookMatrix = new THREE.Matrix4().lookAt(camera.position, lookTarget, camera.up);
+    const lookQuat = new THREE.Quaternion().setFromRotationMatrix(lookMatrix);
+    camera.quaternion.slerp(lookQuat, 0.18);
 
     if (controls) {
       controls.target.copy(lookTarget);
       controls.update();
     }
+
+    let zone = 'Open Space';
+    if (shipPos.current.y > 5) zone = 'Upper Sectors';
+    else if (shipPos.current.y < -4) zone = 'Lower Hub';
+    else zone = 'Central Band';
+
+    onFlightStats?.({
+      speed: velocity.current.length(),
+      boosting: boost,
+      boostLevel: boostMeter.current,
+      gravityTarget,
+      zone,
+    });
   });
 
+
   return (
-    <group ref={shipRef} visible={false} scale={0.72}>
-      <mesh position={[0, 0.02, 0.84]}>
-        <coneGeometry args={[0.18, 1.25, 12]} />
-        <meshStandardMaterial color="#dbeeff" emissive="#8adfff" emissiveIntensity={0.22} metalness={0.65} roughness={0.28} />
-      </mesh>
+    <group ref={shipRef} visible={false} scale={0.8}>
+      <group>
+        {/* nose and forward fuselage */}
+        <mesh position={[0, 0.02, 1.22]}>
+          <coneGeometry args={[0.18, 1.85, 20]} />
+          <meshStandardMaterial color="#eef7ff" emissive="#9be7ff" emissiveIntensity={0.16} metalness={0.78} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0.02, 0.24]}>
+          <capsuleGeometry args={[0.22, 1.95, 10, 18]} />
+          <meshStandardMaterial color="#63788f" metalness={0.6} roughness={0.24} />
+        </mesh>
 
-      <mesh position={[0, 0.02, 0.18]}>
-        <capsuleGeometry args={[0.18, 1.05, 8, 14]} />
-        <meshStandardMaterial color="#5d6f86" metalness={0.48} roughness={0.34} />
-      </mesh>
+        {/* canopy */}
+        <mesh position={[0, 0.23, 0.46]} scale={[0.72, 0.34, 1.28]}>
+          <sphereGeometry args={[0.26, 22, 22]} />
+          <meshStandardMaterial color="#b8ebff" emissive="#8fe1ff" emissiveIntensity={0.24} transparent opacity={0.72} />
+        </mesh>
 
-      <mesh position={[0, 0.15, 0.18]} scale={[0.72, 0.42, 1.0]}>
-        <sphereGeometry args={[0.22, 18, 18]} />
-        <meshStandardMaterial color="#a8e0ff" emissive="#8adfff" emissiveIntensity={0.28} transparent opacity={0.72} />
-      </mesh>
+        {/* central dorsal spine */}
+        <mesh position={[0, 0.28, -0.12]} rotation={[0.18, 0, 0]}>
+          <boxGeometry args={[0.1, 0.54, 1.36]} />
+          <meshStandardMaterial color="#7589a0" metalness={0.4} roughness={0.38} />
+        </mesh>
 
-      <mesh position={[-0.62, -0.02, 0.06]} rotation={[0, 0, 0.16]}>
-        <boxGeometry args={[0.82, 0.04, 0.44]} />
-        <meshStandardMaterial color="#93a7c2" metalness={0.36} roughness={0.4} />
-      </mesh>
+        {/* wing roots */}
+        <mesh position={[-0.72, -0.02, 0.08]} rotation={[0.04, 0.08, 0.18]}>
+          <boxGeometry args={[1.02, 0.05, 0.62]} />
+          <meshStandardMaterial color="#96aac5" metalness={0.44} roughness={0.34} />
+        </mesh>
+        <mesh position={[0.72, -0.02, 0.08]} rotation={[0.04, -0.08, -0.18]}>
+          <boxGeometry args={[1.02, 0.05, 0.62]} />
+          <meshStandardMaterial color="#96aac5" metalness={0.44} roughness={0.34} />
+        </mesh>
 
-      <mesh position={[0.62, -0.02, 0.06]} rotation={[0, 0, -0.16]}>
-        <boxGeometry args={[0.82, 0.04, 0.44]} />
-        <meshStandardMaterial color="#93a7c2" metalness={0.36} roughness={0.4} />
-      </mesh>
+        {/* forward fins */}
+        <mesh position={[-0.48, -0.01, 0.78]} rotation={[0.02, 0.1, 0.38]}>
+          <boxGeometry args={[0.54, 0.035, 0.42]} />
+          <meshStandardMaterial color="#a5b9d0" metalness={0.42} roughness={0.34} />
+        </mesh>
+        <mesh position={[0.48, -0.01, 0.78]} rotation={[0.02, -0.1, -0.38]}>
+          <boxGeometry args={[0.54, 0.035, 0.42]} />
+          <meshStandardMaterial color="#a5b9d0" metalness={0.42} roughness={0.34} />
+        </mesh>
 
-      <mesh position={[-0.26, 0.18, -0.62]} rotation={[0.24, 0, 0.05]}>
-        <boxGeometry args={[0.08, 0.36, 0.42]} />
-        <meshStandardMaterial color="#73849a" metalness={0.34} roughness={0.45} />
-      </mesh>
+        {/* rear stabilizers */}
+        <mesh position={[-0.34, 0.32, -0.92]} rotation={[0.46, 0.02, 0.08]}>
+          <boxGeometry args={[0.09, 0.68, 0.78]} />
+          <meshStandardMaterial color="#7a8ca2" metalness={0.34} roughness={0.4} />
+        </mesh>
+        <mesh position={[0.34, 0.32, -0.92]} rotation={[0.46, -0.02, -0.08]}>
+          <boxGeometry args={[0.09, 0.68, 0.78]} />
+          <meshStandardMaterial color="#7a8ca2" metalness={0.34} roughness={0.4} />
+        </mesh>
 
-      <mesh position={[0.26, 0.18, -0.62]} rotation={[0.24, 0, -0.05]}>
-        <boxGeometry args={[0.08, 0.36, 0.42]} />
-        <meshStandardMaterial color="#73849a" metalness={0.34} roughness={0.45} />
-      </mesh>
+        {/* belly intake / keel */}
+        <mesh position={[0, -0.22, -0.04]}>
+          <boxGeometry args={[0.24, 0.08, 0.96]} />
+          <meshStandardMaterial color="#708398" metalness={0.32} roughness={0.42} />
+        </mesh>
 
-      <mesh position={[0, -0.18, -0.1]}>
-        <boxGeometry args={[0.24, 0.05, 0.56]} />
-        <meshStandardMaterial color="#6d7f95" metalness={0.28} roughness={0.44} />
-      </mesh>
+        {/* engine housings */}
+        <mesh position={[-0.22, -0.1, -1.18]} rotation={[0.12, 0, 0]}>
+          <cylinderGeometry args={[0.075, 0.11, 0.46, 16]} />
+          <meshStandardMaterial color="#576a80" metalness={0.52} roughness={0.28} />
+        </mesh>
+        <mesh position={[0.22, -0.1, -1.18]} rotation={[0.12, 0, 0]}>
+          <cylinderGeometry args={[0.075, 0.11, 0.46, 16]} />
+          <meshStandardMaterial color="#576a80" metalness={0.52} roughness={0.28} />
+        </mesh>
+        <mesh position={[0, -0.08, -1.34]} rotation={[0.08, 0, 0]}>
+          <cylinderGeometry args={[0.095, 0.13, 0.5, 16]} />
+          <meshStandardMaterial color="#5c6f85" metalness={0.54} roughness={0.28} />
+        </mesh>
 
-      <mesh ref={flameCore} position={[0, -0.02, -1.0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.075, 0.42, 12]} />
-        <meshBasicMaterial color="#90e8ff" transparent opacity={0.92} />
-      </mesh>
+        {/* thrusters */}
+        <mesh ref={flameCore} position={[0, -0.08, -1.74]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.09, 0.56, 14]} />
+          <meshBasicMaterial color="#90e8ff" transparent opacity={0.94} />
+        </mesh>
+        <mesh ref={flameLeft} position={[-0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.046, 0.3, 12]} />
+          <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
+        </mesh>
+        <mesh ref={flameRight} position={[0.22, -0.1, -1.5]} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.046, 0.3, 12]} />
+          <meshBasicMaterial color="#7ee7ff" transparent opacity={0.84} />
+        </mesh>
 
-      <mesh ref={flameLeft} position={[-0.17, -0.02, -0.9]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.038, 0.22, 10]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.8} />
-      </mesh>
-
-      <mesh ref={flameRight} position={[0.17, -0.02, -0.9]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.038, 0.22, 10]} />
-        <meshBasicMaterial color="#7ee7ff" transparent opacity={0.8} />
-      </mesh>
+        {/* wireframe / edge accents */}
+        <lineSegments position={[0, 0.02, 0.24]}>
+          <edgesGeometry args={[new THREE.CapsuleGeometry(0.225, 1.98, 8, 16)]} />
+          <lineBasicMaterial color="#9ceaff" transparent opacity={0.28} />
+        </lineSegments>
+        <lineSegments position={[0, 0.02, 1.22]}>
+          <edgesGeometry args={[new THREE.ConeGeometry(0.18, 1.85, 20)]} />
+          <lineBasicMaterial color="#d7f7ff" transparent opacity={0.22} />
+        </lineSegments>
+        <lineSegments position={[-0.72, -0.02, 0.08]} rotation={[0.04, 0.08, 0.18]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.24} />
+        </lineSegments>
+        <lineSegments position={[0.72, -0.02, 0.08]} rotation={[0.04, -0.08, -0.18]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(1.02, 0.05, 0.62)]} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.24} />
+        </lineSegments>
+        <lineSegments position={[0, 0.28, -0.12]} rotation={[0.18, 0, 0]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.1, 0.54, 1.36)]} />
+          <lineBasicMaterial color="#9fe9ff" transparent opacity={0.2} />
+        </lineSegments>
+      </group>
     </group>
+  );
   );
 }
 
@@ -567,7 +684,7 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
+function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
@@ -623,7 +740,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly }) {
         minPolarAngle={0}
       />
       <CameraReset tick={resetTick} />
-      <FlyShipRig enabled={freeFly} resetTick={resetTick} />
+      <FlyShipRig enabled={freeFly} resetTick={resetTick} onFlightStats={onFlightStats} />
     </>
   );
 }
@@ -666,13 +783,79 @@ function WarpOverlay({ label }) {
   );
 }
 
+
+function distance3(a, b) {
+  return Math.sqrt(
+    (a[0] - b.x) ** 2 +
+    (a[1] - b.y) ** 2 +
+    (a[2] - b.z) ** 2
+  );
+}
+
+function GameHUD({ freeFly, flightStats }) {
+  return (
+    <div className={`game-hud ${freeFly ? 'active' : ''}`}>
+      <div className="hud-left">
+        <div className="hud-card">
+          <span className="hud-label">Mode</span>
+          <strong>{freeFly ? 'Rocket Flight' : 'Navigation'}</strong>
+        </div>
+        <div className="hud-card">
+          <span className="hud-label">Speed</span>
+          <strong>{Math.round(flightStats.speed)}</strong>
+        </div>
+        <div className="hud-card">
+          <span className="hud-label">Boost</span>
+          <strong>{flightStats.boosting ? 'Active' : 'Standby'}</strong>
+        </div>
+      </div>
+
+      {freeFly ? <div className="hud-crosshair"><span /><span /></div> : null}
+
+      <div className="hud-right">
+        <div className="hud-card">
+          <span className="hud-label">Gravity Pull</span>
+          <strong>{flightStats.gravityTarget || 'None'}</strong>
+        </div>
+        <div className="hud-card">
+          <span className="hud-label">Zone</span>
+          <strong>{flightStats.zone || 'Open Space'}</strong>
+        </div>
+      </div>
+
+      {freeFly ? (
+        <div className="hud-bottom">
+          <div className="boost-bar">
+            <div className="boost-fill" style={{ width: `${Math.min(100, flightStats.boostLevel)}%` }} />
+          </div>
+          <p>WASD move · Mouse drag steer · Space/Shift vertical · Ctrl boost · Q/E roll</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+
+function CinematicIntro({ visible }) {
+  if (!visible) return null;
+  return (
+    <div className="cinematic-intro">
+      <div className="cinematic-scan" />
+      <div className="cinematic-copy">
+        <p>T-Central Web Game</p>
+        <h2>Initializing navigation systems…</h2>
+      </div>
+    </div>
+  );
+}
+
 function SystemOverlay({ loading, mode, freeFly }) {
   return (
     <div className="system-overlay minimal">
       <div className="overlay-status">
         <span>
           {loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}
-          {freeFly ? ' • Space Sim active' : ''}
+          {freeFly ? ' • Rocket Flight active' : ''}
         </span>
       </div>
     </div>
@@ -688,6 +871,8 @@ export default function SystemScene() {
   const [transition, setTransition] = useState(null);
   const [resetTick, setResetTick] = useState(0);
   const [freeFly, setFreeFly] = useState(false);
+  const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
+  const [introVisible, setIntroVisible] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -737,9 +922,9 @@ export default function SystemScene() {
     if (bubble.type === 'freefly') {
       setFreeFly((v) => !v);
       setSelected({
-        label: 'Space Sim Flight',
+        label: 'Rocket Ship Mode',
         address: 'WASD + drag + Space/Shift + Ctrl boost + Q/E roll',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll.',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll. The craft is rebuilt as a more recognizable futuristic spaceship with rocket-inspired proportions and wireframe detailing.',
       });
       return;
     }
@@ -748,10 +933,12 @@ export default function SystemScene() {
 
   return (
     <div className="system-page refined">
+      <CinematicIntro visible={introVisible} />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
+      <GameHUD freeFly={freeFly} flightStats={flightStats} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas camera={{ position: [0, 1.4, 26], fov: 38 }}>
-          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} freeFly={freeFly} />
+          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
         {transition ? <WarpOverlay label={transition} /> : null}
