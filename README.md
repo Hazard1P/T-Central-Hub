@@ -160,3 +160,8 @@ Open:
 - Reworked the craft into a more recognizable futuristic spaceship form
 - Improved nose, fuselage, canopy, wings, stabilizers, and engine layout
 - Kept wireframe edge accents for a tech-heavy visual style
+
+
+## Ship wiremesh expansion
+- Added more wireframe edge detailing across canopy, fins, stabilizers, and engine housings
+- Increased the technical panel-line feel of the spacecraft without changing the working flight system

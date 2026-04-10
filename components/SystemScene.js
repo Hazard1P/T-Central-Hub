@@ -408,6 +408,43 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
           <edgesGeometry args={[new THREE.BoxGeometry(0.1, 0.54, 1.36)]} />
           <lineBasicMaterial color="#9fe9ff" transparent opacity={0.2} />
         </lineSegments>
+
+        <lineSegments position={[0, 0.21, 0.28]} scale={[0.68, 0.34, 1.12]}>
+          <edgesGeometry args={[new THREE.SphereGeometry(0.24, 16, 16)]} />
+          <lineBasicMaterial color="#c8f4ff" transparent opacity={0.18} />
+        </lineSegments>
+        <lineSegments position={[-0.48, -0.01, 0.78]} rotation={[0.02, 0.1, 0.38]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
+          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.22} />
+        </lineSegments>
+        <lineSegments position={[0.48, -0.01, 0.78]} rotation={[0.02, -0.1, -0.38]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.54, 0.035, 0.42)]} />
+          <lineBasicMaterial color="#9ae8ff" transparent opacity={0.22} />
+        </lineSegments>
+        <lineSegments position={[-0.34, 0.32, -0.92]} rotation={[0.46, 0.02, 0.08]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.22} />
+        </lineSegments>
+        <lineSegments position={[0.34, 0.32, -0.92]} rotation={[0.46, -0.02, -0.08]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.09, 0.68, 0.78)]} />
+          <lineBasicMaterial color="#86ddff" transparent opacity={0.22} />
+        </lineSegments>
+        <lineSegments position={[-0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
+          <lineBasicMaterial color="#b5efff" transparent opacity={0.18} />
+        </lineSegments>
+        <lineSegments position={[0.22, -0.12, -1.02]} rotation={[0.16, 0, 0]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.065, 0.09, 0.34, 12)]} />
+          <lineBasicMaterial color="#b5efff" transparent opacity={0.18} />
+        </lineSegments>
+        <lineSegments position={[0, -0.1, -1.14]} rotation={[0.08, 0, 0]}>
+          <edgesGeometry args={[new THREE.CylinderGeometry(0.085, 0.11, 0.38, 12)]} />
+          <lineBasicMaterial color="#d3f7ff" transparent opacity={0.2} />
+        </lineSegments>
+        <lineSegments position={[0, -0.2, -0.08]}>
+          <edgesGeometry args={[new THREE.BoxGeometry(0.22, 0.06, 0.72)]} />
+          <lineBasicMaterial color="#8fe3ff" transparent opacity={0.18} />
+        </lineSegments>
       </group>
     </group>
   );
@@ -923,7 +960,7 @@ export default function SystemScene() {
       setSelected({
         label: 'Rocket Ship Mode',
         address: 'WASD + drag + Space/Shift + Ctrl boost + Q/E roll',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll. The craft is rebuilt as a more recognizable futuristic spaceship with rocket-inspired proportions and wireframe detailing.',
+        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll. The craft is rebuilt as a more recognizable futuristic spaceship with rocket-inspired proportions and denser wireframe detailing.',
       });
       return;
     }
