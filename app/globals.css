@@ -745,3 +745,12 @@ button { font: inherit; }
 .sector-label {
   letter-spacing: 0.18em;
 }
+
+
+.interactive-map-stage.full.refined-stage canvas {
+  cursor: grab;
+}
+
+.interactive-map-stage.full.refined-stage canvas:active {
+  cursor: grabbing;
+}

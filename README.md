@@ -111,3 +111,10 @@ Open:
 ## Solar lock position fix
 - Moved the Solar Replica upward so it no longer sits inside the Rust black hole
 - Locked it into the same T-Central Hub positional zone at a cleaner vertical level
+
+
+## Camera unlock and solar system update
+- Relaxed camera controls much further for freer mouse-driven exploration
+- Renamed the Solar Replica presentation into Solar System
+- Kept the procedural sun and 9 planets
+- Moved the solar system farther upward in the T-Central Hub zone
