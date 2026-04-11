@@ -870,6 +870,54 @@ function CockpitOverlay({ freeFly, flightStats, selected }) {
     </div>
   );
 }
+
+function SteamIdentityPanel() {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const res = await fetch('/api/auth/steam/session', { cache: 'no-store' });
+        const data = await res.json();
+        if (!active) return;
+        setSession(data?.authenticated ? data.user : null);
+      } catch {
+        if (!active) return;
+        setSession(null);
+      }
+    };
+    load();
+    const id = setInterval(load, 30000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
+  }, []);
+
+  return (
+    <div className="steam-identity-panel">
+      <span className="steam-kicker">Identity</span>
+      {session ? (
+        <div className="steam-identity-row">
+          {session.avatar ? <img src={session.avatar} alt={session.personaname || 'Steam avatar'} className="steam-identity-avatar" /> : null}
+          <div>
+            <strong>{session.personaname || 'Steam user'}</strong>
+            <small>{session.steamid}</small>
+          </div>
+        </div>
+      ) : (
+        <div className="steam-identity-row">
+          <div>
+            <strong>Guest</strong>
+            <small>Sign in with Steam to bind identity</small>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CinematicIntro({ visible }) {
   if (!visible) return null;
   return (
@@ -968,6 +1016,7 @@ export default function SystemScene() {
   return (
     <div className="system-page refined">
       <CinematicIntro visible={introVisible} />
+      <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />

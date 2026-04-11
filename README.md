@@ -208,3 +208,16 @@ Open:
 - Moved Center / Donate / Report / Pilot into a fixed bottom screen control bar
 - Removed those controls from the 3D scene
 - Added a stronger cockpit-style overlay with radar, reticle, and targeting/status panels
+
+
+## Steam login
+- Added a lightweight Steam sign-in flow using Steam's browser-based OpenID callback pattern
+- Added a fixed Steam login HUD in the top-right corner
+- Profile enrichment uses `STEAM_API_KEY` from environment variables
+- Set `NEXT_PUBLIC_APP_URL` and `STEAM_API_KEY` in Vercel before deploying
+
+
+## Steam-linked expansions
+- Added Steam avatar/profile state to the top-right Steam HUD
+- Added a lower-left in-game identity panel that reflects Steam login state
+- Added a Steam-linked player reporting page and API route

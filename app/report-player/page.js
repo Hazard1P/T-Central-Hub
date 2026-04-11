@@ -1,42 +1,105 @@
-import PageShell from '@/components/PageShell';
+'use client';
 
-export const metadata = { title: 'Report Player' };
+import { useEffect, useState } from 'react';
 
-const steps = [
-  'Tell staff which server the issue happened on.',
-  'Include the player name and the time or date.',
-  'Keep the description factual and short.',
-  'Attach screenshots or clips if you have them.',
-  'Use Discord for active disruptions or urgent issues.'
-];
+const initialForm = {
+  reportedPlayer: '',
+  server: 'T-Central Hub',
+  reason: '',
+  evidence: '',
+};
 
 export default function ReportPlayerPage() {
+  const [session, setSession] = useState(null);
+  const [form, setForm] = useState(initialForm);
+  const [status, setStatus] = useState({ state: 'idle', message: '' });
+
+  useEffect(() => {
+    fetch('/api/auth/steam/session', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => setSession(data?.authenticated ? data.user : null))
+      .catch(() => setSession(null));
+  }, []);
+
+  const onChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ state: 'loading', message: 'Submitting report…' });
+
+    try {
+      const res = await fetch('/api/report-player', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Report failed');
+      setStatus({ state: 'success', message: `Report submitted. Reference: ${data.reference}` });
+      setForm(initialForm);
+    } catch (err) {
+      setStatus({ state: 'error', message: err.message || 'Report failed' });
+    }
+  };
+
   return (
-    <PageShell
-      eyebrow="Player Reporting"
-      title="A clear route for reporting rule violations and misconduct."
-      text="This page routes reports through your Discord moderation path for now, without pretending there is a backend report queue."
-    >
-      <div className="info-grid two">
-        <article className="content-card">
-          <p className="eyebrow">How to report</p>
-          <div className="step-list">
-            {steps.map((step) => (
-              <div key={step} className="step-item">
-                <span className="dot" />
-                <p>{step}</p>
-              </div>
-            ))}
+    <main className="report-page">
+      <section className="report-shell">
+        <div className="report-header">
+          <p className="report-kicker">T-Central moderation</p>
+          <h1>Player reporting</h1>
+          <p className="report-copy">
+            Use this form to report cheating, griefing, abuse, or rule violations across T-Central servers.
+          </p>
+        </div>
+
+        <div className="report-identity">
+          <div>
+            <span className="report-label">Reporter identity</span>
+            <strong>{session?.personaname || 'Guest reporter'}</strong>
+            <small>{session?.steamid || 'Steam login recommended for linked reports'}</small>
           </div>
-        </article>
-        <article className="content-card">
-          <p className="eyebrow">Discord route</p>
-          <h3>Open the community moderation path.</h3>
-          <a href="https://discord.gg/8bJAEau9" target="_blank" rel="noreferrer" className="button primary">
-            Join Discord
-          </a>
-        </article>
-      </div>
-    </PageShell>
+        </div>
+
+        <form className="report-form" onSubmit={onSubmit}>
+          <label>
+            <span>Reported player</span>
+            <input value={form.reportedPlayer} onChange={(e) => onChange('reportedPlayer', e.target.value)} required />
+          </label>
+
+          <label>
+            <span>Server</span>
+            <select value={form.server} onChange={(e) => onChange('server', e.target.value)}>
+              <option>T-Central Hub</option>
+              <option>Arma3 CTH</option>
+              <option>Rust Bi-Weekly</option>
+              <option>Rust Weekly</option>
+              <option>Rust Monthly</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Reason</span>
+            <input value={form.reason} onChange={(e) => onChange('reason', e.target.value)} required />
+          </label>
+
+          <label>
+            <span>Evidence link or notes</span>
+            <textarea rows="6" value={form.evidence} onChange={(e) => onChange('evidence', e.target.value)} required />
+          </label>
+
+          <div className="report-actions">
+            <button type="submit" className="report-submit">Submit report</button>
+            <a href="/" className="report-back">Back to hub</a>
+          </div>
+
+          {status.message ? (
+            <p className={`report-status ${status.state}`}>{status.message}</p>
+          ) : null}
+        </form>
+      </section>
+    </main>
   );
 }
