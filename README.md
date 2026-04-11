@@ -221,3 +221,21 @@ Open:
 - Added Steam avatar/profile state to the top-right Steam HUD
 - Added a lower-left in-game identity panel that reflects Steam login state
 - Added a Steam-linked player reporting page and API route
+
+
+## Donate page refresh
+- Rebuilt the donate page with stronger supporter and patron messaging
+- Added a direct PayPal.Me option for flexible one-time donations
+- Kept the live PayPal subscription flow in place
+
+
+## Multiplayer package
+- Added a lightweight multiplayer HUD using Supabase Realtime presence
+- Player slots are configurable through `NEXT_PUBLIC_MULTIPLAYER_MAX_SLOTS`
+- Steam-signed-in users join the shared room as live presence
+- Includes a simple safety-in-numbers state that activates at 2 or more players
+- Configure:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `NEXT_PUBLIC_MULTIPLAYER_ROOM`
+  - `NEXT_PUBLIC_MULTIPLAYER_MAX_SLOTS`
