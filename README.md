@@ -177,3 +177,9 @@ Open:
 - Rebuilt the ship into a fuller futuristic spaceship form
 - Added more complete fuselage, intakes, wing, fin, and engine-pod structure
 - Preserved the current working web-game flight stack
+
+
+## Habitable ship pass
+- Reshaped the craft into a more rounded and livable deep-space vessel
+- Added clearer habitation volume, observation dome, side pods, and softer engine assembly
+- Reduced harsh engineering lines to feel more like a real long-range spacecraft
