@@ -202,3 +202,9 @@ Open:
 - Reduced label noise
 - Tightened HUD and overlay styling
 - Softened sector labels and UI surfaces
+
+
+## Fixed HUD and cockpit overlay
+- Moved Center / Donate / Report / Pilot into a fixed bottom screen control bar
+- Removed those controls from the 3D scene
+- Added a stronger cockpit-style overlay with radar, reticle, and targeting/status panels

@@ -6,13 +6,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 
-const NAV_BUBBLES = [
-  { label: 'Center', type: 'reset', position: [-4.8, -12.9, 0], note: 'Reset view' },
-  { label: 'Donate', href: '/donate', position: [-1.6, -12.9, 0], note: 'Support' },
-  { label: 'Report', href: '/report-player', position: [1.6, -12.9, 0], note: 'Reports' },
-  { label: 'Pilot', type: 'freefly', position: [4.8, -12.9, 0], note: 'Ship mode' },
-];
-
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
   { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [3.4, 10.8, -4.4], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
@@ -670,21 +663,6 @@ function ConstellationLines() {
   );
 }
 
-function BubbleNav({ onBubble }) {
-  return (
-    <>
-      {NAV_BUBBLES.map((bubble) => (
-        <Html key={bubble.label} position={bubble.position} center distanceFactor={11}>
-          <button className="bubble-nav" onClick={() => onBubble(bubble)}>
-            <strong>{bubble.label}</strong>
-            <span>{bubble.note}</span>
-          </button>
-        </Html>
-      ))}
-    </>
-  );
-}
-
 function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   const mesh = useRef(null);
   const glowColor = status?.online === true ? '#73ff9e' : status?.online === false ? '#ff7d7d' : node.color;
@@ -721,7 +699,7 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats }) {
+function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
@@ -744,7 +722,6 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats
         <SectorRing position={[7.4, 2.2, 5.0]} radius={4.5} color="#ffd46b" label="Solar" />
 
         <ConstellationLines />
-        <BubbleNav onBubble={onBubble} />
 
         <BlackHoleAnchor node={NODES.find((n) => n.key === 'arma3')} onSelect={onSelect} title="Arma3 Black Hole" subtitle="Tactical anchor" coreColor="#00eaff" ringColor="#8beaff" labelOffset={[0, 1.55, 0]} matterRadius={3.1} />
         <BlackHoleAnchor node={NODES.find((n) => n.key === 'sbox')} onSelect={onSelect} title="S&Box Black Hole" subtitle="Sandbox anchor" coreColor="#67d7ff" ringColor="#b6f3ff" labelOffset={[0, 1.55, 0]} matterRadius={2.7} />
@@ -829,50 +806,78 @@ function distance3(a, b) {
   );
 }
 
-function GameHUD({ freeFly, flightStats }) {
+
+
+function distance3(a, b) {
+  return Math.sqrt(
+    (a[0] - b.x) ** 2 +
+    (a[1] - b.y) ** 2 +
+    (a[2] - b.z) ** 2
+  );
+}
+
+function FixedNav({ onCenter, onPilotToggle, freeFly }) {
   return (
-    <div className={`game-hud ${freeFly ? 'active' : ''}`}>
-      <div className="hud-left">
-        <div className="hud-card">
-          <span className="hud-label">Mode</span>
-          <strong>{freeFly ? 'Rocket Flight' : 'Navigation'}</strong>
-        </div>
-        <div className="hud-card">
-          <span className="hud-label">Speed</span>
-          <strong>{Math.round(flightStats.speed)}</strong>
-        </div>
-        <div className="hud-card">
-          <span className="hud-label">Boost</span>
-          <strong>{flightStats.boosting ? 'Active' : 'Standby'}</strong>
-        </div>
-      </div>
-
-      {freeFly ? <div className="hud-crosshair"><span /><span /></div> : null}
-
-      <div className="hud-right">
-        <div className="hud-card">
-          <span className="hud-label">Gravity Pull</span>
-          <strong>{flightStats.gravityTarget || '—'}</strong>
-        </div>
-        <div className="hud-card">
-          <span className="hud-label">Zone</span>
-          <strong>{flightStats.zone || 'Open Space'}</strong>
-        </div>
-      </div>
-
-      {freeFly ? (
-        <div className="hud-bottom">
-          <div className="boost-bar">
-            <div className="boost-fill" style={{ width: `${Math.min(100, flightStats.boostLevel)}%` }} />
-          </div>
-          <p>WASD move · Mouse drag steer · Space/Shift vertical · Ctrl boost · Q/E roll</p>
-        </div>
-      ) : null}
+    <div className="hud-bottom-fixed">
+      <button onClick={onCenter}>Center</button>
+      <a href="/donate"><button>Donate</button></a>
+      <a href="/report-player"><button>Report</button></a>
+      <button onClick={onPilotToggle}>{freeFly ? 'Exit Pilot' : 'Pilot'}</button>
     </div>
   );
 }
 
+function Radar({ freeFly, target }) {
+  return (
+    <div className={`radar ${freeFly ? 'active' : ''}`}>
+      <div className="radar-ring ring-1" />
+      <div className="radar-ring ring-2" />
+      <div className="radar-ring ring-3" />
+      <div className="radar-sweep" />
+      <div className="radar-center" />
+      {target ? <div className="radar-target" /> : null}
+      <div className="radar-label">{target || 'No lock'}</div>
+    </div>
+  );
+}
 
+function CockpitOverlay({ freeFly, flightStats, selected }) {
+  return (
+    <div className={`cockpit-overlay ${freeFly ? 'active' : ''}`}>
+      <div className="cockpit-frame top-left" />
+      <div className="cockpit-frame top-right" />
+      <div className="cockpit-frame bottom-left" />
+      <div className="cockpit-frame bottom-right" />
+
+      <div className="cockpit-panel left">
+        <div className="panel-title">Navigation</div>
+        <div className="panel-row"><span>Mode</span><strong>{freeFly ? 'Pilot' : 'Observer'}</strong></div>
+        <div className="panel-row"><span>Zone</span><strong>{flightStats.zone || '—'}</strong></div>
+        <div className="panel-row"><span>Pull</span><strong>{flightStats.gravityTarget || '—'}</strong></div>
+      </div>
+
+      <div className="cockpit-panel right">
+        <div className="panel-title">Flight</div>
+        <div className="panel-row"><span>Speed</span><strong>{Math.round(flightStats.speed || 0)}</strong></div>
+        <div className="panel-row"><span>Boost</span><strong>{flightStats.boosting ? 'Active' : 'Standby'}</strong></div>
+        <div className="panel-row"><span>Target</span><strong>{selected?.label || 'None'}</strong></div>
+      </div>
+
+      <Radar freeFly={freeFly} target={selected?.label || flightStats.gravityTarget} />
+
+      {freeFly ? (
+        <>
+          <div className="target-reticle">
+            <span className="reticle-ring" />
+            <span className="reticle-dot" />
+          </div>
+          <div className="scanline scanline-a" />
+          <div className="scanline scanline-b" />
+        </>
+      ) : null}
+    </div>
+  );
+}
 function CinematicIntro({ visible }) {
   if (!visible) return null;
   return (
@@ -950,32 +955,33 @@ export default function SystemScene() {
     }, 900);
   };
 
-  const onBubble = (bubble) => {
-    if (bubble.type === 'reset') {
-      setSelected(null);
-      setResetTick((n) => n + 1);
-      return;
-    }
-    if (bubble.type === 'freefly') {
-      setFreeFly((v) => !v);
-      setSelected({
-        label: 'Pilot Mode',
-        address: 'WASD + drag + Space/Shift + Ctrl boost + Q/E roll',
-        description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll. The craft is rebuilt as a more recognizable futuristic spaceship with rocket-inspired proportions and denser wireframe detailing.',
-      });
-      return;
-    }
-    setSelected({ label: bubble.label, address: bubble.note, description: bubble.note, href: bubble.href, route: bubble.href });
+
+
+  const handleCenter = () => {
+    setSelected(null);
+    setResetTick((n) => n + 1);
+  };
+
+  const handlePilotToggle = () => {
+    setFreeFly((v) => !v);
+    setSelected({
+      label: freeFly ? 'Observer Mode' : 'Pilot Mode',
+      address: freeFly ? 'Ship hidden' : 'Ship active',
+      description: freeFly
+        ? 'Returned to observer mode.'
+        : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
+    });
   };
 
   return (
     <div className="system-page refined">
       <CinematicIntro visible={introVisible} />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
-      <GameHUD freeFly={freeFly} flightStats={flightStats} />
+      <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
+      <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas camera={{ position: [0, 2.4, 36], fov: 40 }}>
-          <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
+          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
         {transition ? <WarpOverlay label={transition} /> : null}
