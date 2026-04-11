@@ -449,7 +449,6 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       </group>
     </group>
   );
-  );
 }
 
 function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [Math.PI / 2.4, 0, 0], count = 44, spread = 0.16 }) {
