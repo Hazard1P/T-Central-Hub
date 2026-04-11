@@ -183,3 +183,9 @@ Open:
 - Reshaped the craft into a more rounded and livable deep-space vessel
 - Added clearer habitation volume, observation dome, side pods, and softer engine assembly
 - Reduced harsh engineering lines to feel more like a real long-range spacecraft
+
+
+## Space layout redistribution
+- Raised the main navigation bubbles higher in the scene
+- Spread major systems across multiple axes instead of a mostly vertical stack
+- Pulled the camera back slightly to fit the larger spatial layout

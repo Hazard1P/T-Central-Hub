@@ -7,25 +7,25 @@ import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
-  { label: 'Center', type: 'reset', position: [-3.4, 9.6, 0], note: 'Reset system view' },
-  { label: 'Donate', href: '/donate', position: [0, 10.1, 0], note: 'Support system' },
-  { label: 'Report', href: '/report-player', position: [3.4, 9.6, 0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [6.9, 9.3, 0], note: 'Toggle ship flight' },
+  { label: 'Center', type: 'reset', position: [-7.2, 13.4, 1.3], note: 'Reset system view' },
+  { label: 'Donate', href: '/donate', position: [-1.4, 14.2, -0.7], note: 'Support system' },
+  { label: 'Report', href: '/report-player', position: [4.4, 13.5, 1.0], note: 'Player reporting' },
+  { label: 'Free Fly', type: 'freefly', position: [10.2, 12.9, -1.2], note: 'Toggle ship flight' },
 ];
 
 const NODES = [
-  { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-9.4, 3.0, 0], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
-  { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [0, 8.2, 0], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
-  { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [0, -6.0, 0], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
-  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole added from the map concept.', position: [-12.2, -5.8, -0.3], color: '#c4d4ff', kind: 'blackhole' },
-  { key: 'solar_system', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [0, 0.2, 1.0], color: '#ffd46b', kind: 'solar' },
-  { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [0, -3.8, 1.35], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
-  { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [4.9, -6.7, -0.45], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
-  { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-4.9, -6.7, -0.45], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
-  { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [9.4, 3.0, 0], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
-  { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [9.8, -2.8, 0.25], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
-  { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [9.6, 8.0, -0.25], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
-  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [12.0, -1.2, 0.15], color: '#ff8a8a', route: '/report-player', kind: 'node' },
+  { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
+  { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [3.4, 10.8, -4.4], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
+  { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [-2.4, -7.8, 2.8], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
+  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole added from the map concept.', position: [-17.2, -3.6, -5.8], color: '#c4d4ff', kind: 'blackhole' },
+  { key: 'solar_system', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [7.4, 2.2, 5.0], color: '#ffd46b', kind: 'solar' },
+  { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [1.8, -5.0, 4.8], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
+  { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [8.4, -9.2, -2.0], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
+  { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-8.8, -9.6, 0.8], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
+  { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [12.8, 5.4, 3.2], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
+  { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [14.2, -2.0, -2.8], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
+  { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [12.2, 11.6, -3.8], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
+  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [15.6, -4.4, 3.2], color: '#ff8a8a', route: '/report-player', kind: 'node' },
 ];
 
 function formatStatus(status) {
@@ -100,7 +100,7 @@ function CameraReset({ tick }) {
   }, []);
 
   useEffect(() => {
-    camera.position.set(0, 1.4, 26);
+    camera.position.set(0, 2.4, 36);
     camera.lookAt(0, 0, 0);
     if (controls) {
       controls.target.set(0, 0, 0);
@@ -736,12 +736,12 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats
       <Stars radius={96} depth={44} count={4200} factor={4.2} saturation={0} fade speed={0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>
-        <SectorRing position={[-9.4, 3.0, 0]} radius={4.8} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[0, 8.2, 0]} radius={3.9} color="#67d7ff" label="S&Box Sector" />
-        <SectorRing position={[0, -6.0, 0]} radius={6.6} color="#9f7cff" label="T-Central Hub" />
-        <SectorRing position={[9.4, 3.0, 0]} radius={4.8} color="#ffd15c" label="Support Sector" />
-        <SectorRing position={[-12.2, -5.8, -0.3]} radius={4.2} color="#c4d4ff" label="Deep Anchor" />
-        <SectorRing position={[0, 0.2, 1.0]} radius={4.4} color="#ffd46b" label="Solar System" />
+        <SectorRing position={[-12.8, 5.0, -2.8]} radius={5.2} color="#58dfff" label="Arma Sector" />
+        <SectorRing position={[3.4, 10.8, -4.4]} radius={4.6} color="#67d7ff" label="S&Box Sector" />
+        <SectorRing position={[-2.4, -7.8, 2.8]} radius={7.2} color="#9f7cff" label="T-Central Hub" />
+        <SectorRing position={[12.8, 5.4, 3.2]} radius={5.2} color="#ffd15c" label="Support Sector" />
+        <SectorRing position={[-17.2, -3.6, -5.8]} radius={5.0} color="#c4d4ff" label="Deep Anchor" />
+        <SectorRing position={[7.4, 2.2, 5.0]} radius={5.2} color="#ffd46b" label="Solar System" />
 
         <ConstellationLines />
         <BubbleNav onBubble={onBubble} />
@@ -767,7 +767,7 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats
         enableZoom
         enableRotate
         minDistance={2}
-        maxDistance={100}
+        maxDistance={135}
         autoRotate={false}
         zoomSpeed={1.0}
         rotateSpeed={0.8}
@@ -974,7 +974,7 @@ export default function SystemScene() {
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <GameHUD freeFly={freeFly} flightStats={flightStats} />
       <div className="interactive-map-stage full refined-stage">
-        <Canvas camera={{ position: [0, 1.4, 26], fov: 38 }}>
+        <Canvas camera={{ position: [0, 2.4, 36], fov: 40 }}>
           <Scene statuses={statuses} onSelect={setSelected} onBubble={onBubble} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
