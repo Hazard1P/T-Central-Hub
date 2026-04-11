@@ -1039,3 +1039,82 @@ button { font: inherit; }
     justify-content: flex-end;
   }
 }
+
+
+/* Bottom-screen nav styling */
+.bubble-nav {
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .bubble-nav {
+    transform: scale(0.95);
+  }
+}
+
+
+/* Cleaner visual pass */
+.map-focus-panel {
+  background: rgba(8, 12, 18, 0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+}
+
+.bubble-nav {
+  min-width: 104px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(7, 12, 20, 0.56);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.bubble-nav strong {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.bubble-nav span {
+  font-size: 10px;
+  opacity: 0.72;
+}
+
+.map-node-label,
+.map-anchor-label {
+  background: rgba(7, 12, 20, 0.42);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+}
+
+.sector-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+
+.game-hud .hud-card {
+  background: rgba(7,12,20,0.42);
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 96px;
+  padding: 8px 10px;
+}
+
+.game-hud .hud-card strong {
+  font-size: 14px;
+}
+
+.hud-bottom {
+  width: min(440px, 88vw);
+}
+
+.hud-bottom p {
+  opacity: 0.68;
+}
+
+.transition-overlay,
+.cinematic-intro {
+  backdrop-filter: blur(6px);
+}

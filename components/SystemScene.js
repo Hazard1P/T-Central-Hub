@@ -7,10 +7,10 @@ import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three
 import * as THREE from 'three';
 
 const NAV_BUBBLES = [
-  { label: 'Center', type: 'reset', position: [-7.2, 13.4, 1.3], note: 'Reset system view' },
-  { label: 'Donate', href: '/donate', position: [-1.4, 14.2, -0.7], note: 'Support system' },
-  { label: 'Report', href: '/report-player', position: [4.4, 13.5, 1.0], note: 'Player reporting' },
-  { label: 'Free Fly', type: 'freefly', position: [10.2, 12.9, -1.2], note: 'Toggle ship flight' },
+  { label: 'Center', type: 'reset', position: [-4.8, -12.9, 0], note: 'Reset view' },
+  { label: 'Donate', href: '/donate', position: [-1.6, -12.9, 0], note: 'Support' },
+  { label: 'Report', href: '/report-player', position: [1.6, -12.9, 0], note: 'Reports' },
+  { label: 'Pilot', type: 'freefly', position: [4.8, -12.9, 0], note: 'Ship mode' },
 ];
 
 const NODES = [
@@ -185,7 +185,7 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
         speed: 0,
         boosting: false,
         boostLevel: boostMeter.current,
-        gravityTarget: 'None',
+        gravityTarget: '—',
         zone: 'Navigation',
       });
       return;
@@ -736,12 +736,12 @@ function Scene({ statuses, onSelect, onBubble, resetTick, freeFly, onFlightStats
       <Stars radius={96} depth={44} count={4200} factor={4.2} saturation={0} fade speed={0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>
-        <SectorRing position={[-12.8, 5.0, -2.8]} radius={5.2} color="#58dfff" label="Arma Sector" />
-        <SectorRing position={[3.4, 10.8, -4.4]} radius={4.6} color="#67d7ff" label="S&Box Sector" />
-        <SectorRing position={[-2.4, -7.8, 2.8]} radius={7.2} color="#9f7cff" label="T-Central Hub" />
-        <SectorRing position={[12.8, 5.4, 3.2]} radius={5.2} color="#ffd15c" label="Support Sector" />
-        <SectorRing position={[-17.2, -3.6, -5.8]} radius={5.0} color="#c4d4ff" label="Deep Anchor" />
-        <SectorRing position={[7.4, 2.2, 5.0]} radius={5.2} color="#ffd46b" label="Solar System" />
+        <SectorRing position={[-12.8, 5.0, -2.8]} radius={4.6} color="#58dfff" label="Arma" />
+        <SectorRing position={[3.4, 10.8, -4.4]} radius={4.0} color="#67d7ff" label="S&Box" />
+        <SectorRing position={[-2.4, -7.8, 2.8]} radius={6.2} color="#9f7cff" label="Hub" />
+        <SectorRing position={[12.8, 5.4, 3.2]} radius={4.6} color="#ffd15c" label="Support" />
+        <SectorRing position={[-17.2, -3.6, -5.8]} radius={4.3} color="#c4d4ff" label="Deep" />
+        <SectorRing position={[7.4, 2.2, 5.0]} radius={4.5} color="#ffd46b" label="Solar" />
 
         <ConstellationLines />
         <BubbleNav onBubble={onBubble} />
@@ -852,7 +852,7 @@ function GameHUD({ freeFly, flightStats }) {
       <div className="hud-right">
         <div className="hud-card">
           <span className="hud-label">Gravity Pull</span>
-          <strong>{flightStats.gravityTarget || 'None'}</strong>
+          <strong>{flightStats.gravityTarget || '—'}</strong>
         </div>
         <div className="hud-card">
           <span className="hud-label">Zone</span>
@@ -892,7 +892,7 @@ function SystemOverlay({ loading, mode, freeFly }) {
       <div className="overlay-status">
         <span>
           {loading ? 'Loading status layer…' : mode === 'remote' ? 'Live status layer connected' : 'Status layer ready — source not configured'}
-          {freeFly ? ' • Rocket Flight active' : ''}
+          {freeFly ? ' • Pilot Mode active' : ''}
         </span>
       </div>
     </div>
@@ -959,7 +959,7 @@ export default function SystemScene() {
     if (bubble.type === 'freefly') {
       setFreeFly((v) => !v);
       setSelected({
-        label: 'Rocket Ship Mode',
+        label: 'Pilot Mode',
         address: 'WASD + drag + Space/Shift + Ctrl boost + Q/E roll',
         description: 'Use W A S D to move, Space to rise, Shift to descend, hold the mouse button while dragging to steer, hold Control to boost, and use Q / E for extra roll. The craft is rebuilt as a more recognizable futuristic spaceship with rocket-inspired proportions and denser wireframe detailing.',
       });

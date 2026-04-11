@@ -189,3 +189,16 @@ Open:
 - Raised the main navigation bubbles higher in the scene
 - Spread major systems across multiple axes instead of a mostly vertical stack
 - Pulled the camera back slightly to fit the larger spatial layout
+
+
+## Bottom HUD and pilot-only ship
+- Moved Center / Donate / Report / Pilot controls to the bottom of the screen
+- Kept the ship visible only while piloting
+- Cleaned the scene so the spacecraft is not always present
+
+
+## Cleaner visual pass
+- Simplified bottom controls
+- Reduced label noise
+- Tightened HUD and overlay styling
+- Softened sector labels and UI surfaces
