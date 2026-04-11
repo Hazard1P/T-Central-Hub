@@ -808,14 +808,6 @@ function distance3(a, b) {
 
 
 
-function distance3(a, b) {
-  return Math.sqrt(
-    (a[0] - b.x) ** 2 +
-    (a[1] - b.y) ** 2 +
-    (a[2] - b.z) ** 2
-  );
-}
-
 function FixedNav({ onCenter, onPilotToggle, freeFly }) {
   return (
     <div className="hud-bottom-fixed">
