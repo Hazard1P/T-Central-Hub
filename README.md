@@ -236,3 +236,10 @@ Open:
 - Added a visible Arma3 server list card inside the blackhole interior
 - Added copy IP, Launch Arma 3, and Quick Connect actions
 - Quick Connect uses the Steam browser protocol handoff
+
+
+## Dynamic server browser
+- Replaced the simple Arma3 interior card with a full dynamic browser layout
+- Added search, sort, suggested server logic, and per-server quick-connect actions
+- Server definitions live in `lib/serverCatalog.js`
+- Live status enriches entries when available from the existing status layer

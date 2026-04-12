@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
+import { SERVER_CATALOG } from '@/lib/serverCatalog';
 
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
@@ -789,19 +790,54 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
 }
 
 
-function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, onClose }) {
-  if (!item || item.key !== 'arma3') return null;
-  const status = statuses?.arma3 || null;
-  const serverIp = 'tcentral.game.nfoservers.com:2302';
-  const steamLaunchUrl = 'steam://run/107410';
-  const quickConnectUrl = `steam://connect/${serverIp}`;
 
-  const copyIp = async () => {
+function Arma3BlackholeInterior({ item, statuses, onClose }) {
+  const [query, setQuery] = useState('');
+  const [sortMode, setSortMode] = useState('best');
+  const [copiedIp, setCopiedIp] = useState('');
+  if (!item || item.key !== 'arma3') return null;
+
+  const servers = SERVER_CATALOG.arma3.map((server) => {
+    const linked = server.statusKey ? statuses?.[server.statusKey] : null;
+    const players = typeof linked?.players === 'number' ? linked.players : 0;
+    const maxPlayers = typeof linked?.maxPlayers === 'number' ? linked.maxPlayers : 100;
+    const online = linked?.online === true;
+    const occupancy = maxPlayers > 0 ? players / maxPlayers : 0;
+    return {
+      ...server,
+      online,
+      players,
+      maxPlayers,
+      liveMap: linked?.map || server.map,
+      occupancy,
+      joinUrl: `steam://connect/${server.ip}`,
+      launchUrl: `steam://run/${server.steamAppId || '107410'}`,
+    };
+  });
+
+  const filtered = servers
+    .filter((server) => {
+      const haystack = [server.title, server.ip, server.game, server.mode, server.liveMap, ...(server.tags || [])]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(query.trim().toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortMode === 'players') return b.players - a.players;
+      if (sortMode === 'name') return a.title.localeCompare(b.title);
+      if (sortMode === 'mode') return a.mode.localeCompare(b.mode);
+      const score = (s) => (s.online ? 1000 : 0) + (s.players * 4) + (s.tier === 'Primary' ? 60 : 0) - Math.abs(0.72 - s.occupancy) * 100;
+      return score(b) - score(a);
+    });
+
+  const bestServer = filtered[0] || null;
+
+  const copyIp = async (ip) => {
     try {
-      await navigator.clipboard.writeText(serverIp);
-    } catch {
-      // ignore clipboard failure
-    }
+      await navigator.clipboard.writeText(ip);
+      setCopiedIp(ip);
+      window.setTimeout(() => setCopiedIp(''), 1400);
+    } catch {}
   };
 
   return (
@@ -822,82 +858,92 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
           <div className="blackhole-interior-header">
             <div>
               <p className="eyebrow">Arma3 blackhole interior</p>
-              <h2>CTH Tactical Command Sphere</h2>
+              <h2>Dynamic server browser</h2>
               <p className="muted">
-                Review the server datapoints, confirm the target, and then use the quick-connect actions to launch into Arma 3 CTH.
+                Browse T-Central Arma 3 routes, sort by best fit, and connect through Steam from one command sphere.
               </p>
             </div>
             <button className="focus-close" onClick={onClose}>×</button>
           </div>
 
-          <div className="interior-server-list-card">
-            <div className="server-list-head">
+          <div className="browser-topbar">
+            <div className="browser-search-wrap">
+              <input
+                className="browser-search"
+                placeholder="Search mode, map, IP, or server name"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="browser-sort">
+              <button className={sortMode === 'best' ? 'active' : ''} onClick={() => setSortMode('best')}>Best</button>
+              <button className={sortMode === 'players' ? 'active' : ''} onClick={() => setSortMode('players')}>Players</button>
+              <button className={sortMode === 'name' ? 'active' : ''} onClick={() => setSortMode('name')}>Name</button>
+              <button className={sortMode === 'mode' ? 'active' : ''} onClick={() => setSortMode('mode')}>Mode</button>
+            </div>
+          </div>
+
+          {bestServer ? (
+            <div className="browser-highlight-card">
               <div>
-                <span className="interior-step">Server list</span>
-                <h3>Arma3 CTH live route</h3>
+                <span className="interior-step">Suggested server</span>
+                <h3>{bestServer.title}</h3>
+                <p className="muted">
+                  Best-fit route based on uptime, occupancy, and priority weighting.
+                </p>
               </div>
-              <span className="server-mode-pill">CTH</span>
-            </div>
-
-            <div className="arma-server-row">
-              <div className="arma-server-main">
-                <strong>T-Central Arma3 CTH</strong>
-                <span>{serverIp}</span>
-              </div>
-              <div className="arma-server-state">
-                <span>{status?.online === true ? 'Online' : status?.online === false ? 'Offline' : 'Unavailable'}</span>
-                <strong>{formatStatus(status)}</strong>
+              <div className="highlight-actions">
+                <a className="button secondary" href={bestServer.launchUrl}>Launch Arma 3</a>
+                <a className="button primary" href={bestServer.joinUrl}>Quick Connect</a>
               </div>
             </div>
+          ) : null}
 
-            <div className="arma-server-actions">
-              <button className="button secondary" onClick={copyIp}>Copy IP</button>
-              <a className="button secondary" href={steamLaunchUrl}>Launch Arma 3</a>
-              <a className="button primary" href={quickConnectUrl}>Quick Connect</a>
-            </div>
-          </div>
+          <div className="server-browser-list">
+            {filtered.map((server) => (
+              <article key={server.id} className="browser-server-card">
+                <div className="browser-server-main">
+                  <div className="browser-server-titleline">
+                    <strong>{server.title}</strong>
+                    <span className={`browser-state ${server.online ? 'online' : ''}`}>
+                      {server.online ? 'Online' : 'Unavailable'}
+                    </span>
+                  </div>
 
-          <div className="interior-checkpoint-grid">
-            <article className="interior-card">
-              <span className="interior-step">01 · Datapoint capture</span>
-              <h3>Live operational snapshot</h3>
-              <div className="interior-metric-list">
-                <div><span>Status</span><strong>{status?.online === true ? 'Online' : status?.online === false ? 'Offline' : 'Unavailable'}</strong></div>
-                <div><span>Players</span><strong>{formatStatus(status)}</strong></div>
-                <div><span>Map</span><strong>{status?.map || 'Altis / tactical layer'}</strong></div>
+                  <div className="browser-server-meta">
+                    <span>{server.mode}</span>
+                    <span>{server.liveMap}</span>
+                    <span>{server.ip}</span>
+                  </div>
+                </div>
+
+                <div className="browser-server-stats">
+                  <div>
+                    <span>Players</span>
+                    <strong>{server.players} / {server.maxPlayers}</strong>
+                  </div>
+                  <div>
+                    <span>Tier</span>
+                    <strong>{server.tier}</strong>
+                  </div>
+                </div>
+
+                <div className="browser-server-actions">
+                  <button className="button secondary" onClick={() => copyIp(server.ip)}>
+                    {copiedIp === server.ip ? 'Copied' : 'Copy IP'}
+                  </button>
+                  <a className="button secondary" href={server.launchUrl}>Launch Arma 3</a>
+                  <a className="button primary" href={server.joinUrl}>Quick Connect</a>
+                </div>
+              </article>
+            ))}
+
+            {filtered.length === 0 ? (
+              <div className="browser-empty-state">
+                No servers matched that search.
               </div>
-            </article>
-
-            <article className="interior-card">
-              <span className="interior-step">02 · Confirmation</span>
-              <h3>Target validation</h3>
-              <div className="interior-metric-list">
-                <div><span>Server IP</span><strong>{serverIp}</strong></div>
-                <div><span>Mode</span><strong>Capture the Hill</strong></div>
-                <div><span>Verified</span><strong>{verified ? 'Confirmed' : 'Pending'}</strong></div>
-              </div>
-              <button className="button secondary" onClick={onVerify}>
-                {verified ? 'Datapoints confirmed' : 'Confirm datapoints'}
-              </button>
-            </article>
-
-            <article className="interior-card">
-              <span className="interior-step">03 · Deploy</span>
-              <h3>Steam handoff</h3>
-              <p className="muted">
-                Use the Steam handoff after confirmation for a faster route into the server. Launch Arma 3 first if needed, then use Quick Connect.
-              </p>
-              <div className="button-column">
-                <button className="button primary" onClick={onDeploy} disabled={!verified}>
-                  {verified ? 'Quick connect now' : 'Confirm to enable'}
-                </button>
-                <button className="button secondary" onClick={onClose}>Exit interior</button>
-              </div>
-            </article>
-          </div>
-
-          <div className="interior-footer-note">
-            Tactical preview: this interior now prioritizes real join actions first — server list, visible IP, Arma launch, and quick connect.
+            ) : null}
           </div>
         </div>
       </div>
@@ -905,7 +951,8 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
   );
 }
 
-function WarpOverlay({ label }) {
+function WarpOverlay
+({ label }) {
   return (
     <div className="transition-overlay warp-enter">
       <div className="warp-rings"><span /><span /><span /></div>
@@ -1073,7 +1120,6 @@ export default function SystemScene() {
   const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
   const [introVisible, setIntroVisible] = useState(true);
   const [activeInterior, setActiveInterior] = useState(null);
-  const [interiorVerified, setInteriorVerified] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -1119,7 +1165,6 @@ export default function SystemScene() {
     if (!href) return;
     if (item.key === 'arma3') {
       setActiveInterior('arma3');
-      setInteriorVerified(false);
       setSelected(item);
       return;
     }
@@ -1130,20 +1175,8 @@ export default function SystemScene() {
 
   const handleInteriorClose = () => {
     setActiveInterior(null);
-    setInteriorVerified(false);
   };
 
-  const handleInteriorVerify = () => {
-    setInteriorVerified(true);
-  };
-
-  const handleInteriorDeploy = () => {
-    setActiveInterior(null);
-    setTransition('Arma3 CTH');
-    setTimeout(() => {
-      window.location.href = 'steam://connect/tcentral.game.nfoservers.com:2302';
-    }, 900);
-  };
 
   const handleCenter = () => {
     setSelected(null);
@@ -1176,9 +1209,9 @@ export default function SystemScene() {
         <Arma3BlackholeInterior
           item={activeInterior === 'arma3' ? selected : null}
           statuses={statuses}
-          verified={interiorVerified}
-          onVerify={handleInteriorVerify}
-          onDeploy={handleInteriorDeploy}
+
+
+
           onClose={handleInteriorClose}
         />
         {transition ? <WarpOverlay label={transition} /> : null}
