@@ -847,6 +847,27 @@ function LiveRoomPanel({ players, me }) {
 }
 
 
+
+function ServerLayerPanel({ active, roomStats, onEnterPilot, onSpectate }) {
+  return (
+    <div className={`server-layer-panel ${active ? 'active' : ''}`}>
+      <div className="live-room-head">
+        <span className="pilot-assist-kicker">Web-game server</span>
+        <strong>3D simulator layer active</strong>
+      </div>
+      <div className="server-layer-stats">
+        <div><span>Visible</span><strong>{roomStats.visiblePlayers}</strong></div>
+        <div><span>Pilots</span><strong>{roomStats.pilots}</strong></div>
+        <div><span>Spectators</span><strong>{roomStats.spectators}</strong></div>
+      </div>
+      <div className="button-column">
+        <button className="button primary" onClick={onEnterPilot}>Enter pilot mode</button>
+        <button className="button secondary" onClick={onSpectate}>Enter spectate mode</button>
+      </div>
+    </div>
+  );
+}
+
 function ActivityFeed({ players }) {
   const sorted = [...players]
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
@@ -1369,6 +1390,10 @@ export default function SystemScene() {
   const [spectatorMode, setSpectatorMode] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedScene, setReducedScene] = useState(false);
+  const [serverLayerActive, setServerLayerActive] = useState(true);
+  const [roomStats, setRoomStats] = useState({ visiblePlayers: 0, pilots: 0, spectators: 0 });
+  const stateChannelRef = useRef(null);
+  const lastRemoteUpdateRef = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -1408,70 +1433,68 @@ export default function SystemScene() {
   }, []);
 
 
-  useEffect(() => {
-    const supabase = getSupabaseClient();
-    if (!supabase || !steamUser?.steamid) return;
 
-    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
-    const channel = supabase.channel(`webgame:${room}`, {
-      config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
-    });
+useEffect(() => {
+  const supabase = getSupabaseClient();
+  if (!supabase || !steamUser?.steamid) return;
 
-    channel
-      .on('broadcast', { event: 'player-state' }, ({ payload }) => {
-        if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
-        setRemotePlayers((prev) => {
-          const next = prev.filter((entry) => entry.steamid !== payload.steamid);
-          next.push(payload);
-          return next.slice(-100);
-        });
-      })
-      .subscribe(async (status) => {
-        if (status !== 'SUBSCRIBED') return;
-        await channel.track({
-          steamid: steamUser.steamid,
-          personaname: steamUser.personaname || 'Steam user',
-          avatar: steamUser.avatar || null,
-          joinedAt: new Date().toISOString(),
-        });
+  const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+  const channel = supabase.channel(`webgame:${room}`, {
+    config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
+  });
+
+  stateChannelRef.current = channel;
+
+  channel
+    .on('broadcast', { event: 'player-state' }, ({ payload }) => {
+      if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
+      setRemotePlayers((prev) => {
+        const next = prev.filter((entry) => entry.steamid !== payload.steamid);
+        next.push(payload);
+        return next.slice(-100);
       });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [steamUser]);
-
-  useEffect(() => {
-    const supabase = getSupabaseClient();
-    if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
-
-    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
-    const channel = supabase.channel(`webgame:${room}`, {
-      config: { broadcast: { self: false } },
-    });
-
-    channel.subscribe((status) => {
+      lastRemoteUpdateRef.current = Date.now();
+    })
+    .subscribe(async (status) => {
       if (status !== 'SUBSCRIBED') return;
-      channel.send({
-        type: 'broadcast',
-        event: 'player-state',
-        payload: {
-          steamid: steamUser.steamid,
-          personaname: steamUser.personaname || 'Steam user',
-          avatar: steamUser.avatar || null,
-          position: flightStats.position,
-          mode: freeFly ? 'pilot' : (spectatorMode ? 'spectate' : (flightStats.mode || 'spectate')),
-          zone: flightStats.zone || 'Navigation',
-          target: selected?.label || null,
-          updatedAt: Date.now(),
-        },
+      await channel.track({
+        steamid: steamUser.steamid,
+        personaname: steamUser.personaname || 'Steam user',
+        avatar: steamUser.avatar || null,
+        joinedAt: new Date().toISOString(),
+        layer: 'webgame',
       });
     });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [steamUser, flightStats, freeFly, selected, spectatorMode]);
+  return () => {
+    stateChannelRef.current = null;
+    supabase.removeChannel(channel);
+  };
+}, [steamUser]);
+
+useEffect(() => {
+  if (!steamUser?.steamid || !flightStats?.position || !stateChannelRef.current) return;
+
+  const interval = window.setInterval(() => {
+    stateChannelRef.current?.send({
+      type: 'broadcast',
+      event: 'player-state',
+      payload: {
+        steamid: steamUser.steamid,
+        personaname: steamUser.personaname || 'Steam user',
+        avatar: steamUser.avatar || null,
+        position: flightStats.position,
+        mode: freeFly ? 'pilot' : (spectatorMode ? 'spectate' : (flightStats.mode || 'spectate')),
+        zone: flightStats.zone || 'Navigation',
+        target: selected?.label || null,
+        updatedAt: Date.now(),
+      },
+    });
+  }, 150);
+
+  return () => window.clearInterval(interval);
+}, [steamUser, flightStats, freeFly, selected, spectatorMode]);
+
 
 
   useEffect(() => {
@@ -1502,6 +1525,17 @@ export default function SystemScene() {
 
     setNearbyTarget(bestDistance <= 7.5 ? best : null);
   }, [flightStats]);
+
+
+  useEffect(() => {
+    const pilots = remotePlayers.filter((player) => player.mode === 'pilot').length;
+    const spectators = Math.max(0, remotePlayers.length - pilots);
+    setRoomStats({
+      visiblePlayers: remotePlayers.length,
+      pilots,
+      spectators,
+    });
+  }, [remotePlayers]);
 
   const executeWarp = (item) => {
     const href = item.route || item.href;
@@ -1549,6 +1583,18 @@ export default function SystemScene() {
     });
   };
 
+  const handleEnterPilot = () => {
+    setSpectatorMode(false);
+    setFreeFly(true);
+    setSelected({
+      label: 'Pilot Mode',
+      address: 'Ship active',
+      description: isMobile
+        ? 'Pilot mode engaged. Use the touch thrusters and steer pad.'
+        : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
+    });
+  };
+
   const handlePilotToggle = () => {
     setSpectatorMode(false);
     setFreeFly((v) => !v);
@@ -1569,6 +1615,7 @@ export default function SystemScene() {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <ServerLayerPanel active={serverLayerActive} roomStats={roomStats} onEnterPilot={handleEnterPilot} onSpectate={handleSpectate} />
       <LiveRoomPanel players={remotePlayers} me={steamUser} />
       <ActivityFeed players={remotePlayers} />
       <ProximityPrompt target={nearbyTarget} onOpen={openNode} />

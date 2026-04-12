@@ -19,13 +19,17 @@ export default function MultiplayerHud() {
 
   const slotCount = presenceUsers.length;
   const slotsLeft = Math.max(0, MAX_SLOTS - slotCount);
+  const pilotCount = presenceUsers.filter((u) => u.mode === 'pilot').length;
+  const spectateCount = Math.max(0, slotCount - pilotCount);
 
   const summary = useMemo(() => ({
     room: ROOM_NAME,
     slotCount,
     slotsLeft,
+    pilotCount,
+    spectateCount,
     safetyInNumbers: slotCount >= 2,
-  }), [slotCount, slotsLeft]);
+  }), [slotCount, slotsLeft, pilotCount, spectateCount]);
 
   useEffect(() => {
     let active = true;
@@ -73,6 +77,7 @@ export default function MultiplayerHud() {
           avatar: steamUser.avatar || null,
           joinedAt: new Date().toISOString(),
           mode: 'spectate',
+          layer: 'webgame',
         });
         setJoined(result === 'ok');
       });
@@ -89,7 +94,7 @@ export default function MultiplayerHud() {
     <div className="multiplayer-hud">
       <div className="multiplayer-card">
         <div className="multiplayer-topline">
-          <span className="multiplayer-kicker">Multiplayer</span>
+          <span className="multiplayer-kicker">Server layer</span>
           <span className={`multiplayer-status ${connected ? 'online' : ''}`}>
             {connected ? 'Connected' : 'Offline'}
           </span>
@@ -105,18 +110,18 @@ export default function MultiplayerHud() {
             <strong>{summary.slotCount} / {MAX_SLOTS}</strong>
           </div>
           <div className="multiplayer-stat">
-            <span>Slots left</span>
-            <strong>{summary.slotsLeft}</strong>
+            <span>Pilots</span>
+            <strong>{summary.pilotCount}</strong>
           </div>
           <div className="multiplayer-stat">
-            <span>Safety in numbers</span>
-            <strong>{summary.safetyInNumbers ? 'Active' : 'Waiting'}</strong>
+            <span>Spectators</span>
+            <strong>{summary.spectateCount}</strong>
           </div>
         </div>
 
         <div className="multiplayer-presence">
           {steamUser ? (
-            joined ? <p className="multiplayer-note">You are in the live room as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
+            joined ? <p className="multiplayer-note">You are inside the live web-game server layer as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
                    : <p className="multiplayer-note">Steam linked, but the room is full or unavailable.</p>
           ) : (
             <p className="multiplayer-note">Sign in with Steam to enter the live multiplayer room.</p>
