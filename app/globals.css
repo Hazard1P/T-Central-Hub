@@ -2551,3 +2551,227 @@ button { font: inherit; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.pilot-assist-panel {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 38;
+  width: min(420px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(7, 12, 20, 0.62);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+  text-align: center;
+  pointer-events: none;
+}
+
+.pilot-assist-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--cyan);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.pilot-assist-panel strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.pilot-assist-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mobile-pilot-ui {
+  position: fixed;
+  inset: auto 0 88px 0;
+  z-index: 42;
+  display: none;
+  padding: 0 14px 14px;
+  pointer-events: none;
+}
+
+.mobile-pilot-hint {
+  width: min(320px, calc(100vw - 28px));
+  margin: 0 auto 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(7, 12, 20, 0.74);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  text-align: center;
+}
+
+.mobile-pilot-hint strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.mobile-pilot-hint span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mobile-pilot-bottom {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.mobile-thrust-cluster,
+.mobile-look-pad {
+  pointer-events: auto;
+}
+
+.mobile-thrust-cluster {
+  display: grid;
+  gap: 8px;
+  width: min(240px, 52vw);
+}
+
+.touch-key-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.touch-key {
+  min-height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(7, 12, 20, 0.78);
+  color: #eefbff;
+  font-weight: 700;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  touch-action: none;
+}
+
+.touch-key:active {
+  transform: scale(0.98);
+}
+
+.touch-wide {
+  width: 100%;
+}
+
+.touch-boost {
+  background: rgba(255, 209, 92, 0.18);
+}
+
+.mobile-look-pad {
+  display: grid;
+  place-items: center;
+  width: min(150px, 32vw);
+  height: min(150px, 32vw);
+  border-radius: 50%;
+  border: 1px solid rgba(127,231,255,0.18);
+  background:
+    radial-gradient(circle, rgba(127,231,255,0.12), rgba(7,12,20,0.72));
+  color: #dffcff;
+  font-weight: 700;
+  touch-action: none;
+  box-shadow: inset 0 0 24px rgba(127,231,255,0.08);
+}
+
+@media (max-width: 900px) {
+  .mobile-pilot-ui {
+    display: block;
+  }
+
+  .hud-bottom-fixed {
+    bottom: 14px;
+    width: calc(100vw - 18px);
+    max-width: 560px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .hud-bottom-fixed button {
+    min-width: 0;
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .steam-login-hud,
+  .multiplayer-hud {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .steam-login-hud {
+    top: 12px;
+  }
+
+  .multiplayer-hud {
+    top: auto;
+    bottom: 160px;
+  }
+
+  .steam-login-card,
+  .multiplayer-card {
+    max-width: none;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .cockpit-panel {
+    display: none;
+  }
+
+  .radar {
+    right: 14px;
+    bottom: 170px;
+    width: 108px;
+    height: 108px;
+  }
+
+  .cockpit-frame {
+    display: none;
+  }
+
+  .pilot-assist-panel {
+    top: auto;
+    bottom: 238px;
+    width: calc(100vw - 28px);
+  }
+
+  .blackhole-interior-overlay {
+    padding: 12px;
+  }
+
+  .blackhole-interior-content {
+    padding: 16px;
+  }
+
+  .browser-topbar {
+    gap: 10px;
+  }
+
+  .browser-search {
+    padding: 12px 14px;
+  }
+
+  .browser-server-card,
+  .browser-highlight-card,
+  .browser-brief-card,
+  .browser-map-panel,
+  .interior-server-list-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+}

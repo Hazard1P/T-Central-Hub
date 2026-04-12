@@ -144,11 +144,30 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
     };
 
+    const onPilotKey = (e) => {
+      const detail = e.detail || {};
+      if (!detail.code) return;
+      keys.current[detail.code] = Boolean(detail.active);
+    };
+
+    const onPilotLook = (e) => {
+      if (!enabled) return;
+      const detail = e.detail || {};
+      const dx = Number(detail.dx || 0);
+      const dy = Number(detail.dy || 0);
+      yaw.current -= dx * 0.004;
+      pitch.current -= dy * 0.003;
+      const limit = Math.PI / 2.45;
+      pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
+    };
+
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('pilot-key', onPilotKey);
+    window.addEventListener('pilot-look', onPilotLook);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
@@ -156,6 +175,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('pilot-key', onPilotKey);
+      window.removeEventListener('pilot-look', onPilotLook);
     };
   }, [enabled]);
 
@@ -998,7 +1019,7 @@ function FixedNav({ onCenter, onPilotToggle, freeFly }) {
   return (
     <div className="hud-bottom-fixed">
       <button onClick={onCenter}>Center</button>
-      <a href="/donate"><button>Donate</button></a>
+      <a href="/donate"><button>Support</button></a>
       <a href="/report-player"><button>Report</button></a>
       <button onClick={onPilotToggle}>{freeFly ? 'Exit Pilot' : 'Pilot'}</button>
     </div>
@@ -1061,6 +1082,15 @@ function SteamIdentityPanel() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    const updateMobile = () => {
+      setIsMobile(window.innerWidth <= 900 || ('ontouchstart' in window));
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
+
+  useEffect(() => {
     let active = true;
     const load = async () => {
       try {
@@ -1104,6 +1134,103 @@ function SteamIdentityPanel() {
   );
 }
 
+
+function MobilePilotControls({ visible }) {
+  const [touchActive, setTouchActive] = useState(false);
+  const lookStart = useRef(null);
+
+  if (!visible) return null;
+
+  const setKey = (code, active) => {
+    window.dispatchEvent(new CustomEvent('pilot-key', { detail: { code, active } }));
+  };
+
+  const bindHold = (code) => ({
+    onTouchStart: (e) => {
+      e.preventDefault();
+      setTouchActive(true);
+      setKey(code, true);
+    },
+    onTouchEnd: (e) => {
+      e.preventDefault();
+      setKey(code, false);
+      setTouchActive(false);
+    },
+    onTouchCancel: () => {
+      setKey(code, false);
+      setTouchActive(false);
+    },
+  });
+
+  const handleLookStart = (e) => {
+    const touch = e.touches?.[0];
+    if (!touch) return;
+    lookStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleLookMove = (e) => {
+    const touch = e.touches?.[0];
+    if (!touch || !lookStart.current) return;
+    const dx = touch.clientX - lookStart.current.x;
+    const dy = touch.clientY - lookStart.current.y;
+    lookStart.current = { x: touch.clientX, y: touch.clientY };
+    window.dispatchEvent(new CustomEvent('pilot-look', { detail: { dx, dy } }));
+  };
+
+  const handleLookEnd = () => {
+    lookStart.current = null;
+  };
+
+  return (
+    <div className="mobile-pilot-ui">
+      <div className="mobile-pilot-hint">
+        <strong>Pilot mode</strong>
+        <span>Use thrust buttons and drag the right pad to steer.</span>
+      </div>
+
+      <div className="mobile-pilot-bottom">
+        <div className="mobile-thrust-cluster">
+          <button className="touch-key touch-wide" {...bindHold('KeyW')}>Forward</button>
+          <div className="touch-key-row">
+            <button className="touch-key" {...bindHold('KeyA')}>Left</button>
+            <button className="touch-key" {...bindHold('KeyS')}>Back</button>
+            <button className="touch-key" {...bindHold('KeyD')}>Right</button>
+          </div>
+          <div className="touch-key-row">
+            <button className="touch-key" {...bindHold('Space')}>Up</button>
+            <button className="touch-key" {...bindHold('ShiftLeft')}>Down</button>
+            <button className="touch-key touch-boost" {...bindHold('ControlLeft')}>Boost</button>
+          </div>
+        </div>
+
+        <div
+          className="mobile-look-pad"
+          onTouchStart={handleLookStart}
+          onTouchMove={handleLookMove}
+          onTouchEnd={handleLookEnd}
+          onTouchCancel={handleLookEnd}
+        >
+          <span>Steer</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PilotAssistPanel({ freeFly, isMobile }) {
+  return (
+    <div className={`pilot-assist-panel ${freeFly ? 'active' : ''} ${isMobile ? 'mobile' : ''}`}>
+      <span className="pilot-assist-kicker">Pilot assist</span>
+      <strong>{freeFly ? 'Flight controls active' : 'Observer mode active'}</strong>
+      <p>
+        {isMobile
+          ? 'Tap Pilot, then use the touch thrusters and steer pad.'
+          : 'Tap Pilot, then drag to steer and use W A S D with Space, Shift, and Ctrl.'}
+      </p>
+    </div>
+  );
+}
+
 function CinematicIntro({ visible }) {
   if (!visible) return null;
   return (
@@ -1142,6 +1269,7 @@ export default function SystemScene() {
   const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
   const [introVisible, setIntroVisible] = useState(true);
   const [activeInterior, setActiveInterior] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -1212,7 +1340,9 @@ export default function SystemScene() {
       address: freeFly ? 'Ship hidden' : 'Ship active',
       description: freeFly
         ? 'Returned to observer mode.'
-        : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
+        : isMobile
+          ? 'Pilot mode engaged. Use the touch thrusters and steer pad.'
+          : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
     });
   };
 
@@ -1221,8 +1351,10 @@ export default function SystemScene() {
       <CinematicIntro visible={introVisible} />
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
+      <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
+      <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas camera={{ position: [0, 2.4, 36], fov: 40 }}>
           <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />

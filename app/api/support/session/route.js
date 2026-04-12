@@ -5,6 +5,7 @@ import { decryptJson } from '@/lib/security';
 export async function GET() {
   const cookieStore = cookies();
   const raw = cookieStore.get('support_receipt')?.value;
+
   let support = null;
   try {
     support = raw ? decryptJson(raw) : null;

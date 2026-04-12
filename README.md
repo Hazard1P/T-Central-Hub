@@ -308,22 +308,8 @@ Open:
 - Changed the Arma page image references to `arma-cth-shot.png`
 
 
-## Repo audit and restoration
-- Restored missing Steam auth routes:
-  - `/api/auth/steam/login`
-  - `/api/auth/steam/callback`
-  - `/api/auth/steam/session`
-  - `/api/auth/steam/logout`
-- Restored missing support-link routes:
-  - `/api/support/link`
-  - `/api/support/session`
-- Re-mounted `MultiplayerHud` on the homepage
-- Added `@supabase/supabase-js` back to dependencies
-- Added `.env.example` with the expected environment variables
-
-## Current intended baseline
-- Single live Arma3 server overall
-- Arma blackhole warp/system entry preserved
-- Altis map image used for Arma page and blackhole interior
-- Donate/report scrollable, fullscreen hub locked
-- Steam login, support-linking, multiplayer presence, and reporting all present in one package
+## Phone and piloting optimization
+- Added mobile pilot assist panel and touch flight controls
+- Simplified cockpit/UI density on smaller screens
+- Improved fixed navigation spacing and top HUD stacking for phones
+- Adjusted support label and pilot messaging for clearer end-user guidance
