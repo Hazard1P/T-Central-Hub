@@ -289,3 +289,9 @@ Open:
 - Restored the uploaded map image inside the Arma blackhole browser
 - Restored the uploaded reference photo on the Arma page
 - Kept the single IP route as `tcentral.game.nfoservers.com:2302`
+
+
+## Consolidation pass
+- Added `/status` page summarizing the current stabilized package
+- Re-checked the one-server Arma setup and image availability
+- Kept recent fixes concurrent instead of branching the package further

@@ -858,7 +858,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
           <div className="blackhole-interior-header">
             <div>
               <p className="eyebrow">Arma3 blackhole interior</p>
-              <h2>Dynamic server browser</h2>
+              <h2>Primary server browser</h2>
               <p className="muted">
                 Browse the single live T-Central Arma 3 route, preview the battlefield image, and connect through Steam from one command sphere.
               </p>
@@ -870,7 +870,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
             <div className="browser-search-wrap">
               <input
                 className="browser-search"
-                placeholder="Search server name, map, or IP"
+                placeholder="Search the live server, map, or IP"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -941,7 +941,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
 
             {filtered.length === 0 ? (
               <div className="browser-empty-state">
-                No server matched that search.
+                No result matched that search.
               </div>
             ) : null}
           </div>
