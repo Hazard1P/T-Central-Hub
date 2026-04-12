@@ -282,3 +282,10 @@ Open:
 ## Environment variables
 - `SUPPORT_LINK_SECRET` should be a long random secret in production
 - `STEAM_API_KEY` still powers Steam profile enrichment
+
+
+## Single-server map restore
+- Reduced the Arma server browser to a single live server overall
+- Restored the uploaded map image inside the Arma blackhole browser
+- Restored the uploaded reference photo on the Arma page
+- Kept the single IP route as `tcentral.game.nfoservers.com:2302`

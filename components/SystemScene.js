@@ -860,7 +860,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
               <p className="eyebrow">Arma3 blackhole interior</p>
               <h2>Dynamic server browser</h2>
               <p className="muted">
-                Browse T-Central Arma 3 routes, sort by best fit, and connect through Steam from one command sphere.
+                Browse the single live T-Central Arma 3 route, preview the battlefield image, and connect through Steam from one command sphere.
               </p>
             </div>
             <button className="focus-close" onClick={onClose}>×</button>
@@ -870,14 +870,14 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
             <div className="browser-search-wrap">
               <input
                 className="browser-search"
-                placeholder="Search mode, map, IP, or server name"
+                placeholder="Search server name, map, or IP"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
 
             <div className="browser-sort">
-              <button className={sortMode === 'best' ? 'active' : ''} onClick={() => setSortMode('best')}>Best</button>
+              <button className={sortMode === 'best' ? 'active' : ''} onClick={() => setSortMode('best')}>Primary</button>
               <button className={sortMode === 'players' ? 'active' : ''} onClick={() => setSortMode('players')}>Players</button>
               <button className={sortMode === 'name' ? 'active' : ''} onClick={() => setSortMode('name')}>Name</button>
               <button className={sortMode === 'mode' ? 'active' : ''} onClick={() => setSortMode('mode')}>Mode</button>
@@ -890,7 +890,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
                 <span className="interior-step">Suggested server</span>
                 <h3>{bestServer.title}</h3>
                 <p className="muted">
-                  Best-fit route based on uptime, occupancy, and priority weighting.
+                  Primary live route based on your current single-server setup.
                 </p>
               </div>
               <div className="highlight-actions">
@@ -941,7 +941,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
 
             {filtered.length === 0 ? (
               <div className="browser-empty-state">
-                No servers matched that search.
+                No server matched that search.
               </div>
             ) : null}
           </div>

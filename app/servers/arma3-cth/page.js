@@ -25,7 +25,7 @@ export default function ArmaPage() {
     <PageShell
       eyebrow="Arma3 CTH"
       title="Capture the Hill, deploy fast, and stay in the fight."
-      text="This page is the practical entry point for the T-Central Arma3 Capture the Hill experience, with quick connect actions, a clear server route, and a briefing on where the mode is headed."
+      text="This page is the practical entry point for the single live T-Central Arma3 Capture the Hill server, with quick connect actions, a clear server route, and a briefing on where the mode is headed."
     >
       <div className="arma-entry-grid">
         <article className="content-card">
@@ -51,7 +51,7 @@ export default function ArmaPage() {
 
         <article className="content-card arma-hero-image-card">
           <Image
-            src="/arma-cth-shot.png"
+            src="/cosmic-map.jpg"
             alt="Arma 3 Capture the Hill map preview"
             width={1366}
             height={1024}
@@ -76,9 +76,9 @@ export default function ArmaPage() {
           <p className="eyebrow">Map reference</p>
           <h3>Visual context</h3>
           <div className="arma-highlight">
-            <strong>Current map look</strong>
+            <strong>Current map and field reference</strong>
             <p className="muted">
-              This page brings back the map image so players have a quick visual reference for the battlefield style before joining.
+              This page restores the uploaded map image so players have a quick visual reference for the battlefield style before joining.
             </p>
           </div>
           <div className="arma-highlight">
@@ -97,6 +97,29 @@ export default function ArmaPage() {
               <li key={point}>{point}</li>
             ))}
           </ul>
+        </article>
+
+      <div className="arma-entry-grid">
+        <article className="content-card arma-hero-image-card">
+          <Image
+            src="/photo.jpg"
+            alt="Uploaded Arma reference photo"
+            width={1366}
+            height={1024}
+            className="page-image"
+          />
+        </article>
+
+        <article className="content-card">
+          <p className="eyebrow">Uploaded reference photo</p>
+          <h3>Additional visual reference</h3>
+          <p className="muted">
+            This restores the uploaded photo directly into the Arma3 route so the visual reference is preserved alongside the main battlefield map.
+          </p>
+          <div className="server-inline-meta">
+            <span>Server IP: tcentral.game.nfoservers.com:2302</span>
+            <span>One live server overall</span>
+          </div>
         </article>
       </div>
     </PageShell>
