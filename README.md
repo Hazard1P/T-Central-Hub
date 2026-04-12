@@ -355,3 +355,10 @@ Open:
 - Standardized assets through `lib/gameAssets.js`
 - Kept the Arma route and Arma interior aligned to `arma-cth-shot.png`
 - Preserved the rest of the live web-game stack including Rust, Arma, standalone black hole anchor, donate page, and pilot-mode ship styling
+
+
+## Server layer next
+- Added a dedicated server-layer panel for the live 3D simulator
+- Switched realtime player-state sync to a more stable interval-based broadcast loop
+- Upgraded remote players into richer visible ships when piloting
+- Added pilot/spectate entry actions directly into the live server layer
