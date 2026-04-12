@@ -6,7 +6,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
-import { GAME_ASSETS } from '@/lib/gameAssets';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 const NODES = [
@@ -802,7 +801,7 @@ function MultiplayerPresenceMarkers({ players }) {
           <Html position={[0, 0.36, 0]} center distanceFactor={12}>
             <div className="presence-marker-label">
               <strong>{player.personaname || 'Player'}</strong>
-              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}{player.target ? ` • ${player.target}` : ''}</span>
+              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
             </div>
           </Html>
         </group>
@@ -811,89 +810,7 @@ function MultiplayerPresenceMarkers({ players }) {
   );
 }
 
-
-function ProximityPrompt({ target, onOpen }) {
-  if (!target) return null;
-  return (
-    <div className="proximity-prompt">
-      <span className="pilot-assist-kicker">Nearby system</span>
-      <strong>{target.label}</strong>
-      <p>{target.description}</p>
-      <button className="button primary" onClick={() => onOpen(target)}>
-        {target.key === 'arma3' ? 'Warp into system' : 'Open destination'}
-      </button>
-    </div>
-  );
-}
-
-function LiveRoomPanel({ players, me }) {
-  return (
-    <div className="live-room-panel">
-      <div className="live-room-head">
-        <span className="pilot-assist-kicker">Live room</span>
-        <strong>{players.length} visible player{players.length === 1 ? '' : 's'}</strong>
-      </div>
-      <div className="live-room-list">
-        {players.slice(0, 6).map((player) => (
-          <div key={player.steamid} className={`live-room-pill ${me && player.steamid === me.steamid ? 'self' : ''}`}>
-            <span>{player.personaname || 'Player'}</span>
-            <small>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</small>
-          </div>
-        ))}
-        {players.length === 0 ? <div className="live-room-empty">No players in view yet.</div> : null}
-      </div>
-    </div>
-  );
-}
-
-
-
-function ServerLayerPanel({ active, roomStats, onEnterPilot, onSpectate }) {
-  return (
-    <div className={`server-layer-panel ${active ? 'active' : ''}`}>
-      <div className="live-room-head">
-        <span className="pilot-assist-kicker">Web-game server</span>
-        <strong>3D simulator layer active</strong>
-      </div>
-      <div className="server-layer-stats">
-        <div><span>Visible</span><strong>{roomStats.visiblePlayers}</strong></div>
-        <div><span>Pilots</span><strong>{roomStats.pilots}</strong></div>
-        <div><span>Spectators</span><strong>{roomStats.spectators}</strong></div>
-      </div>
-      <div className="button-column">
-        <button className="button primary" onClick={onEnterPilot}>Enter pilot mode</button>
-        <button className="button secondary" onClick={onSpectate}>Enter spectate mode</button>
-      </div>
-    </div>
-  );
-}
-
-function ActivityFeed({ players }) {
-  const sorted = [...players]
-    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
-    .slice(0, 5);
-
-  return (
-    <div className="activity-feed">
-      <div className="live-room-head">
-        <span className="pilot-assist-kicker">Activity</span>
-        <strong>Recent room signals</strong>
-      </div>
-      <div className="activity-feed-list">
-        {sorted.map((player) => (
-          <div key={`${player.steamid}-${player.updatedAt || 0}`} className="activity-feed-item">
-            <span>{player.personaname || 'Player'}</span>
-            <small>{player.mode === 'pilot' ? 'Flying' : 'Spectating'}{player.target ? ` • ${player.target}` : ''}</small>
-          </div>
-        ))}
-        {sorted.length === 0 ? <div className="live-room-empty">No recent player signals.</div> : null}
-      </div>
-    </div>
-  );
-}
-
 function FocusPanel({ item, statuses, onClose, onOpen }) {
-
   if (!item) return null;
   const status = item.key ? statuses?.[item.key] : null;
   const openable = Boolean(item.route || item.href);
@@ -1050,7 +967,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
                   <span className="interior-step">Altis reference</span>
                   <h3>Battlefield map</h3>
                   <div className="browser-map-media">
-                    <img src={GAME_ASSETS.armaAltisMap} alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
+                    <img src="/arma-cth-shot.png" alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
                   </div>
                 </article>
               </div>
@@ -1127,11 +1044,10 @@ function distance3(a, b) {
 
 
 
-function FixedNav({ onCenter, onPilotToggle, onSpectate, freeFly }) {
+function FixedNav({ onCenter, onPilotToggle, freeFly }) {
   return (
     <div className="hud-bottom-fixed">
       <button onClick={onCenter}>Center</button>
-      <button onClick={onSpectate}>Spectate</button>
       <a href="/donate"><button>Support</button></a>
       <a href="/report-player"><button>Report</button></a>
       <button onClick={onPilotToggle}>{freeFly ? 'Exit Pilot' : 'Pilot'}</button>
@@ -1386,14 +1302,7 @@ export default function SystemScene() {
   const [activeInterior, setActiveInterior] = useState(null);
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
-  const [nearbyTarget, setNearbyTarget] = useState(null);
-  const [spectatorMode, setSpectatorMode] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [reducedScene, setReducedScene] = useState(false);
-  const [serverLayerActive, setServerLayerActive] = useState(true);
-  const [roomStats, setRoomStats] = useState({ visiblePlayers: 0, pilots: 0, spectators: 0 });
-  const stateChannelRef = useRef(null);
-  const lastRemoteUpdateRef = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -1433,109 +1342,69 @@ export default function SystemScene() {
   }, []);
 
 
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+    if (!supabase || !steamUser?.steamid) return;
 
-useEffect(() => {
-  const supabase = getSupabaseClient();
-  if (!supabase || !steamUser?.steamid) return;
+    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
+    });
 
-  const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
-  const channel = supabase.channel(`webgame:${room}`, {
-    config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
-  });
-
-  stateChannelRef.current = channel;
-
-  channel
-    .on('broadcast', { event: 'player-state' }, ({ payload }) => {
-      if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
-      setRemotePlayers((prev) => {
-        const next = prev.filter((entry) => entry.steamid !== payload.steamid);
-        next.push(payload);
-        return next.slice(-100);
+    channel
+      .on('broadcast', { event: 'player-state' }, ({ payload }) => {
+        if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
+        setRemotePlayers((prev) => {
+          const next = prev.filter((entry) => entry.steamid !== payload.steamid);
+          next.push(payload);
+          return next.slice(-100);
+        });
+      })
+      .subscribe(async (status) => {
+        if (status !== 'SUBSCRIBED') return;
+        await channel.track({
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          joinedAt: new Date().toISOString(),
+        });
       });
-      lastRemoteUpdateRef.current = Date.now();
-    })
-    .subscribe(async (status) => {
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser]);
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+    if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
+
+    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { broadcast: { self: false } },
+    });
+
+    channel.subscribe((status) => {
       if (status !== 'SUBSCRIBED') return;
-      await channel.track({
-        steamid: steamUser.steamid,
-        personaname: steamUser.personaname || 'Steam user',
-        avatar: steamUser.avatar || null,
-        joinedAt: new Date().toISOString(),
-        layer: 'webgame',
+      channel.send({
+        type: 'broadcast',
+        event: 'player-state',
+        payload: {
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          position: flightStats.position,
+          mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+          zone: flightStats.zone || 'Navigation',
+          updatedAt: Date.now(),
+        },
       });
     });
 
-  return () => {
-    stateChannelRef.current = null;
-    supabase.removeChannel(channel);
-  };
-}, [steamUser]);
-
-useEffect(() => {
-  if (!steamUser?.steamid || !flightStats?.position || !stateChannelRef.current) return;
-
-  const interval = window.setInterval(() => {
-    stateChannelRef.current?.send({
-      type: 'broadcast',
-      event: 'player-state',
-      payload: {
-        steamid: steamUser.steamid,
-        personaname: steamUser.personaname || 'Steam user',
-        avatar: steamUser.avatar || null,
-        position: flightStats.position,
-        mode: freeFly ? 'pilot' : (spectatorMode ? 'spectate' : (flightStats.mode || 'spectate')),
-        zone: flightStats.zone || 'Navigation',
-        target: selected?.label || null,
-        updatedAt: Date.now(),
-      },
-    });
-  }, 150);
-
-  return () => window.clearInterval(interval);
-}, [steamUser, flightStats, freeFly, selected, spectatorMode]);
-
-
-
-  useEffect(() => {
-    const myPos = flightStats?.position;
-    if (!Array.isArray(myPos)) {
-      setNearbyTarget(null);
-      return;
-    }
-
-    const candidates = [
-      { key: 'arma3', label: 'Arma3 CTH', description: 'Enter the tactical command sphere.', position: [-12.8, 5.0, -2.8], route: '/servers/arma3-cth' },
-      { key: 'sbox', label: 'S&Box', description: 'Open the sandbox route.', position: [3.4, 10.8, -4.4], route: 'https://sbox.game/', external: true },
-      { key: 'rust_anchor', label: 'T-Central Hub', description: 'Enter the lower singularity hub.', position: [-2.4, -7.8, 2.8], route: '/servers/rust-biweekly' },
-    ];
-
-    let best = null;
-    let bestDistance = Infinity;
-    for (const node of candidates) {
-      const dx = myPos[0] - node.position[0];
-      const dy = myPos[1] - node.position[1];
-      const dz = myPos[2] - node.position[2];
-      const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-      if (d < bestDistance) {
-        bestDistance = d;
-        best = node;
-      }
-    }
-
-    setNearbyTarget(bestDistance <= 7.5 ? best : null);
-  }, [flightStats]);
-
-
-  useEffect(() => {
-    const pilots = remotePlayers.filter((player) => player.mode === 'pilot').length;
-    const spectators = Math.max(0, remotePlayers.length - pilots);
-    setRoomStats({
-      visiblePlayers: remotePlayers.length,
-      pilots,
-      spectators,
-    });
-  }, [remotePlayers]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser, flightStats, freeFly]);
 
   const executeWarp = (item) => {
     const href = item.route || item.href;
@@ -1573,30 +1442,7 @@ useEffect(() => {
     setResetTick((n) => n + 1);
   };
 
-  const handleSpectate = () => {
-    setSpectatorMode(true);
-    setFreeFly(false);
-    setSelected({
-      label: 'Spectate Mode',
-      address: 'Observer view',
-      description: 'Spectate mode active. Move through the shared system and watch nearby players.',
-    });
-  };
-
-  const handleEnterPilot = () => {
-    setSpectatorMode(false);
-    setFreeFly(true);
-    setSelected({
-      label: 'Pilot Mode',
-      address: 'Ship active',
-      description: isMobile
-        ? 'Pilot mode engaged. Use the touch thrusters and steer pad.'
-        : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
-    });
-  };
-
   const handlePilotToggle = () => {
-    setSpectatorMode(false);
     setFreeFly((v) => !v);
     setSelected({
       label: freeFly ? 'Observer Mode' : 'Pilot Mode',
@@ -1615,12 +1461,8 @@ useEffect(() => {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
-      <ServerLayerPanel active={serverLayerActive} roomStats={roomStats} onEnterPilot={handleEnterPilot} onSpectate={handleSpectate} />
-      <LiveRoomPanel players={remotePlayers} me={steamUser} />
-      <ActivityFeed players={remotePlayers} />
-      <ProximityPrompt target={nearbyTarget} onOpen={openNode} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
-      <FixedNav onCenter={handleCenter} onSpectate={handleSpectate} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
+      <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>

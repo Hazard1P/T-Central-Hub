@@ -52,7 +52,7 @@ export default function ArmaPage() {
         <article className="content-card arma-hero-image-card">
           <Image
             src="/arma-cth-shot.png"
-            alt="Arma 3 CTH battlefield map"
+            alt="Arma 3 CTH map and command reference"
             width={1366}
             height={1024}
             className="page-image"
@@ -76,9 +76,9 @@ export default function ArmaPage() {
           <p className="eyebrow">Map reference</p>
           <h3>Visual context</h3>
           <div className="arma-highlight">
-            <strong>Altis battlefield map</strong>
+            <strong>Current map and field reference</strong>
             <p className="muted">
-              This route is aligned around the Arma battlefield map so the entry stays focused on gameplay instead of unrelated fallback images.
+              This page restores the Altis battlefield image so players have a quick visual reference for the Arma3 CTH environment before joining.
             </p>
           </div>
           <div className="arma-highlight">
@@ -97,6 +97,30 @@ export default function ArmaPage() {
               <li key={point}>{point}</li>
             ))}
           </ul>
+        </article>
+      </div>
+
+      <div className="arma-entry-grid">
+        <article className="content-card arma-hero-image-card">
+          <Image
+            src="/arma-cth-shot.png"
+            alt="Uploaded Arma reference photo"
+            width={1366}
+            height={1024}
+            className="page-image"
+          />
+        </article>
+
+        <article className="content-card">
+          <p className="eyebrow">Altis map reference</p>
+          <h3>Additional battlefield reference</h3>
+          <p className="muted">
+            This keeps the Arma3 route visually aligned around the Altis battlefield map for a cleaner and more consistent server entry.
+          </p>
+          <div className="server-inline-meta">
+            <span>Server IP: tcentral.game.nfoservers.com:2302</span>
+            <span>One live server overall</span>
+          </div>
         </article>
       </div>
     </PageShell>

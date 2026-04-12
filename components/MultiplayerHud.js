@@ -19,17 +19,13 @@ export default function MultiplayerHud() {
 
   const slotCount = presenceUsers.length;
   const slotsLeft = Math.max(0, MAX_SLOTS - slotCount);
-  const pilotCount = presenceUsers.filter((u) => u.mode === 'pilot').length;
-  const spectateCount = Math.max(0, slotCount - pilotCount);
 
   const summary = useMemo(() => ({
     room: ROOM_NAME,
     slotCount,
     slotsLeft,
-    pilotCount,
-    spectateCount,
     safetyInNumbers: slotCount >= 2,
-  }), [slotCount, slotsLeft, pilotCount, spectateCount]);
+  }), [slotCount, slotsLeft]);
 
   useEffect(() => {
     let active = true;
@@ -110,12 +106,12 @@ export default function MultiplayerHud() {
             <strong>{summary.slotCount} / {MAX_SLOTS}</strong>
           </div>
           <div className="multiplayer-stat">
-            <span>Pilots</span>
-            <strong>{summary.pilotCount}</strong>
+            <span>Slots left</span>
+            <strong>{summary.slotsLeft}</strong>
           </div>
           <div className="multiplayer-stat">
-            <span>Spectators</span>
-            <strong>{summary.spectateCount}</strong>
+            <span>Safety</span>
+            <strong>{summary.safetyInNumbers ? 'Active' : 'Waiting'}</strong>
           </div>
         </div>
 
@@ -126,19 +122,6 @@ export default function MultiplayerHud() {
           ) : (
             <p className="multiplayer-note">Sign in with Steam to enter the live multiplayer room.</p>
           )}
-        </div>
-
-        <div className="multiplayer-roster">
-          {presenceUsers.slice(0, 8).map((user) => (
-            <div key={`${user.steamid}-${user.joinedAt || ''}`} className="multiplayer-player-pill">
-              {user.avatar ? <img src={user.avatar} alt={user.personaname || 'Steam avatar'} /> : null}
-              <div className="multiplayer-player-copy">
-                <strong>{user.personaname || 'Player'}</strong>
-                <span>{user.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
-              </div>
-            </div>
-          ))}
-          {presenceUsers.length === 0 ? <div className="multiplayer-empty">No active players yet.</div> : null}
         </div>
       </div>
     </div>

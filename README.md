@@ -277,7 +277,7 @@ Open:
   - `components/DonateSupportClient.js`
 - Added supporter status to the Steam HUD
 - Restored the Arma3 battlefield image inside the blackhole server browser
-- Added `public/arma-cth-shot.png` as a compatible image alias from the existing map asset
+- Added `public/photo.jpg` as a compatible image alias from the existing map asset
 
 ## Environment variables
 - `SUPPORT_LINK_SECRET` should be a long random secret in production
@@ -331,34 +331,7 @@ Open:
 - Replaced compatibility-risk CSS `end` values with `flex-end`
 
 
-## Web-base game progression
-- Added an expanded live multiplayer roster in the HUD
-- Added an in-world live room panel for visible players
-- Added proximity prompts so nearby blackholes/systems feel more interactive
-- Player markers can now surface current mode and target context in the 3D world
-
-
-## All-the-way progression pass
-- Upgraded remote players from simple dots into richer visible ships for pilots
-- Added a spectate shortcut in the bottom navigation
-- Added a live activity feed so room changes feel more active
-- Kept proximity prompts and blackhole interaction progression in the shared space
-
-
-## Client exception fix
-- Restored the missing `reducedScene` state in `components/SystemScene.js`
-- Fixes the client-side exception caused by referencing `reducedScene` and `setReducedScene` before declaration
-
-
-## Asset cleanup pass
-- Removed `photo.jpg` entirely from the package
-- Standardized assets through `lib/gameAssets.js`
-- Kept the Arma route and Arma interior aligned to `arma-cth-shot.png`
-- Preserved the rest of the live web-game stack including Rust, Arma, standalone black hole anchor, donate page, and pilot-mode ship styling
-
-
-## Server layer next
-- Added a dedicated server-layer panel for the live 3D simulator
-- Switched realtime player-state sync to a more stable interval-based broadcast loop
-- Upgraded remote players into richer visible ships when piloting
-- Added pilot/spectate entry actions directly into the live server layer
+## Stabilized server-layer pass
+- Simplified the later game-layer additions that were more likely to cause client-side failures
+- Kept `/system`, shared-room sync, proximity prompts, and 3D presence markers active
+- Reduced extra HUD/panel complexity so the live layer is more reliable
