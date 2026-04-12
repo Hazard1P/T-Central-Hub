@@ -336,3 +336,10 @@ Open:
 - Added an in-world live room panel for visible players
 - Added proximity prompts so nearby blackholes/systems feel more interactive
 - Player markers can now surface current mode and target context in the 3D world
+
+
+## All-the-way progression pass
+- Upgraded remote players from simple dots into richer visible ships for pilots
+- Added a spectate shortcut in the bottom navigation
+- Added a live activity feed so room changes feel more active
+- Kept proximity prompts and blackhole interaction progression in the shared space

@@ -845,7 +845,33 @@ function LiveRoomPanel({ players, me }) {
   );
 }
 
+
+function ActivityFeed({ players }) {
+  const sorted = [...players]
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+    .slice(0, 5);
+
+  return (
+    <div className="activity-feed">
+      <div className="live-room-head">
+        <span className="pilot-assist-kicker">Activity</span>
+        <strong>Recent room signals</strong>
+      </div>
+      <div className="activity-feed-list">
+        {sorted.map((player) => (
+          <div key={`${player.steamid}-${player.updatedAt || 0}`} className="activity-feed-item">
+            <span>{player.personaname || 'Player'}</span>
+            <small>{player.mode === 'pilot' ? 'Flying' : 'Spectating'}{player.target ? ` • ${player.target}` : ''}</small>
+          </div>
+        ))}
+        {sorted.length === 0 ? <div className="live-room-empty">No recent player signals.</div> : null}
+      </div>
+    </div>
+  );
+}
+
 function FocusPanel({ item, statuses, onClose, onOpen }) {
+
   if (!item) return null;
   const status = item.key ? statuses?.[item.key] : null;
   const openable = Boolean(item.route || item.href);
@@ -1079,10 +1105,11 @@ function distance3(a, b) {
 
 
 
-function FixedNav({ onCenter, onPilotToggle, freeFly }) {
+function FixedNav({ onCenter, onPilotToggle, onSpectate, freeFly }) {
   return (
     <div className="hud-bottom-fixed">
       <button onClick={onCenter}>Center</button>
+      <button onClick={onSpectate}>Spectate</button>
       <a href="/donate"><button>Support</button></a>
       <a href="/report-player"><button>Report</button></a>
       <button onClick={onPilotToggle}>{freeFly ? 'Exit Pilot' : 'Pilot'}</button>
@@ -1338,6 +1365,7 @@ export default function SystemScene() {
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [nearbyTarget, setNearbyTarget] = useState(null);
+  const [spectatorMode, setSpectatorMode] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -1430,7 +1458,7 @@ export default function SystemScene() {
           personaname: steamUser.personaname || 'Steam user',
           avatar: steamUser.avatar || null,
           position: flightStats.position,
-          mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+          mode: freeFly ? 'pilot' : (spectatorMode ? 'spectate' : (flightStats.mode || 'spectate')),
           zone: flightStats.zone || 'Navigation',
           target: selected?.label || null,
           updatedAt: Date.now(),
@@ -1441,7 +1469,7 @@ export default function SystemScene() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [steamUser, flightStats, freeFly]);
+  }, [steamUser, flightStats, freeFly, selected, spectatorMode]);
 
 
   useEffect(() => {
@@ -1509,7 +1537,18 @@ export default function SystemScene() {
     setResetTick((n) => n + 1);
   };
 
+  const handleSpectate = () => {
+    setSpectatorMode(true);
+    setFreeFly(false);
+    setSelected({
+      label: 'Spectate Mode',
+      address: 'Observer view',
+      description: 'Spectate mode active. Move through the shared system and watch nearby players.',
+    });
+  };
+
   const handlePilotToggle = () => {
+    setSpectatorMode(false);
     setFreeFly((v) => !v);
     setSelected({
       label: freeFly ? 'Observer Mode' : 'Pilot Mode',
@@ -1529,9 +1568,10 @@ export default function SystemScene() {
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <LiveRoomPanel players={remotePlayers} me={steamUser} />
+      <ActivityFeed players={remotePlayers} />
       <ProximityPrompt target={nearbyTarget} onOpen={openNode} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
-      <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
+      <FixedNav onCenter={handleCenter} onSpectate={handleSpectate} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>

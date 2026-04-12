@@ -3149,3 +3149,51 @@ button { font: inherit; }
     display: none;
   }
 }
+
+
+.activity-feed {
+  position: fixed;
+  right: 18px;
+  top: 294px;
+  z-index: 38;
+  width: min(280px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.58);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.22);
+}
+
+.activity-feed-list {
+  display: grid;
+  gap: 8px;
+}
+
+.activity-feed-item {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.activity-feed-item span {
+  font-size: 12px;
+}
+
+.activity-feed-item small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+@media (max-width: 900px) {
+  .activity-feed {
+    right: 12px;
+    left: 12px;
+    top: auto;
+    bottom: 430px;
+    width: auto;
+  }
+}
