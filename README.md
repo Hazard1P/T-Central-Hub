@@ -249,3 +249,9 @@ Open:
 - Locked the main web-game shell to the viewport
 - Disabled browser scrolling for the fullscreen system scene
 - Kept regular content pages scrollable where needed
+
+
+## Content-page scroll and Arma refresh
+- Donate and report pages are scrollable again while the fullscreen hub remains locked
+- Restored the Arma map image more prominently on the Arma3 page
+- Added a Capture the Hill briefing, future prospects, and direct quick-connect actions
