@@ -266,3 +266,19 @@ Open:
 ## Why this fixes the Vercel build
 - Next.js App Router does not allow passing event handlers from Server Components into Client Component props
 - The Arma server page now imports a client-only connect actions component instead of attaching `onClick` directly inside the page
+
+
+## Steam-linked recurring support and security
+- Added encrypted support receipt handling for PayPal subscription linking
+- Steam sessions and support receipts now use server-side encryption helpers in `lib/security.js`
+- Added:
+  - `app/api/support/link/route.js`
+  - `app/api/support/session/route.js`
+  - `components/DonateSupportClient.js`
+- Added supporter status to the Steam HUD
+- Restored the Arma3 battlefield image inside the blackhole server browser
+- Added `public/photo.jpg` as a compatible image alias from the existing map asset
+
+## Environment variables
+- `SUPPORT_LINK_SECRET` should be a long random secret in production
+- `STEAM_API_KEY` still powers Steam profile enrichment

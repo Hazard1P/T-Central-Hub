@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { encryptJson } from '@/lib/security';
 
 function getBaseUrl(request) {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
@@ -8,10 +9,6 @@ function getBaseUrl(request) {
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
   const proto = request.headers.get('x-forwarded-proto') || 'https';
   return `${proto}://${host}`;
-}
-
-function encodeSession(value) {
-  return Buffer.from(JSON.stringify(value), 'utf8').toString('base64url');
 }
 
 export async function GET(request) {
@@ -80,7 +77,7 @@ export async function GET(request) {
   const response = NextResponse.redirect(redirectUrl);
   response.cookies.set({
     name: 'steam_session',
-    value: encodeSession(user),
+    value: encryptJson(user),
     httpOnly: true,
     secure: true,
     sameSite: 'lax',

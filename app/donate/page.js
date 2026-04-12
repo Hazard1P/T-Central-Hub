@@ -1,5 +1,5 @@
 import PageShell from '@/components/PageShell';
-import Script from 'next/script';
+import DonateSupportClient from '@/components/DonateSupportClient';
 
 export const metadata = { title: 'Donate' };
 
@@ -97,9 +97,7 @@ export default function DonatePage() {
             </a>
           </div>
 
-          <div className="paypal-live-shell">
-            <div id="paypal-button-container-P-95R19588AD368713ENHLWFNY" />
-          </div>
+          <DonateSupportClient />
         </article>
 
         <article className="content-card donate-secondary-card">
@@ -138,33 +136,6 @@ export default function DonatePage() {
           toward better systems, stronger visuals, smoother experiences, and a more complete long-term community hub.
         </p>
       </section>
-
-      <Script
-        src="https://www.paypal.com/sdk/js?client-id=AXqHQLIJ608RS7GkyIvA5I-jFk-xJQueoSaKSfl3UWVkK6BtHmd0971SA2snZlJxSV-WIHFh5K-uut0Q&vault=true&intent=subscription"
-        strategy="afterInteractive"
-      />
-      <Script id="paypal-subscription-button" strategy="afterInteractive">
-        {`
-          if (window.paypal) {
-            window.paypal.Buttons({
-              style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'subscribe'
-              },
-              createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                  plan_id: 'P-95R19588AD368713ENHLWFNY'
-                });
-              },
-              onApprove: function(data) {
-                alert('Subscription activated: ' + data.subscriptionID);
-              }
-            }).render('#paypal-button-container-P-95R19588AD368713ENHLWFNY');
-          }
-        `}
-      </Script>
     </PageShell>
   );
 }
