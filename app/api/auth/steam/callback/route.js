@@ -16,9 +16,7 @@ export async function GET(request) {
   const params = url.searchParams;
 
   const verify = new URLSearchParams();
-  for (const [key, value] of params.entries()) {
-    verify.set(key, value);
-  }
+  for (const [key, value] of params.entries()) verify.set(key, value);
   verify.set('openid.mode', 'check_authentication');
 
   const verifyRes = await fetch('https://steamcommunity.com/openid/login', {
@@ -69,9 +67,7 @@ export async function GET(request) {
           };
         }
       }
-    } catch {
-      // fall back to steamid-only session
-    }
+    } catch {}
   }
 
   const response = NextResponse.redirect(redirectUrl);
