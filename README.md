@@ -321,3 +321,11 @@ Open:
 - Added `/privacy-policy` and `/terms-and-conditions`
 - Restored a Supabase-backed 100-slot multiplayer baseline
 - Added in-scene multiplayer presence markers for visible players in the 3D space
+
+
+## Performance optimization package
+- Added a launch step before loading the full `/system` 3D scene
+- Moved `/system` to a client wrapper that only mounts the heavy scene on demand
+- Added mobile/reduced-scene scaling for stars, holograms, and background effects
+- Set multiplayer baseline to 100 slots in `.env.example`
+- Replaced compatibility-risk CSS `end` values with `flex-end`
