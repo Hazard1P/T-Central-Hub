@@ -801,12 +801,47 @@ function MultiplayerPresenceMarkers({ players }) {
           <Html position={[0, 0.36, 0]} center distanceFactor={12}>
             <div className="presence-marker-label">
               <strong>{player.personaname || 'Player'}</strong>
-              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
+              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}{player.target ? ` • ${player.target}` : ''}</span>
             </div>
           </Html>
         </group>
       ))}
     </group>
+  );
+}
+
+
+function ProximityPrompt({ target, onOpen }) {
+  if (!target) return null;
+  return (
+    <div className="proximity-prompt">
+      <span className="pilot-assist-kicker">Nearby system</span>
+      <strong>{target.label}</strong>
+      <p>{target.description}</p>
+      <button className="button primary" onClick={() => onOpen(target)}>
+        {target.key === 'arma3' ? 'Warp into system' : 'Open destination'}
+      </button>
+    </div>
+  );
+}
+
+function LiveRoomPanel({ players, me }) {
+  return (
+    <div className="live-room-panel">
+      <div className="live-room-head">
+        <span className="pilot-assist-kicker">Live room</span>
+        <strong>{players.length} visible player{players.length === 1 ? '' : 's'}</strong>
+      </div>
+      <div className="live-room-list">
+        {players.slice(0, 6).map((player) => (
+          <div key={player.steamid} className={`live-room-pill ${me && player.steamid === me.steamid ? 'self' : ''}`}>
+            <span>{player.personaname || 'Player'}</span>
+            <small>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</small>
+          </div>
+        ))}
+        {players.length === 0 ? <div className="live-room-empty">No players in view yet.</div> : null}
+      </div>
+    </div>
   );
 }
 
@@ -1302,6 +1337,7 @@ export default function SystemScene() {
   const [activeInterior, setActiveInterior] = useState(null);
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
+  const [nearbyTarget, setNearbyTarget] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -1396,6 +1432,7 @@ export default function SystemScene() {
           position: flightStats.position,
           mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
           zone: flightStats.zone || 'Navigation',
+          target: selected?.label || null,
           updatedAt: Date.now(),
         },
       });
@@ -1405,6 +1442,36 @@ export default function SystemScene() {
       supabase.removeChannel(channel);
     };
   }, [steamUser, flightStats, freeFly]);
+
+
+  useEffect(() => {
+    const myPos = flightStats?.position;
+    if (!Array.isArray(myPos)) {
+      setNearbyTarget(null);
+      return;
+    }
+
+    const candidates = [
+      { key: 'arma3', label: 'Arma3 CTH', description: 'Enter the tactical command sphere.', position: [-12.8, 5.0, -2.8], route: '/servers/arma3-cth' },
+      { key: 'sbox', label: 'S&Box', description: 'Open the sandbox route.', position: [3.4, 10.8, -4.4], route: 'https://sbox.game/', external: true },
+      { key: 'rust_anchor', label: 'T-Central Hub', description: 'Enter the lower singularity hub.', position: [-2.4, -7.8, 2.8], route: '/servers/rust-biweekly' },
+    ];
+
+    let best = null;
+    let bestDistance = Infinity;
+    for (const node of candidates) {
+      const dx = myPos[0] - node.position[0];
+      const dy = myPos[1] - node.position[1];
+      const dz = myPos[2] - node.position[2];
+      const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (d < bestDistance) {
+        bestDistance = d;
+        best = node;
+      }
+    }
+
+    setNearbyTarget(bestDistance <= 7.5 ? best : null);
+  }, [flightStats]);
 
   const executeWarp = (item) => {
     const href = item.route || item.href;
@@ -1461,6 +1528,8 @@ export default function SystemScene() {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <LiveRoomPanel players={remotePlayers} me={steamUser} />
+      <ProximityPrompt target={nearbyTarget} onOpen={openNode} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />

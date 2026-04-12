@@ -122,6 +122,19 @@ export default function MultiplayerHud() {
             <p className="multiplayer-note">Sign in with Steam to enter the live multiplayer room.</p>
           )}
         </div>
+
+        <div className="multiplayer-roster">
+          {presenceUsers.slice(0, 8).map((user) => (
+            <div key={`${user.steamid}-${user.joinedAt || ''}`} className="multiplayer-player-pill">
+              {user.avatar ? <img src={user.avatar} alt={user.personaname || 'Steam avatar'} /> : null}
+              <div className="multiplayer-player-copy">
+                <strong>{user.personaname || 'Player'}</strong>
+                <span>{user.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
+              </div>
+            </div>
+          ))}
+          {presenceUsers.length === 0 ? <div className="multiplayer-empty">No active players yet.</div> : null}
+        </div>
       </div>
     </div>
   );

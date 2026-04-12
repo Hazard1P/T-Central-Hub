@@ -329,3 +329,10 @@ Open:
 - Added mobile/reduced-scene scaling for stars, holograms, and background effects
 - Set multiplayer baseline to 100 slots in `.env.example`
 - Replaced compatibility-risk CSS `end` values with `flex-end`
+
+
+## Web-base game progression
+- Added an expanded live multiplayer roster in the HUD
+- Added an in-world live room panel for visible players
+- Added proximity prompts so nearby blackholes/systems feel more interactive
+- Player markers can now surface current mode and target context in the 3D world
