@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import PageShell from '@/components/PageShell';
+import ServerConnectActions from '@/components/ServerConnectActions';
 
 export const metadata = { title: 'Arma3 CTH' };
 
@@ -34,16 +35,12 @@ export default function ArmaPage() {
             Launch Arma 3, copy the server IP, or use the Steam quick-connect handoff to get into the T-Central CTH route faster.
           </p>
 
-          <div className="arma-action-stack">
-            <a className="button secondary" href="steam://run/107410">Launch Arma 3</a>
-            <a className="button primary" href={`steam://connect/${serverIp}`}>Quick Connect</a>
-            <button
-              className="button secondary"
-              onClick={() => navigator.clipboard?.writeText(serverIp)}
-            >
-              Copy IP
-            </button>
-          </div>
+          <ServerConnectActions
+            serverIp={serverIp}
+            steamAppId="107410"
+            launchLabel="Launch Arma 3"
+            connectLabel="Quick Connect"
+          />
 
           <div className="server-inline-meta">
             <span>Game: Arma 3</span>

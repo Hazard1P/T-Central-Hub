@@ -255,3 +255,14 @@ Open:
 - Donate and report pages are scrollable again while the fullscreen hub remains locked
 - Restored the Arma map image more prominently on the Arma3 page
 - Added a Capture the Hill briefing, future prospects, and direct quick-connect actions
+
+
+## Full architecture fix
+- Moved interactive server join controls into a dedicated client component: `components/ServerConnectActions.js`
+- Kept route pages and layout-safe wrappers server-friendly where possible
+- Preserved the fullscreen hub while leaving donate and report scrollable
+- Kept Steam auth routes, reporting flow, Arma quick connect, and refreshed donate/support messaging concurrent in the same package
+
+## Why this fixes the Vercel build
+- Next.js App Router does not allow passing event handlers from Server Components into Client Component props
+- The Arma server page now imports a client-only connect actions component instead of attaching `onClick` directly inside the page

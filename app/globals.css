@@ -2285,3 +2285,127 @@ button { font: inherit; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.support-banner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.support-banner-copy,
+.support-impact-grid,
+.support-lane-card,
+.donate-primary-card,
+.donate-secondary-card,
+.patron-appeal-card {
+  background: rgba(255,255,255,0.04);
+}
+
+.support-impact-grid {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.impact-pill {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.support-lanes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.support-lane-card {
+  display: grid;
+  gap: 12px;
+}
+
+.lane-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lane-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(131,235,255,0.14);
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lane-name {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lane-feature-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.donate-action-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.donate-button-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 20px;
+}
+
+.paypal-live-shell {
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+}
+
+.donate-note-box {
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+
+.donate-note-box strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.patron-appeal-card {
+  margin-top: 4px;
+}
+
+@media (max-width: 960px) {
+  .support-banner,
+  .support-lanes-grid,
+  .donate-action-grid {
+    grid-template-columns: 1fr;
+  }
+}
