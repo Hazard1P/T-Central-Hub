@@ -243,3 +243,9 @@ Open:
 - Added search, sort, suggested server logic, and per-server quick-connect actions
 - Server definitions live in `lib/serverCatalog.js`
 - Live status enriches entries when available from the existing status layer
+
+
+## Scroll lock fix
+- Locked the main web-game shell to the viewport
+- Disabled browser scrolling for the fullscreen system scene
+- Kept regular content pages scrollable where needed

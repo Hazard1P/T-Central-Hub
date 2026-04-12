@@ -1,3 +1,39 @@
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+#__next {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.system-page {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.interactive-map-stage,
+.interactive-map-stage.full,
+.interactive-map-stage.full.refined-stage {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.blackhole-interior-overlay,
+.transition-overlay,
+.cinematic-intro,
+.cockpit-overlay {
+  overflow: hidden;
+}
+
 :root {
   --bg: #061018;
   --bg-soft: #0d1724;
@@ -2123,4 +2159,17 @@ button { font: inherit; }
   .browser-server-actions {
     justify-content: flex-start;
   }
+}
+
+
+.content-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.report-page {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
 }
