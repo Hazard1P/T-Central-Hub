@@ -343,3 +343,8 @@ Open:
 - Added a spectate shortcut in the bottom navigation
 - Added a live activity feed so room changes feel more active
 - Kept proximity prompts and blackhole interaction progression in the shared space
+
+
+## Client exception fix
+- Restored the missing `reducedScene` state in `components/SystemScene.js`
+- Fixes the client-side exception caused by referencing `reducedScene` and `setReducedScene` before declaration

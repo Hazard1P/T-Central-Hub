@@ -1367,6 +1367,7 @@ export default function SystemScene() {
   const [nearbyTarget, setNearbyTarget] = useState(null);
   const [spectatorMode, setSpectatorMode] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [reducedScene, setReducedScene] = useState(false);
 
   useEffect(() => {
     let active = true;
