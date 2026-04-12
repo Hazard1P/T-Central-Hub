@@ -51,7 +51,7 @@ export default function ArmaPage() {
 
         <article className="content-card arma-hero-image-card">
           <Image
-            src="/cosmic-map.jpg"
+            src="/arma-cth-shot.png"
             alt="Arma 3 CTH map and command reference"
             width={1366}
             height={1024}
@@ -78,7 +78,7 @@ export default function ArmaPage() {
           <div className="arma-highlight">
             <strong>Current map and field reference</strong>
             <p className="muted">
-              This page restores the uploaded map image so players have a quick visual reference for the battlefield style before joining.
+              This page restores the Altis battlefield image so players have a quick visual reference for the Arma3 CTH environment before joining.
             </p>
           </div>
           <div className="arma-highlight">

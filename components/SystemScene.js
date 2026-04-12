@@ -782,7 +782,7 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         </div>
       ) : null}
       <div className="button-column">
-        {openable ? <button className="button primary" onClick={() => onOpen(item)}>{item?.key === 'arma3' ? 'Enter black hole' : 'Open destination'}</button> : null}
+        {openable ? <button className="button primary" onClick={() => onOpen(item)}>{item?.key === 'arma3' ? 'Warp into system' : 'Open destination'}</button> : null}
         <button className="button secondary" onClick={onClose}>Clear selection</button>
       </div>
     </div>
@@ -858,9 +858,9 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
           <div className="blackhole-interior-header">
             <div>
               <p className="eyebrow">Arma3 blackhole interior</p>
-              <h2>Primary server browser</h2>
+              <h2>Warping into Arma3 system</h2>
               <p className="muted">
-                Browse the single live T-Central Arma 3 route, preview the battlefield image, and connect through Steam from one command sphere.
+                Warp into the Arma3 CTH system, review the Altis battlefield briefing, and connect through Steam from one command sphere.
               </p>
             </div>
             <button className="focus-close" onClick={onClose}>×</button>
@@ -887,7 +887,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
           {bestServer ? (
             <div className="browser-highlight-card">
               <div>
-                <span className="interior-step">Suggested server</span>
+                <span className="interior-step">Primary live server</span>
                 <h3>{bestServer.title}</h3>
                 <p className="muted">
                   Primary live route based on your current single-server setup.
@@ -900,7 +900,29 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
             </div>
           ) : null}
 
-          <div className="server-browser-list">
+          
+              <div className="browser-brief-grid">
+                <article className="browser-brief-card">
+                  <span className="interior-step">System briefing</span>
+                  <h3>Arma3 CTH tactical briefing</h3>
+                  <ul className="arma-list">
+                    <li>Capture the Hill centers combat around control of a live central objective.</li>
+                    <li>Players re-enter quickly, contest the hill, and fight for momentum and territory.</li>
+                    <li>The focus is fast tactical pressure, repeat engagement, and clear battlefield flow.</li>
+                    <li>This route is aligned around one live public Arma3 CTH server overall.</li>
+                  </ul>
+                </article>
+
+                <article className="browser-brief-card browser-map-card">
+                  <span className="interior-step">Altis reference</span>
+                  <h3>Battlefield map</h3>
+                  <div className="browser-map-media">
+                    <img src="/arma-cth-shot.png" alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
+                  </div>
+                </article>
+              </div>
+
+              <div className="server-browser-list">
             {filtered.map((server) => (
               <article key={server.id} className="browser-server-card">
                 <div className="browser-server-main">

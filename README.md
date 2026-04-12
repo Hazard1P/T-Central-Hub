@@ -295,3 +295,9 @@ Open:
 - Added `/status` page summarizing the current stabilized package
 - Re-checked the one-server Arma setup and image availability
 - Kept recent fixes concurrent instead of branching the package further
+
+
+## Arma inner restore
+- Restored a stronger Arma blackhole entry feel with system warp wording
+- Added a tactical briefing and Altis map panel back into the Arma blackhole interior
+- Switched the Arma page main map back to the battlefield image instead of the cosmic reference
