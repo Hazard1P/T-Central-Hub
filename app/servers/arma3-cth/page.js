@@ -52,7 +52,7 @@ export default function ArmaPage() {
         <article className="content-card arma-hero-image-card">
           <Image
             src="/cosmic-map.jpg"
-            alt="Arma 3 Capture the Hill map preview"
+            alt="Arma 3 CTH map and command reference"
             width={1366}
             height={1024}
             className="page-image"
@@ -98,6 +98,7 @@ export default function ArmaPage() {
             ))}
           </ul>
         </article>
+      </div>
 
       <div className="arma-entry-grid">
         <article className="content-card arma-hero-image-card">
