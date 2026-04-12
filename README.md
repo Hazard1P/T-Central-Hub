@@ -335,3 +335,10 @@ Open:
 - Simplified the later game-layer additions that were more likely to cause client-side failures
 - Kept `/system`, shared-room sync, proximity prompts, and 3D presence markers active
 - Reduced extra HUD/panel complexity so the live layer is more reliable
+
+
+## Runtime stabilization fix
+- Fixed client-side exception sources in `components/SystemScene.js`
+- Moved mobile/reduced-scene state handling into `SystemScene`
+- Removed broken references from `SteamIdentityPanel`
+- Fixed `MobilePilotControls` JSX structure

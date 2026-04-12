@@ -1111,17 +1111,6 @@ function SteamIdentityPanel() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    const updateMobile = () => {
-      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
-      setIsMobile(mobile);
-      setReducedScene(mobile || window.innerWidth <= 1200);
-    };
-    updateMobile();
-    window.addEventListener('resize', updateMobile);
-    return () => window.removeEventListener('resize', updateMobile);
-  }, []);
-
-  useEffect(() => {
     let active = true;
     const load = async () => {
       try {
@@ -1303,6 +1292,7 @@ export default function SystemScene() {
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [reducedScene, setReducedScene] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -1339,6 +1329,17 @@ export default function SystemScene() {
       active = false;
       clearInterval(id);
     };
+  }, []);
+
+  useEffect(() => {
+    const updateMobile = () => {
+      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
+      setIsMobile(mobile);
+      setReducedScene(mobile || window.innerWidth <= 1200);
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
   }, []);
 
 
