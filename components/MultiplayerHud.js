@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 const ROOM_NAME = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
-const MAX_SLOTS = Number(process.env.NEXT_PUBLIC_MULTIPLAYER_MAX_SLOTS || 32);
+const MAX_SLOTS = Number(process.env.NEXT_PUBLIC_MULTIPLAYER_MAX_SLOTS || 100);
 
 function flattenPresence(state) {
   return Object.values(state || {}).flatMap((entries) => entries || []);
@@ -19,16 +19,13 @@ export default function MultiplayerHud() {
 
   const slotCount = presenceUsers.length;
   const slotsLeft = Math.max(0, MAX_SLOTS - slotCount);
-  const safetyInNumbers = slotCount >= 2;
 
-  const summary = useMemo(() => {
-    return {
-      room: ROOM_NAME,
-      slotCount,
-      slotsLeft,
-      safetyInNumbers,
-    };
-  }, [slotCount, slotsLeft, safetyInNumbers]);
+  const summary = useMemo(() => ({
+    room: ROOM_NAME,
+    slotCount,
+    slotsLeft,
+    safetyInNumbers: slotCount >= 2,
+  }), [slotCount, slotsLeft]);
 
   useEffect(() => {
     let active = true;
@@ -42,9 +39,7 @@ export default function MultiplayerHud() {
         if (!active) return;
         setSteamUser(null);
       });
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -52,41 +47,33 @@ export default function MultiplayerHud() {
     if (!supabase || !steamUser?.steamid) return;
 
     const channel = supabase.channel(`presence:${ROOM_NAME}`, {
-      config: {
-        presence: { key: steamUser.steamid },
-        broadcast: { self: true },
-      },
+      config: { presence: { key: steamUser.steamid }, broadcast: { self: true } },
     });
 
     channelRef.current = channel;
 
     channel
       .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        setPresenceUsers(flattenPresence(state));
+        setPresenceUsers(flattenPresence(channel.presenceState()));
       })
       .subscribe(async (status) => {
         setConnected(status === 'SUBSCRIBED');
         if (status !== 'SUBSCRIBED') return;
 
-        const payload = {
-          steamid: steamUser.steamid,
-          personaname: steamUser.personaname || 'Steam user',
-          avatar: steamUser.avatar || null,
-          profileurl: steamUser.profileurl || null,
-          mode: 'observer',
-          zone: 'hub',
-          joinedAt: new Date().toISOString(),
-        };
-
         const current = flattenPresence(channel.presenceState());
-        const alreadyCounted = current.some((entry) => entry.steamid === steamUser.steamid);
-        if (current.length >= MAX_SLOTS && !alreadyCounted) {
+        const already = current.some((entry) => entry.steamid === steamUser.steamid);
+        if (current.length >= MAX_SLOTS && !already) {
           setJoined(false);
           return;
         }
 
-        const result = await channel.track(payload);
+        const result = await channel.track({
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          joinedAt: new Date().toISOString(),
+          mode: 'spectate',
+        });
         setJoined(result === 'ok');
       });
 
@@ -129,24 +116,11 @@ export default function MultiplayerHud() {
 
         <div className="multiplayer-presence">
           {steamUser ? (
-            joined ? (
-              <p className="multiplayer-note">You are in the live room as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
-            ) : (
-              <p className="multiplayer-note">Steam linked, but the room is full or not ready yet.</p>
-            )
+            joined ? <p className="multiplayer-note">You are in the live room as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
+                   : <p className="multiplayer-note">Steam linked, but the room is full or unavailable.</p>
           ) : (
-            <p className="multiplayer-note">Sign in with Steam to join live presence and player slots.</p>
+            <p className="multiplayer-note">Sign in with Steam to enter the live multiplayer room.</p>
           )}
-        </div>
-
-        <div className="multiplayer-player-list">
-          {presenceUsers.slice(0, 8).map((user) => (
-            <div key={`${user.steamid}-${user.joinedAt || ''}`} className="multiplayer-player-pill">
-              {user.avatar ? <img src={user.avatar} alt={user.personaname || 'Steam avatar'} /> : null}
-              <span>{user.personaname || user.steamid}</span>
-            </div>
-          ))}
-          {presenceUsers.length === 0 ? <div className="multiplayer-empty">No active players yet.</div> : null}
         </div>
       </div>
     </div>

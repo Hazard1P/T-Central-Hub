@@ -313,3 +313,11 @@ Open:
 - Simplified cockpit/UI density on smaller screens
 - Improved fixed navigation spacing and top HUD stacking for phones
 - Adjusted support label and pilot messaging for clearer end-user guidance
+
+
+## V2 package baseline
+- Added a new front page entry layer at `/`
+- Moved the live 3D web-game system to `/system`
+- Added `/privacy-policy` and `/terms-and-conditions`
+- Restored a Supabase-backed 100-slot multiplayer baseline
+- Added in-scene multiplayer presence markers for visible players in the 3D space

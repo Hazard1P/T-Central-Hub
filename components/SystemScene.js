@@ -6,6 +6,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
@@ -202,6 +203,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
         boostLevel: boostMeter.current,
         gravityTarget: '—',
         zone: 'Navigation',
+        position: [shipPos.current.x, shipPos.current.y, shipPos.current.z],
+        mode: 'spectate',
       });
       return;
     }
@@ -309,6 +312,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       boostLevel: boostMeter.current,
       gravityTarget,
       zone,
+      position: [shipPos.current.x, shipPos.current.y, shipPos.current.z],
+      mode: enabled ? 'pilot' : 'spectate',
     });
   });
 
@@ -721,12 +726,13 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats }) {
+function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePlayers }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
     <>
       <DynamicBackgroundField />
+      <MultiplayerPresenceMarkers players={remotePlayers || []} />
       <MapHologram />
       <ambientLight intensity={1.05} />
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
@@ -778,6 +784,29 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats }) {
       <CameraReset tick={resetTick} />
       <FlyShipRig enabled={freeFly} resetTick={resetTick} onFlightStats={onFlightStats} />
     </>
+  );
+}
+
+
+function MultiplayerPresenceMarkers({ players }) {
+  return (
+    <group>
+      {players.map((player) => (
+        <group key={player.steamid} position={player.position || [0, 1.4, 26]}>
+          <mesh>
+            <sphereGeometry args={[0.12, 16, 16]} />
+            <meshBasicMaterial color={player.mode === 'pilot' ? '#83ebff' : '#ffd15c'} />
+          </mesh>
+          <pointLight color={player.mode === 'pilot' ? '#83ebff' : '#ffd15c'} intensity={2.4} distance={2.8} />
+          <Html position={[0, 0.36, 0]} center distanceFactor={12}>
+            <div className="presence-marker-label">
+              <strong>{player.personaname || 'Player'}</strong>
+              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
+            </div>
+          </Html>
+        </group>
+      ))}
+    </group>
   );
 }
 
@@ -921,7 +950,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
             </div>
           ) : null}
 
-          
+
               <div className="browser-brief-grid">
                 <article className="browser-brief-card">
                   <span className="interior-step">System briefing</span>
@@ -1269,10 +1298,23 @@ export default function SystemScene() {
   const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
   const [introVisible, setIntroVisible] = useState(true);
   const [activeInterior, setActiveInterior] = useState(null);
+  const [steamUser, setSteamUser] = useState(null);
+  const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     let active = true;
+
+    fetch('/api/auth/steam/session', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setSteamUser(data?.authenticated ? data.user : null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSteamUser(null);
+      });
 
     const fetchStatus = async () => {
       try {
@@ -1296,6 +1338,71 @@ export default function SystemScene() {
       clearInterval(id);
     };
   }, []);
+
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+    if (!supabase || !steamUser?.steamid) return;
+
+    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
+    });
+
+    channel
+      .on('broadcast', { event: 'player-state' }, ({ payload }) => {
+        if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
+        setRemotePlayers((prev) => {
+          const next = prev.filter((entry) => entry.steamid !== payload.steamid);
+          next.push(payload);
+          return next.slice(-100);
+        });
+      })
+      .subscribe(async (status) => {
+        if (status !== 'SUBSCRIBED') return;
+        await channel.track({
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          joinedAt: new Date().toISOString(),
+        });
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser]);
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+    if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
+
+    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { broadcast: { self: false } },
+    });
+
+    channel.subscribe((status) => {
+      if (status !== 'SUBSCRIBED') return;
+      channel.send({
+        type: 'broadcast',
+        event: 'player-state',
+        payload: {
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          position: flightStats.position,
+          mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+          zone: flightStats.zone || 'Navigation',
+          updatedAt: Date.now(),
+        },
+      });
+    });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser, flightStats, freeFly]);
 
   const executeWarp = (item) => {
     const href = item.route || item.href;
@@ -1357,7 +1464,7 @@ export default function SystemScene() {
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <Canvas camera={{ position: [0, 2.4, 36], fov: 40 }}>
-          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
+          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} remotePlayers={remotePlayers} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
         <Arma3BlackholeInterior
