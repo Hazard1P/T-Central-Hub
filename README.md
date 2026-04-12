@@ -301,3 +301,8 @@ Open:
 - Restored a stronger Arma blackhole entry feel with system warp wording
 - Added a tactical briefing and Altis map panel back into the Arma blackhole interior
 - Switched the Arma page main map back to the battlefield image instead of the cosmic reference
+
+
+## Altis page patch
+- Kept the Arma blackhole warp/system behavior intact
+- Changed the Arma page image references to `arma-cth-shot.png`

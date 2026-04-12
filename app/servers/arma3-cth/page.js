@@ -103,7 +103,7 @@ export default function ArmaPage() {
       <div className="arma-entry-grid">
         <article className="content-card arma-hero-image-card">
           <Image
-            src="/photo.jpg"
+            src="/arma-cth-shot.png"
             alt="Uploaded Arma reference photo"
             width={1366}
             height={1024}
@@ -112,10 +112,10 @@ export default function ArmaPage() {
         </article>
 
         <article className="content-card">
-          <p className="eyebrow">Uploaded reference photo</p>
-          <h3>Additional visual reference</h3>
+          <p className="eyebrow">Altis map reference</p>
+          <h3>Additional battlefield reference</h3>
           <p className="muted">
-            This restores the uploaded photo directly into the Arma3 route so the visual reference is preserved alongside the main battlefield map.
+            This keeps the Arma3 route visually aligned around the Altis battlefield map for a cleaner and more consistent server entry.
           </p>
           <div className="server-inline-meta">
             <span>Server IP: tcentral.game.nfoservers.com:2302</span>
