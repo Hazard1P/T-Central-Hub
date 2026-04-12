@@ -230,3 +230,9 @@ Open:
   - confirmation
   - deploy
 - The deploy button only activates after confirmation
+
+
+## Arma3 blackhole quick-connect
+- Added a visible Arma3 server list card inside the blackhole interior
+- Added copy IP, Launch Arma 3, and Quick Connect actions
+- Quick Connect uses the Steam browser protocol handoff

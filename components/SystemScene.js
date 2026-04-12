@@ -792,6 +792,17 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
 function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, onClose }) {
   if (!item || item.key !== 'arma3') return null;
   const status = statuses?.arma3 || null;
+  const serverIp = 'tcentral.game.nfoservers.com:2302';
+  const steamLaunchUrl = 'steam://run/107410';
+  const quickConnectUrl = `steam://connect/${serverIp}`;
+
+  const copyIp = async () => {
+    try {
+      await navigator.clipboard.writeText(serverIp);
+    } catch {
+      // ignore clipboard failure
+    }
+  };
 
   return (
     <div className="blackhole-interior-overlay">
@@ -813,10 +824,37 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
               <p className="eyebrow">Arma3 blackhole interior</p>
               <h2>CTH Tactical Command Sphere</h2>
               <p className="muted">
-                This interior uses a three-step validation loop so the destination can be reviewed before deployment.
+                Review the server datapoints, confirm the target, and then use the quick-connect actions to launch into Arma 3 CTH.
               </p>
             </div>
             <button className="focus-close" onClick={onClose}>×</button>
+          </div>
+
+          <div className="interior-server-list-card">
+            <div className="server-list-head">
+              <div>
+                <span className="interior-step">Server list</span>
+                <h3>Arma3 CTH live route</h3>
+              </div>
+              <span className="server-mode-pill">CTH</span>
+            </div>
+
+            <div className="arma-server-row">
+              <div className="arma-server-main">
+                <strong>T-Central Arma3 CTH</strong>
+                <span>{serverIp}</span>
+              </div>
+              <div className="arma-server-state">
+                <span>{status?.online === true ? 'Online' : status?.online === false ? 'Offline' : 'Unavailable'}</span>
+                <strong>{formatStatus(status)}</strong>
+              </div>
+            </div>
+
+            <div className="arma-server-actions">
+              <button className="button secondary" onClick={copyIp}>Copy IP</button>
+              <a className="button secondary" href={steamLaunchUrl}>Launch Arma 3</a>
+              <a className="button primary" href={quickConnectUrl}>Quick Connect</a>
+            </div>
           </div>
 
           <div className="interior-checkpoint-grid">
@@ -832,9 +870,9 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
 
             <article className="interior-card">
               <span className="interior-step">02 · Confirmation</span>
-              <h3>Destination validation</h3>
+              <h3>Target validation</h3>
               <div className="interior-metric-list">
-                <div><span>Target</span><strong>{item.address}</strong></div>
+                <div><span>Server IP</span><strong>{serverIp}</strong></div>
                 <div><span>Mode</span><strong>Capture the Hill</strong></div>
                 <div><span>Verified</span><strong>{verified ? 'Confirmed' : 'Pending'}</strong></div>
               </div>
@@ -844,15 +882,14 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
             </article>
 
             <article className="interior-card">
-              <span className="interior-step">03 · Build strategy</span>
-              <h3>Deploy with intent</h3>
+              <span className="interior-step">03 · Deploy</span>
+              <h3>Steam handoff</h3>
               <p className="muted">
-                Enter only after the route, state, and objective picture are aligned. This keeps the blackhole flow
-                tied to a repeatable capture → confirm → deploy strategy.
+                Use the Steam handoff after confirmation for a faster route into the server. Launch Arma 3 first if needed, then use Quick Connect.
               </p>
               <div className="button-column">
                 <button className="button primary" onClick={onDeploy} disabled={!verified}>
-                  {verified ? 'Deploy to battlefield' : 'Confirm to deploy'}
+                  {verified ? 'Quick connect now' : 'Confirm to enable'}
                 </button>
                 <button className="button secondary" onClick={onClose}>Exit interior</button>
               </div>
@@ -860,7 +897,7 @@ function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, 
           </div>
 
           <div className="interior-footer-note">
-            Tactical preview: capture zone core, faction lanes, and deployment route are staged here before handoff.
+            Tactical preview: this interior now prioritizes real join actions first — server list, visible IP, Arma launch, and quick connect.
           </div>
         </div>
       </div>
@@ -1101,11 +1138,11 @@ export default function SystemScene() {
   };
 
   const handleInteriorDeploy = () => {
-    const armaNode = NODES.find((node) => node.key === 'arma3');
     setActiveInterior(null);
-    if (armaNode) {
-      executeWarp(armaNode);
-    }
+    setTransition('Arma3 CTH');
+    setTimeout(() => {
+      window.location.href = 'steam://connect/tcentral.game.nfoservers.com:2302';
+    }, 900);
   };
 
   const handleCenter = () => {
