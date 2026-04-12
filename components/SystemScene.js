@@ -781,8 +781,88 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         </div>
       ) : null}
       <div className="button-column">
-        {openable ? <button className="button primary" onClick={() => onOpen(item)}>Open destination</button> : null}
+        {openable ? <button className="button primary" onClick={() => onOpen(item)}>{item?.key === 'arma3' ? 'Enter black hole' : 'Open destination'}</button> : null}
         <button className="button secondary" onClick={onClose}>Clear selection</button>
+      </div>
+    </div>
+  );
+}
+
+
+function Arma3BlackholeInterior({ item, statuses, verified, onVerify, onDeploy, onClose }) {
+  if (!item || item.key !== 'arma3') return null;
+  const status = statuses?.arma3 || null;
+
+  return (
+    <div className="blackhole-interior-overlay">
+      <div className="blackhole-interior-shell">
+        <div className="blackhole-interior-backdrop">
+          <div className="interior-grid-sphere sphere-a" />
+          <div className="interior-grid-sphere sphere-b" />
+          <div className="interior-terrain-hologram">
+            <div className="terrain-ring ring-outer" />
+            <div className="terrain-ring ring-mid" />
+            <div className="terrain-ring ring-inner" />
+            <div className="capture-core" />
+          </div>
+        </div>
+
+        <div className="blackhole-interior-content">
+          <div className="blackhole-interior-header">
+            <div>
+              <p className="eyebrow">Arma3 blackhole interior</p>
+              <h2>CTH Tactical Command Sphere</h2>
+              <p className="muted">
+                This interior uses a three-step validation loop so the destination can be reviewed before deployment.
+              </p>
+            </div>
+            <button className="focus-close" onClick={onClose}>×</button>
+          </div>
+
+          <div className="interior-checkpoint-grid">
+            <article className="interior-card">
+              <span className="interior-step">01 · Datapoint capture</span>
+              <h3>Live operational snapshot</h3>
+              <div className="interior-metric-list">
+                <div><span>Status</span><strong>{status?.online === true ? 'Online' : status?.online === false ? 'Offline' : 'Unavailable'}</strong></div>
+                <div><span>Players</span><strong>{formatStatus(status)}</strong></div>
+                <div><span>Map</span><strong>{status?.map || 'Altis / tactical layer'}</strong></div>
+              </div>
+            </article>
+
+            <article className="interior-card">
+              <span className="interior-step">02 · Confirmation</span>
+              <h3>Destination validation</h3>
+              <div className="interior-metric-list">
+                <div><span>Target</span><strong>{item.address}</strong></div>
+                <div><span>Mode</span><strong>Capture the Hill</strong></div>
+                <div><span>Verified</span><strong>{verified ? 'Confirmed' : 'Pending'}</strong></div>
+              </div>
+              <button className="button secondary" onClick={onVerify}>
+                {verified ? 'Datapoints confirmed' : 'Confirm datapoints'}
+              </button>
+            </article>
+
+            <article className="interior-card">
+              <span className="interior-step">03 · Build strategy</span>
+              <h3>Deploy with intent</h3>
+              <p className="muted">
+                Enter only after the route, state, and objective picture are aligned. This keeps the blackhole flow
+                tied to a repeatable capture → confirm → deploy strategy.
+              </p>
+              <div className="button-column">
+                <button className="button primary" onClick={onDeploy} disabled={!verified}>
+                  {verified ? 'Deploy to battlefield' : 'Confirm to deploy'}
+                </button>
+                <button className="button secondary" onClick={onClose}>Exit interior</button>
+              </div>
+            </article>
+          </div>
+
+          <div className="interior-footer-note">
+            Tactical preview: capture zone core, faction lanes, and deployment route are staged here before handoff.
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -955,6 +1035,8 @@ export default function SystemScene() {
   const [freeFly, setFreeFly] = useState(false);
   const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
   const [introVisible, setIntroVisible] = useState(true);
+  const [activeInterior, setActiveInterior] = useState(null);
+  const [interiorVerified, setInteriorVerified] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -982,7 +1064,7 @@ export default function SystemScene() {
     };
   }, []);
 
-  const openNode = (item) => {
+  const executeWarp = (item) => {
     const href = item.route || item.href;
     if (!href) return;
     setTransition(item.label);
@@ -995,7 +1077,36 @@ export default function SystemScene() {
     }, 900);
   };
 
+  const openNode = (item) => {
+    const href = item.route || item.href;
+    if (!href) return;
+    if (item.key === 'arma3') {
+      setActiveInterior('arma3');
+      setInteriorVerified(false);
+      setSelected(item);
+      return;
+    }
+    executeWarp(item);
+  };
 
+
+
+  const handleInteriorClose = () => {
+    setActiveInterior(null);
+    setInteriorVerified(false);
+  };
+
+  const handleInteriorVerify = () => {
+    setInteriorVerified(true);
+  };
+
+  const handleInteriorDeploy = () => {
+    const armaNode = NODES.find((node) => node.key === 'arma3');
+    setActiveInterior(null);
+    if (armaNode) {
+      executeWarp(armaNode);
+    }
+  };
 
   const handleCenter = () => {
     setSelected(null);
@@ -1025,6 +1136,14 @@ export default function SystemScene() {
           <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
+        <Arma3BlackholeInterior
+          item={activeInterior === 'arma3' ? selected : null}
+          statuses={statuses}
+          verified={interiorVerified}
+          onVerify={handleInteriorVerify}
+          onDeploy={handleInteriorDeploy}
+          onClose={handleInteriorClose}
+        />
         {transition ? <WarpOverlay label={transition} /> : null}
       </div>
     </div>
