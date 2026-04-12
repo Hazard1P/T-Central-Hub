@@ -6,6 +6,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
+import { GAME_ASSETS } from '@/lib/gameAssets';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 const NODES = [
@@ -1028,7 +1029,7 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
                   <span className="interior-step">Altis reference</span>
                   <h3>Battlefield map</h3>
                   <div className="browser-map-media">
-                    <img src="/arma-cth-shot.png" alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
+                    <img src={GAME_ASSETS.armaAltisMap} alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
                   </div>
                 </article>
               </div>

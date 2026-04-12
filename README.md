@@ -277,7 +277,7 @@ Open:
   - `components/DonateSupportClient.js`
 - Added supporter status to the Steam HUD
 - Restored the Arma3 battlefield image inside the blackhole server browser
-- Added `public/photo.jpg` as a compatible image alias from the existing map asset
+- Added `public/arma-cth-shot.png` as a compatible image alias from the existing map asset
 
 ## Environment variables
 - `SUPPORT_LINK_SECRET` should be a long random secret in production
@@ -348,3 +348,10 @@ Open:
 ## Client exception fix
 - Restored the missing `reducedScene` state in `components/SystemScene.js`
 - Fixes the client-side exception caused by referencing `reducedScene` and `setReducedScene` before declaration
+
+
+## Asset cleanup pass
+- Removed `photo.jpg` entirely from the package
+- Standardized assets through `lib/gameAssets.js`
+- Kept the Arma route and Arma interior aligned to `arma-cth-shot.png`
+- Preserved the rest of the live web-game stack including Rust, Arma, standalone black hole anchor, donate page, and pilot-mode ship styling
