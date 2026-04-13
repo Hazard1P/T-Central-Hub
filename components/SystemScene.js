@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
+import { Html, OrbitControls, Stars, Trail, Line, Billboard, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
 import { getSupabaseClient } from '@/lib/supabaseClient';
@@ -613,6 +613,7 @@ function Planet({ planet, index }) {
 
   return (
     <>
+      <CosmicBackdrop />
       <mesh ref={planetRef}><sphereGeometry args={[planet.radius, 20, 20]} /><meshStandardMaterial color={planet.color} emissive={planet.color} emissiveIntensity={0.35} /></mesh>
       {planet.ring ? (
         <mesh ref={ringRef} rotation={[Math.PI / 2.5, 0, 0]}>
@@ -736,6 +737,20 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
+
+function CosmicBackdrop() {
+  const texture = useTexture('/assets/cosmic-bg.jpg');
+  texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  return (
+    <mesh scale={[-1, 1, 1]} renderOrder={-20}>
+      <sphereGeometry args={[180, 48, 48]} />
+      <meshBasicMaterial map={texture} side={THREE.BackSide} transparent opacity={0.42} depthWrite={false} fog={false} />
+    </mesh>
+  );
+}
+
 function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePlayers, reducedScene, isMobile, onIntroDone }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
@@ -748,7 +763,7 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePl
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
       <pointLight position={[7, 3, -2]} intensity={8} color="#b78dff" distance={18} />
-      <fog attach="fog" args={['#090311', reducedScene ? 15 : 17, reducedScene ? 34 : 42]} />
+      <fog attach="fog" args={['#08111b', reducedScene ? 24 : 28, reducedScene ? 90 : 120]} />
       <Stars radius={96} depth={44} count={reducedScene ? 1400 : 4200} factor={reducedScene ? 2.6 : 4.2} saturation={0} fade speed={reducedScene ? 0.4 : 0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>

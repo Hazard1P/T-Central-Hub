@@ -383,3 +383,9 @@ Open:
 - Merged the selected cosmic background asset into the current build-further package
 - Applied the background across entry, launcher, system, and content layers
 - Added a cosmic overlay to the front page and 3D system stage
+
+
+## 3D backdrop patch
+- Added `CosmicBackdrop` inside the actual Three.js scene using `/assets/cosmic-bg.jpg`
+- Shifted the cosmic image from page-only styling into the real 3D environment backdrop
+- Relaxed fog so the nebula sphere is visible behind nodes, ships, and blackholes

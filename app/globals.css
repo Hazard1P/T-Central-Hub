@@ -3279,3 +3279,10 @@ button { font: inherit; }
     bottom: 246px;
   }
 }
+
+
+/* Let the 3D nebula sphere read more clearly behind the scene */
+.interactive-map-stage.full.refined-stage .cosmic-overlay {
+  opacity: 0.38;
+  filter: blur(10px);
+}
