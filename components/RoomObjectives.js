@@ -10,7 +10,7 @@ export default function RoomObjectives() {
       <div className="room-objective-list">
         <div className="room-objective-item">
           <span>•</span>
-          <p>Travel between blackholes and routes to learn the system layout.</p>
+          <p>Travel between the 5 blackholes and 3 Dyson spheres to learn the system layout.</p>
         </div>
         <div className="room-objective-item">
           <span>•</span>
@@ -18,7 +18,7 @@ export default function RoomObjectives() {
         </div>
         <div className="room-objective-item">
           <span>•</span>
-          <p>Use the Arma3 blackhole interior as the main tactical handoff into the live server.</p>
+          <p>Use the Arma3 blackhole interior as the main tactical handoff, while the solar system remains present with its orbit structure.</p>
         </div>
       </div>
     </div>

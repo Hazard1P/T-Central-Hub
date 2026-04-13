@@ -390,7 +390,7 @@ Open:
 - Ensures the blackhole appears in the live 3D system and current route/status flow
 
 
-## MatrixCoinExchange visibility patch
-- Moved MatrixCoinExchange to a more visible scene position
-- Increased its visual emphasis in the live route/status flow
-- Added a route chip bar so MatrixCoinExchange is always surfaced in the current system
+## World layout alignment
+- Aligned the active system to 5 blackholes: Rust, S&Box, Arma3, MatrixCoinExchange, and Deep Standalone Blackhole
+- Added 3 Dyson spheres: CSIS, S.S, and Affiliates
+- Preserved the solar system as its own orbit-based structure

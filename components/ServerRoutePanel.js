@@ -1,9 +1,9 @@
 'use client';
 
 export default function ServerRoutePanel({ selected }) {
-  const label = selected?.label || 'System routes ready';
-  const description = selected?.description || 'Move through the shared system and select a route to reveal the next destination, including MatrixCoinExchange.';
-  const address = selected?.address || selected?.sublabel || 'Arma3 CTH • MatrixCoinExchange • Rust';
+  const label = selected?.label || 'No route selected';
+  const description = selected?.description || 'Move through the shared system and select a route to reveal the next destination.';
+  const address = selected?.address || selected?.sublabel || 'Awaiting route focus';
 
   return (
     <div className="server-route-panel">
