@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import SteamLoginHud from '@/components/SteamLoginHud';
-import SystemStatusStrip from '@/components/SystemStatusStrip';
 import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
 
@@ -18,7 +17,6 @@ export default function SystemEntryClient() {
   return (
     <>
       <SteamLoginHud />
-      <SystemStatusStrip />
       {entered ? <MultiplayerHud /> : null}
       {entered ? <SystemScene /> : <SystemLauncher onEnter={() => setEntered(true)} />}
     </>

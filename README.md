@@ -337,55 +337,13 @@ Open:
 - Reduced extra HUD/panel complexity so the live layer is more reliable
 
 
-## Continue building pass
-- Integrated the selected cosmic background asset into the live package
-- Applied the cosmic image across entry, launcher, system, and content layers
-- Added a screen-space cosmic overlay for more depth in the 3D scene
-- Kept moving the project toward the web-base game direction instead of splitting into a separate visual branch
+## Runtime stabilization fix
+- Fixed client-side exception sources in `components/SystemScene.js`
+- Moved mobile/reduced-scene state handling into `SystemScene`
+- Removed broken references from `SteamIdentityPanel`
+- Fixed `MobilePilotControls` JSX structure
 
 
-## Front page JSX fix
-- Rebuilt `app/page.js` cleanly after the cosmic wrapper insertion malformed the JSX structure
-
-
-## Combined runtime fix
-- Removed leaked `setIsMobile` / `setReducedScene` calls from `SteamIdentityPanel`
-- Fixed `CameraReset` so it reports intro completion through a passed callback instead of directly calling `setIntroVisible`
-- Restored `reducedScene` state and mobile detection inside `SystemScene`
-
-
-## Deep simulation stabilization
-- Removed leaked `setIsMobile` / `setReducedScene` calls from `SteamIdentityPanel`
-- Added null guards to scene objects that can receive undefined nodes
-- Restored mobile/reduced-scene logic to `SystemScene`
-- Hooked `onIntroDone` back into `SystemScene`
-- Simplified outbound realtime broadcasts to a steadier interval loop
-
-
-## Continued development pass
-- Added a top-level system status strip for clearer live-world context
-- Added an in-world guide panel to make the 3D environment easier to use
-- Kept the focus on the same shared 3D system instead of branching away from it
-
-
-## WorldGuide split fix
-- Moved `WorldGuide` back into `components/WorldGuide.js`
-- Removed the accidental second `export default` from `components/SystemScene.js`
-
-
-## Build further pass
-- Added a route-focus panel to strengthen node/server progression in the shared world
-- Added objective framing so the 3D environment feels more like a live game-space
-- Added a room pulse panel for better immediate awareness of the shared layer
-
-
-## Build further + background pass
-- Merged the selected cosmic background asset into the current build-further package
-- Applied the background across entry, launcher, system, and content layers
-- Added a cosmic overlay to the front page and 3D system stage
-
-
-## 3D backdrop patch
-- Added `CosmicBackdrop` inside the actual Three.js scene using `/assets/cosmic-bg.jpg`
-- Shifted the cosmic image from page-only styling into the real 3D environment backdrop
-- Relaxed fog so the nebula sphere is visible behind nodes, ships, and blackholes
+## MatrixCoinExchange blackhole
+- Added a MatrixCoinExchange blackhole to the 3D system
+- Forwards to `https://matrixcoinexchange.com`

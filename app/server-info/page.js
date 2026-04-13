@@ -1,37 +1,78 @@
-import PageShell from '@/components/PageShell';
+import SectionTitle from '@/components/SectionTitle';
 
-export const metadata = { title: 'Server Info' };
+const serverCards = [
+  {
+    title: 'Arma3 CTH Server',
+    details: [
+      'Direct connect: tcentral.game.nfoservers.com:2302',
+      'Mode: Capture the Hill',
+      'Focus: public tactical team combat',
+      'Use this card for map rotation, restart schedule, and featured event notes.',
+    ],
+  },
+  {
+    title: 'Rust Vanilla Server',
+    details: [
+      'Server name: NFOservers.com: T-Central Rust Vanilla Bi-Weekly Wipe',
+      'Direct connect: tcentralrust.game.nfoservers.com:28015',
+      'Game: Rust',
+      'Current map: Procedural Map',
+      'Current players: 0 / 250',
+      'Currently locked: No',
+      'Wipe cadence: Bi-Weekly Wipe',
+    ],
+  },
+];
+
+const rustQuickStats = [
+  { label: 'Server', value: 'Rust Vanilla' },
+  { label: 'Wipe', value: 'Bi-Weekly' },
+  { label: 'Map', value: 'Procedural Map' },
+  { label: 'Capacity', value: '250 Players' },
+];
 
 export default function ServerInfoPage() {
   return (
-    <PageShell
-      eyebrow="Server layer"
-      title="The web-base game is the live system."
-      text="This project is being built as a shared 3D multiplayer space where players sign in, fly, spectate, and use blackholes as server-entry systems."
-    >
-      <div className="arma-brief-grid">
-        <article className="content-card">
-          <p className="eyebrow">Current direction</p>
-          <h3>Live shared world</h3>
-          <p className="muted">
-            The 3D environment remains the actual web-game layer rather than a decorative landing page.
-          </p>
-        </article>
-        <article className="content-card">
-          <p className="eyebrow">Core roles</p>
-          <h3>Pilot and spectate</h3>
-          <p className="muted">
-            Players can pilot ships, move through space, and observe the shared room while navigating to blackholes and server routes.
-          </p>
-        </article>
-        <article className="content-card">
-          <p className="eyebrow">Target</p>
-          <h3>Persistent growth</h3>
-          <p className="muted">
-            Each package continues toward a fuller multiplayer simulator with better visuals, stronger sync, and deeper server interiors.
-          </p>
-        </article>
+    <section className="section-block page-top">
+      <div className="container">
+        <SectionTitle
+          eyebrow="Server information"
+          title="Keep all join details in one clean place."
+          text="This page is built for players who want quick access to direct connect details, server expectations, and the core experience for each game."
+        />
+
+        <div className="card-grid two">
+          {serverCards.map((card) => (
+            <article key={card.title} className="content-card large">
+              <h3>{card.title}</h3>
+              <div className="list-block compact-list">
+                {card.details.map((detail) => (
+                  <div key={detail} className="list-item">
+                    <span className="dot" />
+                    <p>{detail}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="section-block" style={{ paddingBottom: 0 }}>
+          <SectionTitle
+            eyebrow="Rust quick view"
+            title="Current Rust server snapshot."
+            text="A dedicated card set for the live Rust public details you provided."
+          />
+          <div className="card-grid four">
+            {rustQuickStats.map((item) => (
+              <article key={item.label} className="content-card">
+                <p className="eyebrow">{item.label}</p>
+                <h3>{item.value}</h3>
+              </article>
+            ))}
+          </div>
+        </div>
       </div>
-    </PageShell>
+    </section>
   );
 }
