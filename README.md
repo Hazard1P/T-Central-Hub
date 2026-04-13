@@ -342,3 +342,10 @@ Open:
 - Moved mobile/reduced-scene state handling into `SystemScene`
 - Removed broken references from `SteamIdentityPanel`
 - Fixed `MobilePilotControls` JSX structure
+
+
+## Cosmic background pass
+- Deepened the overall nebula and starfield look across the site
+- Increased contrast and color separation for the shared 3D system
+- Added a subtle cosmic haze layer behind the live navigation scene
+- Tuned stars and fog for a richer space-simulator atmosphere
