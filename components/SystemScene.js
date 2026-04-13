@@ -731,9 +731,9 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePl
 
   return (
     <>
-      {!reducedScene ? <DynamicBackgroundField /> : null}
+      {!reducedScene ? {!reducedScene ? <DynamicBackgroundField /> : null} : null}
       <MultiplayerPresenceMarkers players={remotePlayers || []} />
-      {!isMobile ? <MapHologram /> : null}
+      {!isMobile ? {!isMobile ? <MapHologram /> : null} : null}
       <ambientLight intensity={1.05} />
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
@@ -1303,6 +1303,7 @@ export default function SystemScene() {
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [reducedScene, setReducedScene] = useState(false);
 
   useEffect(() => {
     let active = true;

@@ -346,3 +346,9 @@ Open:
 
 ## Front page JSX fix
 - Rebuilt `app/page.js` cleanly after the cosmic wrapper insertion malformed the JSX structure
+
+
+## Runtime crash fix
+- Removed invalid `setIsMobile` and `setReducedScene` calls from `SteamIdentityPanel`
+- Restored `reducedScene` state and mobile detection inside `SystemScene`
+- Reconnected reduced-scene rendering logic to the main 3D scene where it belongs
