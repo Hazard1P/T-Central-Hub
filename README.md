@@ -388,3 +388,9 @@ Open:
 ## MatrixCoinExchange current-status fix
 - Added MatrixCoinExchange to the current build-further-with-background package
 - Ensures the blackhole appears in the live 3D system and current route/status flow
+
+
+## MatrixCoinExchange visibility patch
+- Moved MatrixCoinExchange to a more visible scene position
+- Increased its visual emphasis in the live route/status flow
+- Added a route chip bar so MatrixCoinExchange is always surfaced in the current system

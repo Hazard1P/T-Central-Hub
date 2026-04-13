@@ -3279,3 +3279,47 @@ button { font: inherit; }
     bottom: 246px;
   }
 }
+
+
+.system-route-chipbar {
+  position: fixed;
+  left: 50%;
+  top: 74px;
+  transform: translateX(-50%);
+  z-index: 44;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: min(760px, calc(100vw - 28px));
+  pointer-events: none;
+}
+
+.system-route-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(7, 12, 20, 0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+  color: #eefbff;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.system-route-chip.matrix {
+  border-color: rgba(109,255,181,0.38);
+  box-shadow: 0 0 0 1px rgba(109,255,181,0.16), 0 12px 28px rgba(0,0,0,0.2);
+  color: #dffff1;
+}
+
+@media (max-width: 900px) {
+  .system-route-chipbar {
+    top: 118px;
+    width: calc(100vw - 20px);
+  }
+}

@@ -20,6 +20,13 @@ export default function SystemEntryClient() {
       <SteamLoginHud />
       <SystemStatusStrip />
       {entered ? <MultiplayerHud /> : null}
+      {entered ? (
+        <div className="system-route-chipbar">
+          <span className="system-route-chip">Arma3 CTH</span>
+          <span className="system-route-chip matrix">MatrixCoinExchange</span>
+          <span className="system-route-chip">Rust</span>
+        </div>
+      ) : null}
       {entered ? <SystemScene /> : <SystemLauncher onEnter={() => setEntered(true)} />}
     </>
   );
