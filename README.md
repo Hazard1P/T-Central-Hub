@@ -371,3 +371,9 @@ Open:
 ## WorldGuide split fix
 - Moved `WorldGuide` back into `components/WorldGuide.js`
 - Removed the accidental second `export default` from `components/SystemScene.js`
+
+
+## Build further pass
+- Added a route-focus panel to strengthen node/server progression in the shared world
+- Added objective framing so the 3D environment feels more like a live game-space
+- Added a room pulse panel for better immediate awareness of the shared layer

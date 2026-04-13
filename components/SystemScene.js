@@ -8,6 +8,8 @@ import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import WorldGuide from '@/components/WorldGuide';
+import ServerRoutePanel from '@/components/ServerRoutePanel';
+import RoomObjectives from '@/components/RoomObjectives';
 
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
@@ -819,6 +821,17 @@ function MultiplayerPresenceMarkers({ players }) {
 }
 
 
+
+function RoomPulse({ freeFly, remotePlayers }) {
+  return (
+    <div className={`room-pulse ${freeFly ? 'pilot' : 'spectate'}`}>
+      <span className="pilot-assist-kicker">Room pulse</span>
+      <strong>{freeFly ? 'Pilot lane active' : 'Spectate lane active'}</strong>
+      <p>{remotePlayers?.length || 0} remote player{(remotePlayers?.length || 0) === 1 ? '' : 's'} visible in the shared layer.</p>
+    </div>
+  );
+}
+
 function FocusPanel({ item, statuses, onClose, onOpen }) {
   if (!item) return null;
   const status = item.key ? statuses?.[item.key] : null;
@@ -1452,7 +1465,11 @@ export default function SystemScene() {
 
 
   const handleCenter = () => {
-    setSelected(null);
+    setSelected({
+      label: 'System Center',
+      address: 'Navigation origin',
+      description: 'Centered back into the shared 3D web-game space. Select a node or move toward a blackhole to continue.',
+    });
     setResetTick((n) => n + 1);
   };
 
@@ -1475,7 +1492,10 @@ export default function SystemScene() {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <ServerRoutePanel selected={selected} />
+      <RoomObjectives />
       <WorldGuide />
+      <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
