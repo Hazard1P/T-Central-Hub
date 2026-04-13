@@ -86,13 +86,15 @@ function MapHologram() {
   );
 }
 
-function CameraReset({ tick }) {
+function CameraReset({ tick, onIntroDone }) {
   const { camera, controls } = useThree();
 
   useEffect(() => {
-    const t = setTimeout(() => setIntroVisible(false), 2200);
+    const t = setTimeout(() => {
+      if (onIntroDone) onIntroDone();
+    }, 2200);
     return () => clearTimeout(t);
-  }, []);
+  }, [onIntroDone]);
 
   useEffect(() => {
     camera.position.set(0, 2.4, 36);
@@ -726,7 +728,7 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePlayers, reducedScene, isMobile }) {
+function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePlayers, reducedScene, isMobile, onIntroDone }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
@@ -781,7 +783,7 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePl
         maxPolarAngle={Math.PI}
         minPolarAngle={0}
       />
-      <CameraReset tick={resetTick} />
+      <CameraReset tick={resetTick} onIntroDone={onIntroDone} />
       <FlyShipRig enabled={freeFly} resetTick={resetTick} onFlightStats={onFlightStats} />
     </>
   );

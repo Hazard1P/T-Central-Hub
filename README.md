@@ -348,12 +348,7 @@ Open:
 - Rebuilt `app/page.js` cleanly after the cosmic wrapper insertion malformed the JSX structure
 
 
-## Runtime crash fix
-- Removed invalid `setIsMobile` and `setReducedScene` calls from `SteamIdentityPanel`
+## Combined runtime fix
+- Removed leaked `setIsMobile` / `setReducedScene` calls from `SteamIdentityPanel`
+- Fixed `CameraReset` so it reports intro completion through a passed callback instead of directly calling `setIntroVisible`
 - Restored `reducedScene` state and mobile detection inside `SystemScene`
-- Reconnected reduced-scene rendering logic to the main 3D scene where it belongs
-
-
-## SystemScene JSX fix
-- Removed duplicated reduced-scene JSX conditionals in `components/SystemScene.js`
-- Restored valid conditional rendering for `DynamicBackgroundField` and `MapHologram`
