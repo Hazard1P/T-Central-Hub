@@ -499,6 +499,7 @@ function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [
 
 function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor, labelOffset = [0, 1.55, 0], matterRadius = 3.2 }) {
   const group = useRef(null);
+  if (!node) return null;
   const disc = useRef(null);
 
   useFrame((_, delta) => {
@@ -535,6 +536,7 @@ function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor
 
 function DysonSphere({ node, onSelect }) {
   const group = useRef(null);
+  if (!node) return null;
   const ringA = useRef(null);
   const ringB = useRef(null);
   const ringC = useRef(null);
@@ -564,6 +566,7 @@ function DysonSphere({ node, onSelect }) {
 
 function StarNode({ node, onSelect }) {
   const core = useRef(null);
+  if (!node) return null;
   const halo = useRef(null);
 
   useFrame((state, delta) => {
@@ -620,6 +623,7 @@ function Planet({ planet, index }) {
 
 function SolarSystem({ node, onSelect }) {
   const group = useRef(null);
+  if (!node) return null;
   const sunRef = useRef(null);
   const planets = useMemo(() => [
     { name: 'Mercury', radius: 0.06, orbit: 0.9, speed: 1.3, color: '#c7b39a' },
@@ -694,6 +698,7 @@ function ConstellationLines() {
 
 function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   const mesh = useRef(null);
+  if (!node) return null;
   const glowColor = status?.online === true ? '#73ff9e' : status?.online === false ? '#ff7d7d' : node.color;
 
   useFrame((state) => {
@@ -809,6 +814,33 @@ function MultiplayerPresenceMarkers({ players }) {
         </group>
       ))}
     </group>
+  );
+}
+
+
+export default function WorldGuide() {
+  return (
+    <div className="world-guide">
+      <div className="live-room-head">
+        <span className="pilot-assist-kicker">World guide</span>
+        <strong>How to use the system</strong>
+      </div>
+
+      <div className="world-guide-list">
+        <div className="world-guide-item">
+          <span>1</span>
+          <p>Select a node or move toward a blackhole to reveal its route.</p>
+        </div>
+        <div className="world-guide-item">
+          <span>2</span>
+          <p>Enter pilot mode to fly directly, or stay in spectate mode to observe the room.</p>
+        </div>
+        <div className="world-guide-item">
+          <span>3</span>
+          <p>Use the Arma3 blackhole to open the tactical interior and connect to the live server.</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1113,17 +1145,6 @@ function SteamIdentityPanel() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    const updateMobile = () => {
-      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
-      setIsMobile(mobile);
-      setReducedScene(mobile || window.innerWidth <= 1200);
-    };
-    updateMobile();
-    window.addEventListener('resize', updateMobile);
-    return () => window.removeEventListener('resize', updateMobile);
-  }, []);
-
-  useEffect(() => {
     let active = true;
     const load = async () => {
       try {
@@ -1308,6 +1329,17 @@ export default function SystemScene() {
   const [reducedScene, setReducedScene] = useState(false);
 
   useEffect(() => {
+    const updateMobile = () => {
+      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
+      setIsMobile(mobile);
+      setReducedScene(mobile || window.innerWidth <= 1200);
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
+
+  useEffect(() => {
     let active = true;
 
     fetch('/api/auth/steam/session', { cache: 'no-store' })
@@ -1387,24 +1419,28 @@ export default function SystemScene() {
       config: { broadcast: { self: false } },
     });
 
+    let timer = null;
     channel.subscribe((status) => {
       if (status !== 'SUBSCRIBED') return;
-      channel.send({
-        type: 'broadcast',
-        event: 'player-state',
-        payload: {
-          steamid: steamUser.steamid,
-          personaname: steamUser.personaname || 'Steam user',
-          avatar: steamUser.avatar || null,
-          position: flightStats.position,
-          mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
-          zone: flightStats.zone || 'Navigation',
-          updatedAt: Date.now(),
-        },
-      });
+      timer = window.setInterval(() => {
+        channel.send({
+          type: 'broadcast',
+          event: 'player-state',
+          payload: {
+            steamid: steamUser.steamid,
+            personaname: steamUser.personaname || 'Steam user',
+            avatar: steamUser.avatar || null,
+            position: flightStats.position,
+            mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+            zone: flightStats.zone || 'Navigation',
+            updatedAt: Date.now(),
+          },
+        });
+      }, 250);
     });
 
     return () => {
+      if (timer) window.clearInterval(timer);
       supabase.removeChannel(channel);
     };
   }, [steamUser, flightStats, freeFly]);
@@ -1451,7 +1487,7 @@ export default function SystemScene() {
       label: freeFly ? 'Observer Mode' : 'Pilot Mode',
       address: freeFly ? 'Ship hidden' : 'Ship active',
       description: freeFly
-        ? 'Returned to observer mode.'
+        ? 'Returned to observer mode. You can continue spectating the shared system.'
         : isMobile
           ? 'Pilot mode engaged. Use the touch thrusters and steer pad.'
           : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
@@ -1464,13 +1500,14 @@ export default function SystemScene() {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <WorldGuide />
       <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <div className="cosmic-overlay" />
         <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>
-          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} />
+          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} onIntroDone={() => setIntroVisible(false)} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
         <Arma3BlackholeInterior

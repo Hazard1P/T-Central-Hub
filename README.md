@@ -352,3 +352,17 @@ Open:
 - Removed leaked `setIsMobile` / `setReducedScene` calls from `SteamIdentityPanel`
 - Fixed `CameraReset` so it reports intro completion through a passed callback instead of directly calling `setIntroVisible`
 - Restored `reducedScene` state and mobile detection inside `SystemScene`
+
+
+## Deep simulation stabilization
+- Removed leaked `setIsMobile` / `setReducedScene` calls from `SteamIdentityPanel`
+- Added null guards to scene objects that can receive undefined nodes
+- Restored mobile/reduced-scene logic to `SystemScene`
+- Hooked `onIntroDone` back into `SystemScene`
+- Simplified outbound realtime broadcasts to a steadier interval loop
+
+
+## Continued development pass
+- Added a top-level system status strip for clearer live-world context
+- Added an in-world guide panel to make the 3D environment easier to use
+- Kept the focus on the same shared 3D system instead of branching away from it
