@@ -352,3 +352,8 @@ Open:
 - Removed invalid `setIsMobile` and `setReducedScene` calls from `SteamIdentityPanel`
 - Restored `reducedScene` state and mobile detection inside `SystemScene`
 - Reconnected reduced-scene rendering logic to the main 3D scene where it belongs
+
+
+## SystemScene JSX fix
+- Removed duplicated reduced-scene JSX conditionals in `components/SystemScene.js`
+- Restored valid conditional rendering for `DynamicBackgroundField` and `MapHologram`
