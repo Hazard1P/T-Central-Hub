@@ -7,6 +7,7 @@ import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import WorldGuide from '@/components/WorldGuide';
 
 const NODES = [
   { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
@@ -817,32 +818,6 @@ function MultiplayerPresenceMarkers({ players }) {
   );
 }
 
-
-export default function WorldGuide() {
-  return (
-    <div className="world-guide">
-      <div className="live-room-head">
-        <span className="pilot-assist-kicker">World guide</span>
-        <strong>How to use the system</strong>
-      </div>
-
-      <div className="world-guide-list">
-        <div className="world-guide-item">
-          <span>1</span>
-          <p>Select a node or move toward a blackhole to reveal its route.</p>
-        </div>
-        <div className="world-guide-item">
-          <span>2</span>
-          <p>Enter pilot mode to fly directly, or stay in spectate mode to observe the room.</p>
-        </div>
-        <div className="world-guide-item">
-          <span>3</span>
-          <p>Use the Arma3 blackhole to open the tactical interior and connect to the live server.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function FocusPanel({ item, statuses, onClose, onOpen }) {
   if (!item) return null;

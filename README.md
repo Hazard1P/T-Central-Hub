@@ -366,3 +366,8 @@ Open:
 - Added a top-level system status strip for clearer live-world context
 - Added an in-world guide panel to make the 3D environment easier to use
 - Kept the focus on the same shared 3D system instead of branching away from it
+
+
+## WorldGuide split fix
+- Moved `WorldGuide` back into `components/WorldGuide.js`
+- Removed the accidental second `export default` from `components/SystemScene.js`
