@@ -377,3 +377,9 @@ Open:
 - Added a route-focus panel to strengthen node/server progression in the shared world
 - Added objective framing so the 3D environment feels more like a live game-space
 - Added a room pulse panel for better immediate awareness of the shared layer
+
+
+## Build further + background pass
+- Merged the selected cosmic background asset into the current build-further package
+- Applied the background across entry, launcher, system, and content layers
+- Added a cosmic overlay to the front page and 3D system stage
