@@ -342,3 +342,7 @@ Open:
 - Applied the cosmic image across entry, launcher, system, and content layers
 - Added a screen-space cosmic overlay for more depth in the 3D scene
 - Kept moving the project toward the web-base game direction instead of splitting into a separate visual branch
+
+
+## Front page JSX fix
+- Rebuilt `app/page.js` cleanly after the cosmic wrapper insertion malformed the JSX structure
