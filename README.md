@@ -337,15 +337,8 @@ Open:
 - Reduced extra HUD/panel complexity so the live layer is more reliable
 
 
-## Runtime stabilization fix
-- Fixed client-side exception sources in `components/SystemScene.js`
-- Moved mobile/reduced-scene state handling into `SystemScene`
-- Removed broken references from `SteamIdentityPanel`
-- Fixed `MobilePilotControls` JSX structure
-
-
-## Cosmic background pass
-- Deepened the overall nebula and starfield look across the site
-- Increased contrast and color separation for the shared 3D system
-- Added a subtle cosmic haze layer behind the live navigation scene
-- Tuned stars and fog for a richer space-simulator atmosphere
+## Continue building pass
+- Integrated the selected cosmic background asset into the live package
+- Applied the cosmic image across entry, launcher, system, and content layers
+- Added a screen-space cosmic overlay for more depth in the 3D scene
+- Kept moving the project toward the web-base game direction instead of splitting into a separate visual branch

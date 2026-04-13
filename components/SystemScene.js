@@ -738,8 +738,8 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePl
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
       <pointLight position={[7, 3, -2]} intensity={8} color="#b78dff" distance={18} />
-      <fog attach="fog" args={['#040913', reducedScene ? 15 : 17, reducedScene ? 32 : 40]} />
-      <Stars radius={110} depth={52} count={reducedScene ? 1800 : 5200} factor={reducedScene ? 3.1 : 5.0} saturation={0} fade speed={reducedScene ? 0.5 : 1.1} />
+      <fog attach="fog" args={['#090311', reducedScene ? 15 : 17, reducedScene ? 34 : 42]} />
+      <Stars radius={96} depth={44} count={reducedScene ? 1400 : 4200} factor={reducedScene ? 2.6 : 4.2} saturation={0} fade speed={reducedScene ? 0.4 : 0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>
         <SectorRing position={[-12.8, 5.0, -2.8]} radius={4.6} color="#58dfff" label="Arma" />
@@ -1111,6 +1111,17 @@ function SteamIdentityPanel() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    const updateMobile = () => {
+      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
+      setIsMobile(mobile);
+      setReducedScene(mobile || window.innerWidth <= 1200);
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
+
+  useEffect(() => {
     let active = true;
     const load = async () => {
       try {
@@ -1292,7 +1303,6 @@ export default function SystemScene() {
   const [steamUser, setSteamUser] = useState(null);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [reducedScene, setReducedScene] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -1329,17 +1339,6 @@ export default function SystemScene() {
       active = false;
       clearInterval(id);
     };
-  }, []);
-
-  useEffect(() => {
-    const updateMobile = () => {
-      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
-      setIsMobile(mobile);
-      setReducedScene(mobile || window.innerWidth <= 1200);
-    };
-    updateMobile();
-    window.addEventListener('resize', updateMobile);
-    return () => window.removeEventListener('resize', updateMobile);
   }, []);
 
 
@@ -1466,7 +1465,7 @@ export default function SystemScene() {
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
-        <div className="cosmic-haze" />
+        <div className="cosmic-overlay" />
         <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>
           <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} />
         </Canvas>

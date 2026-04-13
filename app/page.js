@@ -4,10 +4,10 @@ export default function HomePage() {
   return (
     <main className="entry-page">
       <SteamLoginHud />
-      <section className="entry-shell">
-        <div className="entry-copy">
+      <main className="entry-page"><div className="cosmic-overlay" /><section className="entry-shell">
+        <div className="entry-copy cosmic-hero-panel" style={{padding:"22px", borderRadius:"24px"}}>
           <p className="eyebrow">T-Central Hub</p>
-          <h1>Enter the live multiplayer web-game system.</h1>
+          <h1>Enter the live 3D multiplayer server-space.</h1>
           <p className="muted">
             Sign in with Steam, enter the shared 3D space, fly in pilot mode, spectate the player base, and use blackholes as live server-entry systems.
           </p>
@@ -45,7 +45,6 @@ export default function HomePage() {
             <p>The package is prepared for a 100-slot realtime room model through a Supabase-backed presence layer.</p>
           </article>
         </div>
-      </section>
-    </main>
+      </section></main>
   );
 }
