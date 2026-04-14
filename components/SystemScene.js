@@ -11,6 +11,8 @@ import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
 import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
 import RouteLegend from '@/components/RouteLegend';
 import { getPrivateWorldKey } from '@/lib/securityConfig';
+import { DEFAULT_FLIGHT_STATS, normalizeFlightStats, getSafePosition } from '@/lib/playerRuntime';
+import ProgressStagePanel from '@/components/ProgressStagePanel';
 import WorldStructurePanel from '@/components/WorldStructurePanel';
 import NodeCountsPanel from '@/components/NodeCountsPanel';
 import SystemConsolePanel from '@/components/SystemConsolePanel';
@@ -1096,17 +1098,17 @@ function CockpitOverlay({ freeFly, flightStats, selected }) {
         <div className="panel-title">Navigation</div>
         <div className="panel-row"><span>Mode</span><strong>{freeFly ? 'Pilot' : 'Observer'}</strong></div>
         <div className="panel-row"><span>Zone</span><strong>{flightStats.zone || '—'}</strong></div>
-        <div className="panel-row"><span>Pull</span><strong>{flightStats.gravityTarget || '—'}</strong></div>
+        <div className="panel-row"><span>Pull</span><strong>{safeFlightStats.gravityTarget || '—'}</strong></div>
       </div>
 
       <div className="cockpit-panel right">
         <div className="panel-title">Flight</div>
-        <div className="panel-row"><span>Speed</span><strong>{Math.round(flightStats.speed || 0)}</strong></div>
-        <div className="panel-row"><span>Boost</span><strong>{flightStats.boosting ? 'Active' : 'Standby'}</strong></div>
+        <div className="panel-row"><span>Speed</span><strong>{Math.round(safeFlightStats.speed || 0)}</strong></div>
+        <div className="panel-row"><span>Boost</span><strong>{safeFlightStats.boosting ? 'Active' : 'Standby'}</strong></div>
         <div className="panel-row"><span>Target</span><strong>{selected?.label || 'None'}</strong></div>
       </div>
 
-      <Radar freeFly={freeFly} target={selected?.label || flightStats.gravityTarget} />
+      <Radar freeFly={freeFly} target={selected?.label || safeFlightStats.gravityTarget} />
 
       {freeFly ? (
         <>
@@ -1301,13 +1303,15 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
   const [transition, setTransition] = useState(null);
   const [resetTick, setResetTick] = useState(0);
   const [freeFly, setFreeFly] = useState(false);
-  const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
+  const [flightStats, setFlightStats] = useState({ ...DEFAULT_FLIGHT_STATS });
   const [introVisible, setIntroVisible] = useState(true);
   const [activeInterior, setActiveInterior] = useState(null);
   const [steamUser, setSteamUser] = useState(externalSteamUser);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedScene, setReducedScene] = useState(false);
+
+  const safeFlightStats = normalizeFlightStats(flightStats);
 
   useEffect(() => {
     const updateMobile = () => {
@@ -1416,7 +1420,8 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
     } catch {
       return;
     }
-    if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
+    const safePosition = getSafePosition(safeFlightStats);
+    if (!supabase || !steamUser?.steamid || !Array.isArray(safePosition)) return;
 
     const room = SYSTEM_RUNTIME.roomName;
     const channel = supabase.channel(`webgame:${room}`, {
@@ -1436,7 +1441,7 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
             avatar: steamUser.avatar || null,
             position: flightStats.position,
             mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
-            zone: flightStats.zone || 'Navigation',
+            zone: safeFlightStats.zone || 'Navigation',
             updatedAt: Date.now(),
           },
         });
@@ -1510,6 +1515,7 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <SystemConsolePanel mode={mode} freeFly={freeFly} />
+      <ProgressStagePanel />
       <SecurityStandardsPanel />
       <ServerRoutePanel selected={selected} />
       <RouteLegend />
@@ -1519,13 +1525,13 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
       <RoomObjectives />
       <WorldGuide />
       <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />
-      <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
+      <CockpitOverlay freeFly={freeFly} flightStats={safeFlightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
       <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
         <div className="cosmic-overlay" />
         <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>
-          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} onIntroDone={() => setIntroVisible(false)} />
+          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={(next) => setFlightStats(normalizeFlightStats(next))} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} onIntroDone={() => setIntroVisible(false)} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
         <Arma3BlackholeInterior

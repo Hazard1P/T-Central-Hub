@@ -3630,3 +3630,62 @@ button { font: inherit; }
   background: rgba(4, 9, 16, 0.86);
   backdrop-filter: blur(10px);
 }
+
+
+.progress-stage-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 386px;
+  z-index: 38;
+  width: min(340px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.66);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.progress-stage-list {
+  display: grid;
+  gap: 8px;
+}
+
+.progress-stage-item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.progress-stage-item span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(131,235,255,0.14);
+  color: #dffcff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.progress-stage-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .progress-stage-panel {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: 626px;
+  }
+}

@@ -416,3 +416,10 @@ Open:
 - Added `SystemErrorBoundary` around the live system launch path
 - Prevented duplicate Steam session fetches when a valid external Steam user is already present
 - Added guarded Supabase initialization in the HUD and SystemScene
+
+
+## Next stage stabilized pass
+- Added `lib/playerRuntime.js` with safe default flight-state handling
+- Normalized scene flight updates before they enter the live UI/runtime
+- Guarded position-based broadcast logic against undefined state
+- Added `ProgressStagePanel` to mark the next stable build stage
