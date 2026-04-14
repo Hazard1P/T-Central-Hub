@@ -11,6 +11,8 @@ import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
 import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
 import RouteLegend from '@/components/RouteLegend';
 import WorldStructurePanel from '@/components/WorldStructurePanel';
+import NodeCountsPanel from '@/components/NodeCountsPanel';
+import SystemConsolePanel from '@/components/SystemConsolePanel';
 import WorldGuide from '@/components/WorldGuide';
 import ServerRoutePanel from '@/components/ServerRoutePanel';
 import RoomObjectives from '@/components/RoomObjectives';
@@ -1458,7 +1460,7 @@ export default function SystemScene() {
     setSelected({
       label: 'System Center',
       address: 'Navigation origin',
-      description: 'Centered back into the shared 3D web-game space. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue.',
+      description: 'Centered back into the shared 3D web-game space. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue through the world layout.',
     });
     setResetTick((n) => n + 1);
   };
@@ -1482,9 +1484,11 @@ export default function SystemScene() {
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <SystemConsolePanel mode={mode} freeFly={freeFly} />
       <ServerRoutePanel selected={selected} />
       <RouteLegend />
       <WorldStructurePanel />
+      <NodeCountsPanel />
       <RoomObjectives />
       <WorldGuide />
       <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />

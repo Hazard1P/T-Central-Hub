@@ -396,3 +396,9 @@ Open:
 - Added `lib/worldHelpers.js` for cleaner world grouping/access
 - Added `WorldStructurePanel` to show the live layout in-system
 - Improved node-selection fallback and focus metadata handling
+
+
+## Overall build pass
+- Added `lib/worldDescriptors.js` for higher-level world summaries and featured routes
+- Added `NodeCountsPanel` and `SystemConsolePanel` to strengthen the live-world structure
+- Continued moving the project toward a cleaner internal-system baseline while preserving the current 3D environment

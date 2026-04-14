@@ -3386,3 +3386,128 @@ button { font: inherit; }
     bottom: 266px;
   }
 }
+
+
+.node-counts-panel {
+  position: fixed;
+  right: 18px;
+  top: 236px;
+  z-index: 38;
+  width: min(340px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.66);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.node-count-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.node-count-grid div {
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+.node-count-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.node-count-grid strong {
+  font-size: 14px;
+}
+
+.node-feature-list {
+  display: grid;
+  gap: 8px;
+}
+
+.node-feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.node-feature-item strong {
+  font-size: 12px;
+}
+
+.node-feature-item span {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.node-feature-item.matrix {
+  border-color: rgba(109,255,181,0.28);
+}
+
+.system-console-panel {
+  position: fixed;
+  left: 18px;
+  top: 96px;
+  z-index: 38;
+  width: min(320px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.68);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.console-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.console-line:first-of-type {
+  border-top: 0;
+}
+
+.console-line span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.console-line strong {
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .system-console-panel {
+    left: 12px;
+    right: 12px;
+    top: 156px;
+    width: auto;
+  }
+
+  .node-counts-panel {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 386px;
+    width: auto;
+  }
+}
