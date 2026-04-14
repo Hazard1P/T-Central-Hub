@@ -3,10 +3,13 @@ import { NextResponse } from 'next/server';
 function getBaseUrl(request) {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
   if (configured) return configured.replace(/\/$/, '');
+
   const origin = request.headers.get('origin');
   if (origin) return origin.replace(/\/$/, '');
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
-  const proto = request.headers.get('x-forwarded-proto') || 'https';
+
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
+  const inferredProto = host.includes('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
+  const proto = request.headers.get('x-forwarded-proto') || inferredProto;
   return `${proto}://${host}`;
 }
 

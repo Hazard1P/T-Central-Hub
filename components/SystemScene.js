@@ -5,21 +5,21 @@ import { useRouter } from 'next/navigation';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three/drei';
 import * as THREE from 'three';
-
-const NODES = [
-  { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
-  { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [3.4, 10.8, -4.4], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
-  { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [-2.4, -7.8, 2.8], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
-  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole added from the map concept.', position: [-17.2, -3.6, -5.8], color: '#c4d4ff', kind: 'blackhole' },
-  { key: 'solar_system', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [7.4, 2.2, 5.0], color: '#ffd46b', kind: 'solar' },
-  { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [1.8, -5.0, 4.8], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
-  { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [8.4, -9.2, -2.0], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
-  { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-8.8, -9.6, 0.8], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
-  { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [12.8, 5.4, 3.2], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
-  { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [14.2, -2.0, -2.8], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
-  { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [12.2, 11.6, -3.8], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
-  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [15.6, -4.4, 3.2], color: '#ff8a8a', route: '/report-player', kind: 'node' },
-];
+import { SERVER_CATALOG } from '@/lib/serverCatalog';
+import { getSupabaseClient } from '@/lib/supabaseClient';
+import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
+import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
+import RouteLegend from '@/components/RouteLegend';
+import { getPrivateWorldKey } from '@/lib/securityConfig';
+import { DEFAULT_FLIGHT_STATS, normalizeFlightStats, getSafePosition } from '@/lib/playerRuntime';
+import ProgressStagePanel from '@/components/ProgressStagePanel';
+import WorldStructurePanel from '@/components/WorldStructurePanel';
+import NodeCountsPanel from '@/components/NodeCountsPanel';
+import SystemConsolePanel from '@/components/SystemConsolePanel';
+import WorldGuide from '@/components/WorldGuide';
+import ServerRoutePanel from '@/components/ServerRoutePanel';
+import RoomObjectives from '@/components/RoomObjectives';
+import SecurityStandardsPanel from '@/components/SecurityStandardsPanel';
 
 function formatStatus(status) {
   if (!status) return 'Status unavailable';
@@ -84,13 +84,15 @@ function MapHologram() {
   );
 }
 
-function CameraReset({ tick }) {
+function CameraReset({ tick, onIntroDone }) {
   const { camera, controls } = useThree();
 
   useEffect(() => {
-    const t = setTimeout(() => setIntroVisible(false), 2200);
+    const t = setTimeout(() => {
+      if (onIntroDone) onIntroDone();
+    }, 2200);
     return () => clearTimeout(t);
-  }, []);
+  }, [onIntroDone]);
 
   useEffect(() => {
     camera.position.set(0, 2.4, 36);
@@ -143,11 +145,30 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
     };
 
+    const onPilotKey = (e) => {
+      const detail = e.detail || {};
+      if (!detail.code) return;
+      keys.current[detail.code] = Boolean(detail.active);
+    };
+
+    const onPilotLook = (e) => {
+      if (!enabled) return;
+      const detail = e.detail || {};
+      const dx = Number(detail.dx || 0);
+      const dy = Number(detail.dy || 0);
+      yaw.current -= dx * 0.004;
+      pitch.current -= dy * 0.003;
+      const limit = Math.PI / 2.45;
+      pitch.current = Math.max(-limit, Math.min(limit, pitch.current));
+    };
+
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('pilot-key', onPilotKey);
+    window.addEventListener('pilot-look', onPilotLook);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
@@ -155,6 +176,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('pilot-key', onPilotKey);
+      window.removeEventListener('pilot-look', onPilotLook);
     };
   }, [enabled]);
 
@@ -180,6 +203,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
         boostLevel: boostMeter.current,
         gravityTarget: '—',
         zone: 'Navigation',
+        position: [shipPos.current.x, shipPos.current.y, shipPos.current.z],
+        mode: 'spectate',
       });
       return;
     }
@@ -287,6 +312,8 @@ function FlyShipRig({ enabled, resetTick, onFlightStats }) {
       boostLevel: boostMeter.current,
       gravityTarget,
       zone,
+      position: [shipPos.current.x, shipPos.current.y, shipPos.current.z],
+      mode: enabled ? 'pilot' : 'spectate',
     });
   });
 
@@ -470,6 +497,7 @@ function OrbitalMatter({ radius = 2.9, color = '#8f76ff', speed = 0.14, tilt = [
 
 function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor, labelOffset = [0, 1.55, 0], matterRadius = 3.2 }) {
   const group = useRef(null);
+  if (!node) return null;
   const disc = useRef(null);
 
   useFrame((_, delta) => {
@@ -506,6 +534,7 @@ function BlackHoleAnchor({ node, onSelect, title, subtitle, coreColor, ringColor
 
 function DysonSphere({ node, onSelect }) {
   const group = useRef(null);
+  if (!node) return null;
   const ringA = useRef(null);
   const ringB = useRef(null);
   const ringC = useRef(null);
@@ -535,6 +564,7 @@ function DysonSphere({ node, onSelect }) {
 
 function StarNode({ node, onSelect }) {
   const core = useRef(null);
+  if (!node) return null;
   const halo = useRef(null);
 
   useFrame((state, delta) => {
@@ -591,6 +621,7 @@ function Planet({ planet, index }) {
 
 function SolarSystem({ node, onSelect }) {
   const group = useRef(null);
+  if (!node) return null;
   const sunRef = useRef(null);
   const planets = useMemo(() => [
     { name: 'Mercury', radius: 0.06, orbit: 0.9, speed: 1.3, color: '#c7b39a' },
@@ -665,6 +696,7 @@ function ConstellationLines() {
 
 function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   const mesh = useRef(null);
+  if (!node) return null;
   const glowColor = status?.online === true ? '#73ff9e' : status?.online === false ? '#ff7d7d' : node.color;
 
   useFrame((state) => {
@@ -699,19 +731,20 @@ function StatusNode({ node, status, selected, onHover, onLeave, onSelect }) {
   );
 }
 
-function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats }) {
+function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats, remotePlayers, reducedScene, isMobile, onIntroDone }) {
   const [hovered, setHovered] = useState('rust_biweekly');
 
   return (
     <>
-      <DynamicBackgroundField />
-      <MapHologram />
+      {!reducedScene ? <DynamicBackgroundField /> : null}
+      <MultiplayerPresenceMarkers players={remotePlayers || []} />
+      {!isMobile ? <MapHologram /> : null}
       <ambientLight intensity={1.05} />
       <directionalLight position={[5, 7, 4]} intensity={1.25} color="#bdefff" />
       <pointLight position={[-7, 3, 4]} intensity={12} color="#6fdfff" distance={18} />
       <pointLight position={[7, 3, -2]} intensity={8} color="#b78dff" distance={18} />
-      <fog attach="fog" args={['#060e16', 18, 36]} />
-      <Stars radius={96} depth={44} count={4200} factor={4.2} saturation={0} fade speed={0.9} />
+      <fog attach="fog" args={['#090311', reducedScene ? 15 : 17, reducedScene ? 34 : 42]} />
+      <Stars radius={96} depth={44} count={reducedScene ? 1400 : 4200} factor={reducedScene ? 2.6 : 4.2} saturation={0} fade speed={reducedScene ? 0.4 : 0.9} />
 
       <group rotation={[-0.10, -0.03, 0]}>
         <SectorRing position={[-12.8, 5.0, -2.8]} radius={4.6} color="#58dfff" label="Arma" />
@@ -753,9 +786,45 @@ function Scene({ statuses, onSelect, resetTick, freeFly, onFlightStats }) {
         maxPolarAngle={Math.PI}
         minPolarAngle={0}
       />
-      <CameraReset tick={resetTick} />
+      <CameraReset tick={resetTick} onIntroDone={onIntroDone} />
       <FlyShipRig enabled={freeFly} resetTick={resetTick} onFlightStats={onFlightStats} />
     </>
+  );
+}
+
+
+function MultiplayerPresenceMarkers({ players }) {
+  return (
+    <group>
+      {players.map((player) => (
+        <group key={player.steamid} position={player.position || [0, 1.4, 26]}>
+          <mesh>
+            <sphereGeometry args={[0.12, 16, 16]} />
+            <meshBasicMaterial color={player.mode === 'pilot' ? '#83ebff' : '#ffd15c'} />
+          </mesh>
+          <pointLight color={player.mode === 'pilot' ? '#83ebff' : '#ffd15c'} intensity={2.4} distance={2.8} />
+          <Html position={[0, 0.36, 0]} center distanceFactor={12}>
+            <div className="presence-marker-label">
+              <strong>{player.personaname || 'Player'}</strong>
+              <span>{player.mode === 'pilot' ? 'Pilot' : 'Spectate'}</span>
+            </div>
+          </Html>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+
+
+function RoomPulse({ freeFly, remotePlayers }) {
+  const count = Array.isArray(remotePlayers) ? remotePlayers.length : 0;
+  return (
+    <div className={`room-pulse ${freeFly ? 'pilot' : 'spectate'}`}>
+      <span className="pilot-assist-kicker">Room pulse</span>
+      <strong>{freeFly ? 'Pilot lane active' : 'Spectate lane active'}</strong>
+      <p>{count} remote player{count === 1 ? '' : 's'} visible in the shared layer.</p>
+    </div>
   );
 }
 
@@ -771,7 +840,7 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         <button className="focus-close" onClick={onClose}>×</button>
       </div>
       <p className="muted">{item.description}</p>
-      <div className="focus-meta"><span>{item.address || item.sublabel}</span></div>
+      <div className="focus-meta"><span>{item?.address || item?.sublabel || 'No address'}</span>{item?.kind ? <span>{item.kind}</span> : null}</div>
       {item.key && status ? (
         <div className="focus-status">
           <div className="status-row"><span>Status</span><strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong></div>
@@ -781,14 +850,199 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         </div>
       ) : null}
       <div className="button-column">
-        {openable ? <button className="button primary" onClick={() => onOpen(item)}>Open destination</button> : null}
+        {openable ? <button className="button primary" onClick={() => onOpen(item)}>{item?.key === 'arma3' ? 'Warp into system' : 'Open destination'}</button> : null}
         <button className="button secondary" onClick={onClose}>Clear selection</button>
       </div>
     </div>
   );
 }
 
-function WarpOverlay({ label }) {
+
+
+function Arma3BlackholeInterior({ item, statuses, onClose }) {
+  const [query, setQuery] = useState('');
+  const [sortMode, setSortMode] = useState('best');
+  const [copiedIp, setCopiedIp] = useState('');
+  if (!item || item.key !== 'arma3') return null;
+
+  const servers = SERVER_CATALOG.arma3.map((server) => {
+    const linked = server.statusKey ? statuses?.[server.statusKey] : null;
+    const players = typeof linked?.players === 'number' ? linked.players : 0;
+    const maxPlayers = typeof linked?.maxPlayers === 'number' ? linked.maxPlayers : 100;
+    const online = linked?.online === true;
+    const occupancy = maxPlayers > 0 ? players / maxPlayers : 0;
+    return {
+      ...server,
+      online,
+      players,
+      maxPlayers,
+      liveMap: linked?.map || server.map,
+      occupancy,
+      joinUrl: `steam://connect/${server.ip}`,
+      launchUrl: `steam://run/${server.steamAppId || '107410'}`,
+    };
+  });
+
+  const filtered = servers
+    .filter((server) => {
+      const haystack = [server.title, server.ip, server.game, server.mode, server.liveMap, ...(server.tags || [])]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(query.trim().toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortMode === 'players') return b.players - a.players;
+      if (sortMode === 'name') return a.title.localeCompare(b.title);
+      if (sortMode === 'mode') return a.mode.localeCompare(b.mode);
+      const score = (s) => (s.online ? 1000 : 0) + (s.players * 4) + (s.tier === 'Primary' ? 60 : 0) - Math.abs(0.72 - s.occupancy) * 100;
+      return score(b) - score(a);
+    });
+
+  const bestServer = filtered[0] || null;
+
+  const copyIp = async (ip) => {
+    try {
+      await navigator.clipboard.writeText(ip);
+      setCopiedIp(ip);
+      window.setTimeout(() => setCopiedIp(''), 1400);
+    } catch {}
+  };
+
+  return (
+    <div className="blackhole-interior-overlay">
+      <div className="blackhole-interior-shell">
+        <div className="blackhole-interior-backdrop">
+          <div className="interior-grid-sphere sphere-a" />
+          <div className="interior-grid-sphere sphere-b" />
+          <div className="interior-terrain-hologram">
+            <div className="terrain-ring ring-outer" />
+            <div className="terrain-ring ring-mid" />
+            <div className="terrain-ring ring-inner" />
+            <div className="capture-core" />
+          </div>
+        </div>
+
+        <div className="blackhole-interior-content">
+          <div className="blackhole-interior-header">
+            <div>
+              <p className="eyebrow">Arma3 blackhole interior</p>
+              <h2>Warping into Arma3 system</h2>
+              <p className="muted">
+                Warp into the Arma3 CTH system, review the Altis battlefield briefing, and connect through Steam from one command sphere.
+              </p>
+            </div>
+            <button className="focus-close" onClick={onClose}>×</button>
+          </div>
+
+          <div className="browser-topbar">
+            <div className="browser-search-wrap">
+              <input
+                className="browser-search"
+                placeholder="Search the live server, map, or IP"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="browser-sort">
+              <button className={sortMode === 'best' ? 'active' : ''} onClick={() => setSortMode('best')}>Primary</button>
+              <button className={sortMode === 'players' ? 'active' : ''} onClick={() => setSortMode('players')}>Players</button>
+              <button className={sortMode === 'name' ? 'active' : ''} onClick={() => setSortMode('name')}>Name</button>
+              <button className={sortMode === 'mode' ? 'active' : ''} onClick={() => setSortMode('mode')}>Mode</button>
+            </div>
+          </div>
+
+          {bestServer ? (
+            <div className="browser-highlight-card">
+              <div>
+                <span className="interior-step">Primary live server</span>
+                <h3>{bestServer.title}</h3>
+                <p className="muted">
+                  Primary live route based on your current single-server setup.
+                </p>
+              </div>
+              <div className="highlight-actions">
+                <a className="button secondary" href={bestServer.launchUrl}>Launch Arma 3</a>
+                <a className="button primary" href={bestServer.joinUrl}>Quick Connect</a>
+              </div>
+            </div>
+          ) : null}
+
+
+              <div className="browser-brief-grid">
+                <article className="browser-brief-card">
+                  <span className="interior-step">System briefing</span>
+                  <h3>Arma3 CTH tactical briefing</h3>
+                  <ul className="arma-list">
+                    <li>Capture the Hill centers combat around control of a live central objective.</li>
+                    <li>Players re-enter quickly, contest the hill, and fight for momentum and territory.</li>
+                    <li>The focus is fast tactical pressure, repeat engagement, and clear battlefield flow.</li>
+                    <li>This route is aligned around one live public Arma3 CTH server overall.</li>
+                  </ul>
+                </article>
+
+                <article className="browser-brief-card browser-map-card">
+                  <span className="interior-step">Altis reference</span>
+                  <h3>Battlefield map</h3>
+                  <div className="browser-map-media">
+                    <img src="/arma-cth-shot.png" alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
+                  </div>
+                </article>
+              </div>
+
+              <div className="server-browser-list">
+            {filtered.map((server) => (
+              <article key={server.id} className="browser-server-card">
+                <div className="browser-server-main">
+                  <div className="browser-server-titleline">
+                    <strong>{server.title}</strong>
+                    <span className={`browser-state ${server.online ? 'online' : ''}`}>
+                      {server.online ? 'Online' : 'Unavailable'}
+                    </span>
+                  </div>
+
+                  <div className="browser-server-meta">
+                    <span>{server.mode}</span>
+                    <span>{server.liveMap}</span>
+                    <span>{server.ip}</span>
+                  </div>
+                </div>
+
+                <div className="browser-server-stats">
+                  <div>
+                    <span>Players</span>
+                    <strong>{server.players} / {server.maxPlayers}</strong>
+                  </div>
+                  <div>
+                    <span>Tier</span>
+                    <strong>{server.tier}</strong>
+                  </div>
+                </div>
+
+                <div className="browser-server-actions">
+                  <button className="button secondary" onClick={() => copyIp(server.ip)}>
+                    {copiedIp === server.ip ? 'Copied' : 'Copy IP'}
+                  </button>
+                  <a className="button secondary" href={server.launchUrl}>Launch Arma 3</a>
+                  <a className="button primary" href={server.joinUrl}>Quick Connect</a>
+                </div>
+              </article>
+            ))}
+
+            {filtered.length === 0 ? (
+              <div className="browser-empty-state">
+                No result matched that search.
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WarpOverlay
+({ label }) {
   return (
     <div className="transition-overlay warp-enter">
       <div className="warp-rings"><span /><span /><span /></div>
@@ -812,7 +1066,7 @@ function FixedNav({ onCenter, onPilotToggle, freeFly }) {
   return (
     <div className="hud-bottom-fixed">
       <button onClick={onCenter}>Center</button>
-      <a href="/donate"><button>Donate</button></a>
+      <a href="/donate"><button>Support</button></a>
       <a href="/report-player"><button>Report</button></a>
       <button onClick={onPilotToggle}>{freeFly ? 'Exit Pilot' : 'Pilot'}</button>
     </div>
@@ -834,6 +1088,7 @@ function Radar({ freeFly, target }) {
 }
 
 function CockpitOverlay({ freeFly, flightStats, selected }) {
+  const safeStats = flightStats || { position: [0,0,0], velocity: [0,0,0], speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation', mode: 'spectate' };
   return (
     <div className={`cockpit-overlay ${freeFly ? 'active' : ''}`}>
       <div className="cockpit-frame top-left" />
@@ -844,18 +1099,18 @@ function CockpitOverlay({ freeFly, flightStats, selected }) {
       <div className="cockpit-panel left">
         <div className="panel-title">Navigation</div>
         <div className="panel-row"><span>Mode</span><strong>{freeFly ? 'Pilot' : 'Observer'}</strong></div>
-        <div className="panel-row"><span>Zone</span><strong>{flightStats.zone || '—'}</strong></div>
-        <div className="panel-row"><span>Pull</span><strong>{flightStats.gravityTarget || '—'}</strong></div>
+        <div className="panel-row"><span>Zone</span><strong>{safeStats.zone || '—'}</strong></div>
+        <div className="panel-row"><span>Pull</span><strong>{safeStats.gravityTarget || '—'}</strong></div>
       </div>
 
       <div className="cockpit-panel right">
         <div className="panel-title">Flight</div>
-        <div className="panel-row"><span>Speed</span><strong>{Math.round(flightStats.speed || 0)}</strong></div>
-        <div className="panel-row"><span>Boost</span><strong>{flightStats.boosting ? 'Active' : 'Standby'}</strong></div>
+        <div className="panel-row"><span>Speed</span><strong>{Math.round(safeStats.speed || 0)}</strong></div>
+        <div className="panel-row"><span>Boost</span><strong>{safeStats.boosting ? 'Active' : 'Standby'}</strong></div>
         <div className="panel-row"><span>Target</span><strong>{selected?.label || 'None'}</strong></div>
       </div>
 
-      <Radar freeFly={freeFly} target={selected?.label || flightStats.gravityTarget} />
+      <Radar freeFly={freeFly} target={selected?.label || safeStats.gravityTarget} />
 
       {freeFly ? (
         <>
@@ -918,6 +1173,103 @@ function SteamIdentityPanel() {
   );
 }
 
+
+function MobilePilotControls({ visible }) {
+  const [touchActive, setTouchActive] = useState(false);
+  const lookStart = useRef(null);
+
+  if (!visible) return null;
+
+  const setKey = (code, active) => {
+    window.dispatchEvent(new CustomEvent('pilot-key', { detail: { code, active } }));
+  };
+
+  const bindHold = (code) => ({
+    onTouchStart: (e) => {
+      e.preventDefault();
+      setTouchActive(true);
+      setKey(code, true);
+    },
+    onTouchEnd: (e) => {
+      e.preventDefault();
+      setKey(code, false);
+      setTouchActive(false);
+    },
+    onTouchCancel: () => {
+      setKey(code, false);
+      setTouchActive(false);
+    },
+  });
+
+  const handleLookStart = (e) => {
+    const touch = e.touches?.[0];
+    if (!touch) return;
+    lookStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleLookMove = (e) => {
+    const touch = e.touches?.[0];
+    if (!touch || !lookStart.current) return;
+    const dx = touch.clientX - lookStart.current.x;
+    const dy = touch.clientY - lookStart.current.y;
+    lookStart.current = { x: touch.clientX, y: touch.clientY };
+    window.dispatchEvent(new CustomEvent('pilot-look', { detail: { dx, dy } }));
+  };
+
+  const handleLookEnd = () => {
+    lookStart.current = null;
+  };
+
+  return (
+    <div className="mobile-pilot-ui">
+      <div className="mobile-pilot-hint">
+        <strong>Pilot mode</strong>
+        <span>Use thrust buttons and drag the right pad to steer.</span>
+      </div>
+
+      <div className="mobile-pilot-bottom">
+        <div className="mobile-thrust-cluster">
+          <button className="touch-key touch-wide" {...bindHold('KeyW')}>Forward</button>
+          <div className="touch-key-row">
+            <button className="touch-key" {...bindHold('KeyA')}>Left</button>
+            <button className="touch-key" {...bindHold('KeyS')}>Back</button>
+            <button className="touch-key" {...bindHold('KeyD')}>Right</button>
+          </div>
+          <div className="touch-key-row">
+            <button className="touch-key" {...bindHold('Space')}>Up</button>
+            <button className="touch-key" {...bindHold('ShiftLeft')}>Down</button>
+            <button className="touch-key touch-boost" {...bindHold('ControlLeft')}>Boost</button>
+          </div>
+        </div>
+
+        <div
+          className="mobile-look-pad"
+          onTouchStart={handleLookStart}
+          onTouchMove={handleLookMove}
+          onTouchEnd={handleLookEnd}
+          onTouchCancel={handleLookEnd}
+        >
+          <span>Steer</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PilotAssistPanel({ freeFly, isMobile }) {
+  return (
+    <div className={`pilot-assist-panel ${freeFly ? 'active' : ''} ${isMobile ? 'mobile' : ''}`}>
+      <span className="pilot-assist-kicker">Pilot assist</span>
+      <strong>{freeFly ? 'Flight controls active' : 'Observer mode active'}</strong>
+      <p>
+        {isMobile
+          ? 'Tap Pilot, then use the touch thrusters and steer pad.'
+          : 'Tap Pilot, then drag to steer and use W A S D with Space, Shift, and Ctrl.'}
+      </p>
+    </div>
+  );
+}
+
 function CinematicIntro({ visible }) {
   if (!visible) return null;
   return (
@@ -944,7 +1296,7 @@ function SystemOverlay({ loading, mode, freeFly }) {
   );
 }
 
-export default function SystemScene() {
+export default function SystemScene({ lobbyMode = 'hub', steamUser: externalSteamUser = null }) {
   const router = useRouter();
   const [statuses, setStatuses] = useState({});
   const [selected, setSelected] = useState(null);
@@ -953,11 +1305,45 @@ export default function SystemScene() {
   const [transition, setTransition] = useState(null);
   const [resetTick, setResetTick] = useState(0);
   const [freeFly, setFreeFly] = useState(false);
-  const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
+  const [flightStats, setFlightStats] = useState({ ...DEFAULT_FLIGHT_STATS });
   const [introVisible, setIntroVisible] = useState(true);
+  const [activeInterior, setActiveInterior] = useState(null);
+  const [steamUser, setSteamUser] = useState(externalSteamUser);
+  const [remotePlayers, setRemotePlayers] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [reducedScene, setReducedScene] = useState(false);
+
+  const safeFlightStats = normalizeFlightStats(flightStats);
 
   useEffect(() => {
+    const updateMobile = () => {
+      const mobile = isMobileViewport(window.innerWidth) || ('ontouchstart' in window);
+      setIsMobile(mobile);
+      setReducedScene(mobile || shouldReduceScene(window.innerWidth));
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
+
+  useEffect(() => {
+    setSteamUser(externalSteamUser || null);
+  }, [externalSteamUser]);
+
+  useEffect(() => {
+    if (externalSteamUser?.steamid) return;
     let active = true;
+
+    fetch('/api/auth/steam/session', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setSteamUser(data?.authenticated ? data.user : null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSteamUser(null);
+      });
 
     const fetchStatus = async () => {
       try {
@@ -975,14 +1361,102 @@ export default function SystemScene() {
     };
 
     fetchStatus();
-    const id = setInterval(fetchStatus, 30000);
+    const id = setInterval(fetchStatus, SYSTEM_RUNTIME.statusRefreshMs);
     return () => {
       active = false;
       clearInterval(id);
     };
   }, []);
 
-  const openNode = (item) => {
+
+  useEffect(() => {
+    if (lobbyMode !== 'hub') {
+      setRemotePlayers([]);
+      return;
+    }
+
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      setRemotePlayers([]);
+      return;
+    }
+    if (!supabase || !steamUser?.steamid) return;
+
+    const room = SYSTEM_RUNTIME.roomName;
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
+    });
+
+    channel
+      .on('broadcast', { event: 'player-state' }, ({ payload }) => {
+        if (!payload?.steamid || payload.steamid === steamUser.steamid) return;
+        setRemotePlayers((prev) => {
+          const next = prev.filter((entry) => entry.steamid !== payload.steamid);
+          next.push(payload);
+          return next.slice(-100);
+        });
+      })
+      .subscribe(async (status) => {
+        if (status !== 'SUBSCRIBED') return;
+        await channel.track({
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          joinedAt: new Date().toISOString(),
+        });
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser, lobbyMode]);
+
+  useEffect(() => {
+    if (lobbyMode !== 'hub') return;
+
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      return;
+    }
+    const safePosition = getSafePosition(safeFlightStats);
+    if (!supabase || !steamUser?.steamid || !Array.isArray(safePosition)) return;
+
+    const room = SYSTEM_RUNTIME.roomName;
+    const channel = supabase.channel(`webgame:${room}`, {
+      config: { broadcast: { self: false } },
+    });
+
+    let timer = null;
+    channel.subscribe((status) => {
+      if (status !== 'SUBSCRIBED') return;
+      timer = window.setInterval(() => {
+        channel.send({
+          type: 'broadcast',
+          event: 'player-state',
+          payload: {
+            steamid: steamUser.steamid,
+            personaname: steamUser.personaname || 'Steam user',
+            avatar: steamUser.avatar || null,
+            position: flightStats.position,
+            mode: safeFlightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+            zone: safeFlightStats.zone || 'Navigation',
+            updatedAt: Date.now(),
+          },
+        });
+      }, SYSTEM_RUNTIME.playerBroadcastMs);
+    });
+
+    return () => {
+      if (timer) window.clearInterval(timer);
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser, flightStats, freeFly, lobbyMode]);
+
+  const executeWarp = (item) => {
     const href = item.route || item.href;
     if (!href) return;
     setTransition(item.label);
@@ -995,10 +1469,31 @@ export default function SystemScene() {
     }, 900);
   };
 
+  const openNode = (item) => {
+    if (!item) return;
+    const href = item.route || item.href;
+    if (!href) return;
+    if (item.key === 'arma3') {
+      setActiveInterior('arma3');
+      setSelected(item);
+      return;
+    }
+    executeWarp(item);
+  };
+
+
+
+  const handleInteriorClose = () => {
+    setActiveInterior(null);
+  };
 
 
   const handleCenter = () => {
-    setSelected(null);
+    setSelected({
+      label: 'System Center',
+      address: 'Navigation origin',
+      description: `Centered back into the ${lobbyMode === 'hub' ? 'shared multiplayer hub' : 'private Steam-scoped world'}. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue through the world layout.`,
+    });
     setResetTick((n) => n + 1);
   };
 
@@ -1008,8 +1503,10 @@ export default function SystemScene() {
       label: freeFly ? 'Observer Mode' : 'Pilot Mode',
       address: freeFly ? 'Ship hidden' : 'Ship active',
       description: freeFly
-        ? 'Returned to observer mode.'
-        : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
+        ? 'Returned to observer mode. You can continue spectating the shared system.'
+        : isMobile
+          ? 'Pilot mode engaged. Use the touch thrusters and steer pad.'
+          : 'Pilot mode engaged. Use W A S D, mouse drag, Space, Shift, Ctrl, and Q / E.',
     });
   };
 
@@ -1018,13 +1515,35 @@ export default function SystemScene() {
       <CinematicIntro visible={introVisible} />
       <SteamIdentityPanel />
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
-      <CockpitOverlay freeFly={freeFly} flightStats={flightStats} selected={selected} />
+      <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
+      <SystemConsolePanel mode={mode} freeFly={freeFly} />
+      <ProgressStagePanel />
+      <SecurityStandardsPanel />
+      <ServerRoutePanel selected={selected} />
+      <RouteLegend />
+      {lobbyMode === 'private' ? <div className="private-world-banner">Private world key: {getPrivateWorldKey(steamUser?.steamid)}</div> : null}
+      <WorldStructurePanel />
+      <NodeCountsPanel />
+      <RoomObjectives />
+      <WorldGuide />
+      <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />
+      <CockpitOverlay freeFly={freeFly} flightStats={safeFlightStats} selected={selected} />
       <FixedNav onCenter={handleCenter} onPilotToggle={handlePilotToggle} freeFly={freeFly} />
+      <MobilePilotControls visible={freeFly && isMobile} />
       <div className="interactive-map-stage full refined-stage">
-        <Canvas camera={{ position: [0, 2.4, 36], fov: 40 }}>
-          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={setFlightStats} />
+        <div className="cosmic-overlay" />
+        <Canvas dpr={[1, 1.5]} performance={{ min: 0.5 }} camera={{ position: [0, 2.4, 36], fov: 40 }} gl={{ antialias: !isMobile, powerPreference: 'high-performance' }}>
+          <Scene statuses={statuses} onSelect={setSelected} resetTick={resetTick} freeFly={freeFly} onFlightStats={(next) => setFlightStats(normalizeFlightStats(next))} remotePlayers={remotePlayers} reducedScene={reducedScene} isMobile={isMobile} onIntroDone={() => setIntroVisible(false)} />
         </Canvas>
         <FocusPanel item={selected} statuses={statuses} onClose={() => setSelected(null)} onOpen={openNode} />
+        <Arma3BlackholeInterior
+          item={activeInterior === 'arma3' ? selected : null}
+          statuses={statuses}
+
+
+
+          onClose={handleInteriorClose}
+        />
         {transition ? <WarpOverlay label={transition} /> : null}
       </div>
     </div>

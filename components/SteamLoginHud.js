@@ -4,15 +4,22 @@ import { useEffect, useState } from 'react';
 
 export default function SteamLoginHud() {
   const [session, setSession] = useState(null);
+  const [support, setSupport] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const loadSession = async () => {
     try {
-      const res = await fetch('/api/auth/steam/session', { cache: 'no-store' });
-      const data = await res.json();
-      setSession(data?.authenticated ? data.user : null);
+      const [steamRes, supportRes] = await Promise.all([
+        fetch('/api/auth/steam/session', { cache: 'no-store' }),
+        fetch('/api/support/session', { cache: 'no-store' }),
+      ]);
+      const steamData = await steamRes.json();
+      const supportData = await supportRes.json();
+      setSession(steamData?.authenticated ? steamData.user : null);
+      setSupport(supportData?.linked ? supportData.support : null);
     } catch {
       setSession(null);
+      setSupport(null);
     } finally {
       setLoading(false);
     }
@@ -30,6 +37,7 @@ export default function SteamLoginHud() {
         <div className="steam-login-topline">
           <span className="steam-kicker">Steam Access</span>
           {session ? <span className="steam-status online">Linked</span> : <span className="steam-status">Guest</span>}
+          {support ? <span className="steam-status support">Supporter</span> : null}
         </div>
 
         <div className="steam-login-body">

@@ -1,0 +1,150 @@
+'use client';
+
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { getSupabaseClient } from '@/lib/supabaseClient';
+
+const ROOM_NAME = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+const MAX_SLOTS = Number(process.env.NEXT_PUBLIC_MULTIPLAYER_MAX_SLOTS || 100);
+
+function flattenPresence(state) {
+  return Object.values(state || {}).flatMap((entries) => entries || []);
+}
+
+export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalSteamUser = null }) {
+  const [steamUser, setSteamUser] = useState(externalSteamUser || null);
+  const [presenceUsers, setPresenceUsers] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const channelRef = useRef(null);
+
+  const slotCount = presenceUsers.length;
+  const slotsLeft = Math.max(0, MAX_SLOTS - slotCount);
+
+  const summary = useMemo(() => ({
+    room: ROOM_NAME,
+    slotCount,
+    slotsLeft,
+    safetyInNumbers: slotCount >= 2,
+  }), [slotCount, slotsLeft]);
+
+  useEffect(() => {
+    setSteamUser(externalSteamUser || null);
+  }, [externalSteamUser]);
+
+  useEffect(() => {
+    if (externalSteamUser?.steamid) return;
+    let active = true;
+    fetch('/api/auth/steam/session', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setSteamUser(data?.authenticated ? data.user : null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSteamUser(null);
+      });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (lobbyMode !== 'hub') {
+      setConnected(false);
+      setJoined(false);
+      setPresenceUsers([]);
+      return;
+    }
+
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      setConnected(false);
+      setJoined(false);
+      return;
+    }
+    if (!supabase || !steamUser?.steamid) return;
+
+    const channel = supabase.channel(`presence:${ROOM_NAME}`, {
+      config: { presence: { key: steamUser.steamid }, broadcast: { self: true } },
+    });
+
+    channelRef.current = channel;
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        setPresenceUsers(flattenPresence(channel.presenceState()));
+      })
+      .subscribe(async (status) => {
+        setConnected(status === 'SUBSCRIBED');
+        if (status !== 'SUBSCRIBED') return;
+
+        const current = flattenPresence(channel.presenceState());
+        const already = current.some((entry) => entry.steamid === steamUser.steamid);
+        if (current.length >= MAX_SLOTS && !already) {
+          setJoined(false);
+          return;
+        }
+
+        const result = await channel.track({
+          steamid: steamUser.steamid,
+          personaname: steamUser.personaname || 'Steam user',
+          avatar: steamUser.avatar || null,
+          joinedAt: new Date().toISOString(),
+          mode: 'spectate',
+          layer: 'webgame',
+        });
+        setJoined(result === 'ok');
+      });
+
+    return () => {
+      setConnected(false);
+      setJoined(false);
+      channel.untrack();
+      supabase.removeChannel(channel);
+    };
+  }, [steamUser, lobbyMode]);
+
+  return (
+    <div className="multiplayer-hud">
+      <div className="multiplayer-card">
+        <div className="multiplayer-topline">
+          <span className="multiplayer-kicker">Server layer</span>
+          <span className={`multiplayer-status ${connected ? 'online' : ''}`}>
+            {connected ? 'Connected' : 'Offline'}
+          </span>
+        </div>
+
+        <div className="multiplayer-grid">
+          <div className="multiplayer-stat">
+            <span>{lobbyMode === 'hub' ? 'Room' : 'World'}</span>
+            <strong>{lobbyMode === 'hub' ? summary.room : (steamUser?.steamid ? `private:${steamUser.steamid}` : 'private:guest')}</strong>
+          </div>
+          <div className="multiplayer-stat">
+            <span>Players</span>
+            <strong>{summary.slotCount} / {MAX_SLOTS}</strong>
+          </div>
+          <div className="multiplayer-stat">
+            <span>Slots left</span>
+            <strong>{summary.slotsLeft}</strong>
+          </div>
+          <div className="multiplayer-stat">
+            <span>Safety</span>
+            <strong>{summary.safetyInNumbers ? 'Active' : 'Waiting'}</strong>
+          </div>
+        </div>
+
+        <div className="multiplayer-presence">
+          {lobbyMode === 'private' ? (
+            <p className="multiplayer-note">You are in a Steam-scoped private world. Shared multiplayer presence is disconnected, but route portals remain available.</p>
+          ) : steamUser ? (
+            joined ? <p className="multiplayer-note">You are inside the live web-game server layer as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
+                   : <p className="multiplayer-note">Steam linked, but the room is full or unavailable.</p>
+          ) : (
+            <p className="multiplayer-note">Sign in with Steam to enter the live multiplayer room.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

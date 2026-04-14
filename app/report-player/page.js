@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { REPORT_SERVER_OPTIONS } from '@/lib/serverData';
 
 const initialForm = {
   reportedPlayer: '',
-  server: 'T-Central Hub',
+  server: REPORT_SERVER_OPTIONS[0],
   reason: '',
   evidence: '',
 };
@@ -15,10 +16,22 @@ export default function ReportPlayerPage() {
   const [status, setStatus] = useState({ state: 'idle', message: '' });
 
   useEffect(() => {
+    let active = true;
+
     fetch('/api/auth/steam/session', { cache: 'no-store' })
       .then((r) => r.json())
-      .then((data) => setSession(data?.authenticated ? data.user : null))
-      .catch(() => setSession(null));
+      .then((data) => {
+        if (!active) return;
+        setSession(data?.authenticated ? data.user : null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSession(null);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const onChange = (key, value) => {
@@ -72,11 +85,9 @@ export default function ReportPlayerPage() {
           <label>
             <span>Server</span>
             <select value={form.server} onChange={(e) => onChange('server', e.target.value)}>
-              <option>T-Central Hub</option>
-              <option>Arma3 CTH</option>
-              <option>Rust Bi-Weekly</option>
-              <option>Rust Weekly</option>
-              <option>Rust Monthly</option>
+              {REPORT_SERVER_OPTIONS.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </label>
 
