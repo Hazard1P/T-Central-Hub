@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import SteamLoginHud from '@/components/SteamLoginHud';
+import SteamAccessPanel from '@/components/SteamAccessPanel';
 import SystemStatusStrip from '@/components/SystemStatusStrip';
 import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
-import LobbyModePanel from '@/components/LobbyModePanel';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
 import StableSystemWorld from '@/components/StableSystemWorld';
 import { ROUTE_CHIPS } from '@/lib/worldLayout';
@@ -45,7 +45,7 @@ export default function SystemEntryClient() {
       {entered ? (
         <SystemErrorBoundary>
           <>
-            <LobbyModePanel lobbyMode={lobbyMode} onChange={setLobbyMode} steamUser={steamUser} />
+            <SteamAccessPanel lobbyMode={lobbyMode} onChange={setLobbyMode} steamUser={steamUser} />
             <StableSystemWorld lobbyMode={lobbyMode} steamUser={steamUser} />
           </>
         </SystemErrorBoundary>

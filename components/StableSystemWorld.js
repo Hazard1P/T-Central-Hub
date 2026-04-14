@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { WORLD_LAYOUT } from '@/lib/worldLayout';
 import { getPrivateWorldKey } from '@/lib/securityConfig';
+import { getSteamAccessProfile } from '@/lib/steamAccess';
 import StableNodePanel from '@/components/StableNodePanel';
 import SceneObjectsSidebar from '@/components/SceneObjectsSidebar';
 
@@ -94,6 +95,7 @@ function StableSceneContent({ onSelect }) {
 export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null }) {
   const router = useRouter();
   const [selected, setSelected] = useState(null);
+  const accessProfile = getSteamAccessProfile(steamUser, lobbyMode);
 
   const handleOpen = (node) => {
     setSelected(node);
@@ -112,13 +114,13 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
       <div className="stable-system-hud">
         <div className="content-card">
           <p className="eyebrow">Stability shell</p>
-          <h3>{lobbyMode === 'hub' ? 'Multiplayer Hub shell' : 'Private World shell'}</h3>
+          <h3>{accessProfile.instanceType}</h3>
           <p className="muted">
             This simplified world keeps the main routes, blackholes, Dyson spheres, and solar system online while the heavier 3D runtime is being stabilized.
           </p>
           <div className="focus-meta">
             <span>{lobbyMode === 'hub' ? 'Shared route layer' : getPrivateWorldKey(steamUser?.steamid)}</span>
-            <span>{steamUser?.personaname || 'Guest'}</span>
+            <span>{accessProfile.personaName}</span>
           </div>
         </div>
         <StableNodePanel

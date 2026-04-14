@@ -3883,3 +3883,56 @@ button { font: inherit; }
     width: min(300px, calc(100vw - 20px));
   }
 }
+
+
+.steam-access-panel {
+  position: fixed;
+  left: 50%;
+  top: 116px;
+  transform: translateX(-50%);
+  z-index: 44;
+  width: min(760px, calc(100vw - 28px));
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.74);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.steam-access-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+.steam-access-item {
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.steam-access-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.steam-access-item strong {
+  font-size: 12px;
+  word-break: break-word;
+}
+
+@media (max-width: 900px) {
+  .steam-access-panel {
+    top: 152px;
+    width: calc(100vw - 20px);
+  }
+  .steam-access-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

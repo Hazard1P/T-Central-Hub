@@ -447,3 +447,11 @@ Open:
 ## Hidden sidebar pass
 - Replaced the always-visible top summary with a collapsible scene-objects sidebar
 - Keeps a quick view of blackholes, Dyson spheres, and the solar system without crowding the scene
+
+
+## Steam access pass
+- Replaced the standalone LobbyMode panel with `SteamAccessPanel`
+- Bound lobby mode display to Steam-linked identity context
+- Surfaces Steam name, account ID, and instance type:
+  - <[Multi_Player_Instance]>
+  - <[Single_Player_Instance]>
