@@ -7,25 +7,12 @@ import { Html, OrbitControls, Stars, Trail, Line, Billboard } from '@react-three
 import * as THREE from 'three';
 import { SERVER_CATALOG } from '@/lib/serverCatalog';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
+import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
+import RouteLegend from '@/components/RouteLegend';
 import WorldGuide from '@/components/WorldGuide';
 import ServerRoutePanel from '@/components/ServerRoutePanel';
 import RoomObjectives from '@/components/RoomObjectives';
-
-const NODES = [
-  { key: 'arma3', label: 'Arma3 CTH', address: 'tcentral.game.nfoservers.com:2302', description: 'Public tactical hill-control combat.', position: [-12.8, 5.0, -2.8], color: '#7fe7ff', route: '/servers/arma3-cth', kind: 'blackhole' },
-  { key: 'sbox', label: 'S&Box', address: 'sbox.game', description: 'External S&Box route.', position: [3.4, 10.8, -4.4], color: '#7cd6ff', route: 'https://sbox.game/', external: true, kind: 'blackhole' },
-  { key: 'matrixcoinexchange', label: 'MatrixCoinExchange', address: 'matrixcoinexchange.com', description: 'External MatrixCoinExchange route.', position: [11.2, 4.6, -6.8], color: '#9fffc8', route: 'https://matrixcoinexchange.com', external: true, kind: 'blackhole' },
-  { key: 'rust_anchor', label: 'T-Central Hub', address: 'Lower singularity anchor', description: 'Main Rust cluster anchor.', position: [-2.4, -7.8, 2.8], color: '#9f7cff', route: '/servers/rust-biweekly', kind: 'blackhole' },
-  { key: 'deep_blackhole', label: 'Deep Black Hole', address: 'Standalone system anchor', description: 'Independent black hole added from the map concept.', position: [-17.2, -3.6, -5.8], color: '#c4d4ff', kind: 'blackhole' },
-  { key: 'solar_system', label: 'Solar System', address: 'Sun + 9 planets', description: 'Solar system locked into the T-Central Hub zone with nine orbiting planets.', position: [7.4, 2.2, 5.0], color: '#ffd46b', kind: 'solar' },
-  { key: 'rust_biweekly', label: 'Rust Bi-Weekly', address: 'tcentralrust.game.nfoservers.com:28015', description: 'Bi-weekly wipe cycle.', position: [1.8, -5.0, 4.8], color: '#d8ff61', route: '/servers/rust-biweekly', kind: 'node' },
-  { key: 'rust_weekly', label: 'Rust Weekly', address: 'tcentralrust2.game.nfoservers.com:28015', description: 'Weekly fresh-start cycle.', position: [8.4, -9.2, -2.0], color: '#ff9fd9', route: '/servers/rust-weekly', kind: 'node' },
-  { key: 'rust_monthly', label: 'Rust Monthly', address: 'tcentralrust3.game.nfoservers.com:28015', description: 'Monthly progression cycle.', position: [-8.8, -9.6, 0.8], color: '#ffd35c', route: '/servers/rust-monthly', kind: 'node' },
-  { key: 'ss', label: 'S.S', address: 'synapticsystems.ca', description: 'Core systems link.', position: [12.8, 5.4, 3.2], color: '#ffd15c', route: 'https://synapticsystems.ca', external: true, kind: 'dyson' },
-  { key: 'nfo', label: 'Affiliate Star', address: 'nfoservers.com', description: 'Hosting affiliate and provider link.', position: [14.2, -2.0, -2.8], color: '#6affc4', route: 'https://www.nfoservers.com/?aff=A-J4QVQU', external: true, kind: 'star' },
-  { key: 'ns', label: 'National Security Star', address: 'canada.ca', description: 'Government of Canada reporting resource.', position: [12.2, 11.6, -3.8], color: '#fff3a0', route: 'https://www.canada.ca/en/security-intelligence-service/corporate/reporting-national-security-information.html', external: true, kind: 'star' },
-  { key: 'report', label: 'Player Reporting', address: 'Moderation route', description: 'Player misconduct and rule-reporting route.', position: [15.6, -4.4, 3.2], color: '#ff8a8a', route: '/report-player', kind: 'node' },
-];
 
 function formatStatus(status) {
   if (!status) return 'Status unavailable';
@@ -1319,9 +1306,9 @@ export default function SystemScene() {
 
   useEffect(() => {
     const updateMobile = () => {
-      const mobile = window.innerWidth <= 900 || ('ontouchstart' in window);
+      const mobile = isMobileViewport(window.innerWidth) || ('ontouchstart' in window);
       setIsMobile(mobile);
-      setReducedScene(mobile || window.innerWidth <= 1200);
+      setReducedScene(mobile || shouldReduceScene(window.innerWidth));
     };
     updateMobile();
     window.addEventListener('resize', updateMobile);
@@ -1358,7 +1345,7 @@ export default function SystemScene() {
     };
 
     fetchStatus();
-    const id = setInterval(fetchStatus, 30000);
+    const id = setInterval(fetchStatus, SYSTEM_RUNTIME.statusRefreshMs);
     return () => {
       active = false;
       clearInterval(id);
@@ -1370,7 +1357,7 @@ export default function SystemScene() {
     const supabase = getSupabaseClient();
     if (!supabase || !steamUser?.steamid) return;
 
-    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const room = SYSTEM_RUNTIME.roomName;
     const channel = supabase.channel(`webgame:${room}`, {
       config: { presence: { key: steamUser.steamid }, broadcast: { self: false } },
     });
@@ -1403,7 +1390,7 @@ export default function SystemScene() {
     const supabase = getSupabaseClient();
     if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
 
-    const room = process.env.NEXT_PUBLIC_MULTIPLAYER_ROOM || 'tcentral-main';
+    const room = SYSTEM_RUNTIME.roomName;
     const channel = supabase.channel(`webgame:${room}`, {
       config: { broadcast: { self: false } },
     });
@@ -1425,7 +1412,7 @@ export default function SystemScene() {
             updatedAt: Date.now(),
           },
         });
-      }, 250);
+      }, SYSTEM_RUNTIME.playerBroadcastMs);
     });
 
     return () => {
@@ -1494,6 +1481,7 @@ export default function SystemScene() {
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <ServerRoutePanel selected={selected} />
+      <RouteLegend />
       <RoomObjectives />
       <WorldGuide />
       <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />

@@ -385,12 +385,8 @@ Open:
 - Added a cosmic overlay to the front page and 3D system stage
 
 
-## MatrixCoinExchange current-status fix
-- Added MatrixCoinExchange to the current build-further-with-background package
-- Ensures the blackhole appears in the live 3D system and current route/status flow
-
-
-## World layout alignment
-- Aligned the active system to 5 blackholes: Rust, S&Box, Arma3, MatrixCoinExchange, and Deep Standalone Blackhole
-- Added 3 Dyson spheres: CSIS, S.S, and Affiliates
-- Preserved the solar system as its own orbit-based structure
+## Internal systems pass
+- Extracted the world layout into `lib/worldLayout.js`
+- Extracted runtime settings into `lib/systemRuntime.js`
+- Added `RouteLegend` so the world composition is visible in the current game layer
+- Reduced direct scene-file ownership of layout/runtime data for a cleaner project baseline

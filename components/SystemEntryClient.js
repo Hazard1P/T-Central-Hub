@@ -6,6 +6,7 @@ import SteamLoginHud from '@/components/SteamLoginHud';
 import SystemStatusStrip from '@/components/SystemStatusStrip';
 import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
+import { ROUTE_CHIPS } from '@/lib/worldLayout';
 
 const SystemScene = dynamic(() => import('@/components/SystemScene'), {
   ssr: false,

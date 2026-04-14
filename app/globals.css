@@ -3281,4 +3281,48 @@ button { font: inherit; }
 }
 
 
-/* Layout alignment note: system now targets 5 blackholes, 3 Dyson spheres, and the solar system. */
+.route-legend {
+  position: fixed;
+  right: 18px;
+  bottom: 96px;
+  z-index: 38;
+  width: min(340px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.66);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.route-legend-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.route-legend-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #eefbff;
+  font-size: 11px;
+}
+
+.route-legend-chip.matrix {
+  border-color: rgba(109,255,181,0.38);
+  color: #dffff1;
+}
+
+@media (max-width: 900px) {
+  .route-legend {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: 146px;
+  }
+}
