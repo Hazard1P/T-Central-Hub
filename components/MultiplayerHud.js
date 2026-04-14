@@ -136,7 +136,7 @@ export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalS
 
         <div className="multiplayer-presence">
           {lobbyMode === 'private' ? (
-            <p className="multiplayer-note">You are in a Steam-scoped private world. Shared multiplayer presence is disconnected, but route portals remain available.</p>
+            <p className="multiplayer-note">You are in a Steam-scoped private world first. Shared multiplayer presence is disconnected until you exit outward into the multiplayer instance, but route portals remain available.</p>
           ) : steamUser ? (
             joined ? <p className="multiplayer-note">You are inside the live web-game server layer as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
                    : <p className="multiplayer-note">Steam linked, but the room is full or unavailable.</p>
