@@ -14,7 +14,7 @@ export default function SteamModeButtons({ steamUser, lobbyMode = 'private', onC
         disabled={!profile.steamLinked}
         title={profile.steamLinked ? MULTI_PLAYER_INSTANCE : 'Sign in with Steam to unlock multiplayer'}
       >
-        Steam Login <(multi-player)>
+        Steam Login {'<(multi-player)>'}
       </button>
 
       <button
@@ -22,7 +22,7 @@ export default function SteamModeButtons({ steamUser, lobbyMode = 'private', onC
         onClick={() => onChange?.('private')}
         title={SINGLE_PLAYER_INSTANCE}
       >
-        Steam Login <(single-player)>
+        Steam Login {'<(single-player)>'}
       </button>
     </div>
   );

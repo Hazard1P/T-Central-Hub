@@ -3965,3 +3965,45 @@ button { font: inherit; }
     width: 100%;
   }
 }
+
+
+.standalone-anchor-panel {
+  display: none;
+}
+
+.standalone-anchor-panel.visible {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.72);
+  border: 1px solid rgba(196,212,255,0.18);
+}
+
+.standalone-anchor-list {
+  display: grid;
+  gap: 8px;
+}
+
+.standalone-anchor-item {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.standalone-anchor-item span {
+  color: #c4d4ff;
+  font-weight: 700;
+}
+
+.standalone-anchor-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}

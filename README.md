@@ -463,3 +463,14 @@ Open:
   - Steam Login <(multi-player)>
   - Steam Login <(single-player)>
 - Kept multiplayer/private mode switching tied to the Steam account context
+
+
+## Steam mode JSX fix
+- Escaped the Steam mode button labels so JSX no longer parses `<(` as markup.
+
+
+## Standalone anchor pass
+- Expanded the deep standalone blackhole into the permanent universe shell/anchor concept
+- Added `lib/anchorDescriptors.js` and `StandaloneAnchorPanel`
+- Strengthened the standalone blackhole visual weight inside the stable world
+- Added universe-shell copy so the anchor reads as the fabric layer holding instances and multiplayer together
