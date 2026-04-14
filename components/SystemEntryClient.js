@@ -18,7 +18,7 @@ const SystemScene = dynamic(() => import('@/components/SystemScene'), {
 
 export default function SystemEntryClient() {
   const [entered, setEntered] = useState(false);
-  const [lobbyMode, setLobbyMode] = useState('hub');
+  const [lobbyMode, setLobbyMode] = useState(process.env.NEXT_PUBLIC_LOBBY_DEFAULT || 'private');
   const [steamUser, setSteamUser] = useState(null);
 
   useEffect(() => {
