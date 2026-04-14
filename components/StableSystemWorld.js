@@ -383,7 +383,6 @@ function FlightRig({ gravitySources, onNearestChange, onTelemetryChange, touchIn
 
 function StableSceneContent({ onSelect, selectedKey, onAutoFocus, onTelemetryChange, touchInput, deviceTier, authenticated = false }) {
   const graph = useMemo(() => buildUniverseGraph(), []);
-  const epochSummary = universe?.epoch || summarizeEpochRelativity(graph.epochAnchor);
   const epochSummary = useMemo(() => summarizeEpochRelativity(graph.epochAnchor), [graph]);
   const graphByKey = useMemo(() => Object.fromEntries(graph.nodes.map((node) => [node.key, node])), [graph]);
   const positions = useMemo(() => getNodePositionMap(graph), [graph]);
@@ -488,7 +487,6 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
   });
 
   const graph = useMemo(() => buildUniverseGraph(), []);
-  const epochSummary = universe?.epoch || summarizeEpochRelativity(graph.epochAnchor);
   const graphByKey = useMemo(() => Object.fromEntries(graph.nodes.map((node) => [node.key, node])), [graph]);
 
   const handleSelect = (node) => {

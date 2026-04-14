@@ -5,26 +5,20 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Billboard, Line, Sparkles, Stars, Trail } from '@react-three/drei';
 import * as THREE from 'three';
 import { buildUniverseGraph, getNodePositionMap } from '@/lib/universeEngine';
-import { getRenderTier } from '@/lib/renderEngine';
-import { getEventHorizonMaterialProps } from '@/lib/eventHorizonShader';
 
 function useDeviceTier() {
-  const [tier, setTier] = useState({ isMobile: false, dpr: [1, 1.45], stars: 9800, sparkles: 240, meteors: 18, labels: 3, distortionStrength: 1.2, routeOpacity: 0.62, dustOpacity: 0.18 });
+  const [tier, setTier] = useState({ isMobile: false, dpr: [1, 1.35], stars: 4200, sparkles: 110, meteors: 6, labels: 3 });
 
   useEffect(() => {
     const update = () => {
       const isMobile = window.matchMedia('(max-width: 820px), (pointer: coarse)').matches;
-      const renderTier = getRenderTier({ isMobile, maximumRealism: true });
       setTier({
         isMobile,
-        dpr: isMobile ? [1, 1.15] : [1, 1.5],
-        stars: renderTier.stars,
-        sparkles: renderTier.sparkles,
-        meteors: renderTier.meteors,
+        dpr: isMobile ? [1, 1.15] : [1, 1.35],
+        stars: isMobile ? 2400 : 4200,
+        sparkles: isMobile ? 60 : 110,
+        meteors: isMobile ? 4 : 6,
         labels: isMobile ? 2 : 4,
-        distortionStrength: renderTier.distortionStrength,
-        routeOpacity: renderTier.routeOpacity,
-        dustOpacity: renderTier.dustOpacity,
       });
     };
     update();
@@ -35,7 +29,7 @@ function useDeviceTier() {
   return tier;
 }
 
-function CinematicDustField({ sparkleCount, opacity = 0.18 }) {
+function CinematicDustField({ sparkleCount }) {
   const group = useRef(null);
   const clouds = [
     { position: [-16, 8, -26], scale: [18, 10, 1], color: '#7f6dff', opacity: 0.16 },
@@ -58,12 +52,12 @@ function CinematicDustField({ sparkleCount, opacity = 0.18 }) {
           <meshBasicMaterial color={cloud.color} transparent opacity={cloud.opacity} depthWrite={false} />
         </mesh>
       ))}
-      <Sparkles count={sparkleCount} scale={[52, 32, 38]} size={3.4} speed={0.22} opacity={Math.min(0.92, opacity + 0.58)} />
+      <Sparkles count={sparkleCount} scale={[52, 32, 38]} size={2.8} speed={0.18} opacity={0.75} />
     </group>
   );
 }
 
-function RouteRibbon({ from, to, color = '#7fe7ff', arc = 1.8, faint = false, opacity = 0.48 }) {
+function RouteRibbon({ from, to, color = '#7fe7ff', arc = 1.8, faint = false }) {
   const points = useMemo(() => {
     const start = new THREE.Vector3(...from);
     const end = new THREE.Vector3(...to);
@@ -73,11 +67,11 @@ function RouteRibbon({ from, to, color = '#7fe7ff', arc = 1.8, faint = false, op
   }, [from, to, arc]);
 
   return (
-    <Line points={points} color={color} lineWidth={faint ? 0.85 : 1.7} transparent opacity={faint ? 0.22 : opacity} />
+    <Line points={points} color={color} lineWidth={faint ? 0.7 : 1.35} transparent opacity={faint ? 0.22 : 0.48} />
   );
 }
 
-function EventHorizon({ radius = 1.8, color = '#9fdcff', strength = 1.2 }) {
+function EventHorizon({ radius = 1.8, color = '#9fdcff' }) {
   const ringA = useRef(null);
   const ringB = useRef(null);
   const glow = useRef(null);
@@ -91,17 +85,15 @@ function EventHorizon({ radius = 1.8, color = '#9fdcff', strength = 1.2 }) {
     }
   });
 
-  const material = getEventHorizonMaterialProps({ color, strength });
-
   return (
     <group>
       <mesh ref={glow}>
         <sphereGeometry args={[radius * 1.9, 32, 32]} />
-        <meshBasicMaterial color={material.primaryColor} transparent opacity={material.haloOpacity} depthWrite={false} />
+        <meshBasicMaterial color={color} transparent opacity={0.12} depthWrite={false} />
       </mesh>
       <mesh ref={ringA} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radius, radius * 0.28, 28, 140]} />
-        <meshBasicMaterial color={material.primaryColor} transparent opacity={material.ringOpacity} depthWrite={false} />
+        <meshBasicMaterial color={color} transparent opacity={0.82} depthWrite={false} />
       </mesh>
       <mesh ref={ringB} rotation={[Math.PI / 2.4, Math.PI / 6, 0]}>
         <torusGeometry args={[radius * 1.32, radius * 0.08, 16, 120]} />
@@ -140,8 +132,6 @@ function MeteorField({ count = 6, spread = 32 }) {
     });
   });
 
-  const material = getEventHorizonMaterialProps({ color, strength });
-
   return (
     <group>
       {meteors.map((meteor, index) => (
@@ -174,9 +164,9 @@ function BlackholeNode({ node }) {
           <sphereGeometry args={[node.radius * 0.44, 32, 32]} />
           <meshStandardMaterial color="#020409" emissive="#030509" emissiveIntensity={0.12} metalness={0.15} roughness={0.35} />
         </mesh>
-        <EventHorizon radius={node.horizonRadius || node.radius} color={node.color} strength={node.lensing || 1.1} />
+        <EventHorizon radius={node.radius} color={node.color} />
       </group>
-      <MeteorField count={node.debrisBelt?.count || 6} spread={node.debrisBelt?.spread || node.radius * 5.6} />
+      <MeteorField count={3} spread={node.radius * 4.5} />
     </group>
   );
 }
@@ -310,14 +300,14 @@ function UniverseScene({ tier }) {
       <pointLight position={[-16, 6, 8]} intensity={1.1} color="#9f7cff" />
       <pointLight position={[16, -4, 10]} intensity={0.95} color="#6dffb5" />
       <Stars radius={130} depth={68} count={tier.stars} factor={5.4} saturation={0} fade speed={1} />
-      <CinematicDustField sparkleCount={tier.sparkles} opacity={tier.dustOpacity} />
+      <CinematicDustField sparkleCount={tier.sparkles} />
       <MeteorField count={tier.meteors} spread={30} />
 
       {graph.routeLinks.map((link) => {
         const from = positions[link.from];
         const to = positions[link.to];
         if (!from || !to) return null;
-        return <RouteRibbon key={link.key} from={from} to={to} color={link.color} arc={link.arc} faint={link.faint} opacity={tier.routeOpacity} />;
+        return <RouteRibbon key={link.key} from={from} to={to} color={link.color} arc={link.arc} faint={link.faint} />;
       })}
 
       {graph.nodes.map((node) => {

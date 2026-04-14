@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import ServerConnectActions from '@/components/ServerConnectActions';
-import { getRelatedServers } from '@/lib/serverData';
 import ProceduralRoutePreview from '@/components/ProceduralRoutePreview';
+import { getRelatedServers } from '@/lib/serverData';
 
 export default function ServerDetailStats({ server }) {
   if (!server) {
@@ -34,7 +34,7 @@ export default function ServerDetailStats({ server }) {
         </article>
 
         <article className="content-card arma-hero-image-card">
-          <ProceduralRoutePreview title={server.title} seed={server.id?.length || 3} variant={server.family === 'rust' ? 'solar' : 'blackhole'} />
+          <ProceduralRoutePreview title={server.title} accent={server.color || '#7dd3fc'} detail={server.summary} />
         </article>
       </div>
 
