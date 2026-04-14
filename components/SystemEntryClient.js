@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import SteamLoginHud from '@/components/SteamLoginHud';
 import SystemStatusStrip from '@/components/SystemStatusStrip';
-import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
 import LobbyModePanel from '@/components/LobbyModePanel';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
@@ -43,7 +42,6 @@ export default function SystemEntryClient() {
     <>
       <SteamLoginHud />
       <SystemStatusStrip />
-      {entered ? <SystemErrorBoundary><MultiplayerHud lobbyMode={lobbyMode} steamUser={steamUser} /></SystemErrorBoundary> : null}
       {entered ? <SystemNewsInfoPanel lobbyMode={lobbyMode} selected={selectedNode} /> : null}
       {entered ? (
         <SystemErrorBoundary>

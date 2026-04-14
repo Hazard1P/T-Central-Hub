@@ -227,13 +227,6 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
   const perspective = steamUser?.steamid
     ? { role: lobbyMode === 'hub' ? 'Player-linked observer' : 'Private player shell', note: lobbyMode === 'hub' ? 'Steam session linked. You can inspect first, then travel routes.' : 'Private Steam world active with isolated route ownership.' }
     : { role: 'Observer shell', note: 'Spectator-first layout active. Panels remain readable while routes stay inspectable.' };
-  const visibleLayers = [
-    { label: 'Steam control', state: steamUser?.steamid ? 'linked' : 'guest' },
-    { label: 'News & Info', state: 'active' },
-    { label: 'Route focus', state: activeNode?.label || 'deep anchor' },
-    { label: 'Perspective', state: perspective.role },
-    { label: '3D world', state: lobbyMode === 'hub' ? 'shared' : 'private' },
-  ];
 
   return (
     <div className="stable-system-page polished-shell">
@@ -300,21 +293,6 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
             <span>Travel</span>
             <span>Overlay-safe</span>
           </div>
-        </div>
-      </div>
-
-      <div className="stable-layer-dock content-card">
-        <div className="stable-layer-dock-head">
-          <span className="eyebrow">Visible layers</span>
-          <strong>System shell stack</strong>
-        </div>
-        <div className="stable-layer-grid">
-          {visibleLayers.map((layer) => (
-            <div className="stable-layer-pill" key={layer.label}>
-              <span>{layer.label}</span>
-              <strong>{layer.state}</strong>
-            </div>
-          ))}
         </div>
       </div>
 

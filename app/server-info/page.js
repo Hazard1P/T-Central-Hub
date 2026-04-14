@@ -5,7 +5,7 @@ export const metadata = { title: 'Server Info' };
 export default function ServerInfoPage() {
   return (
     <PageShell
-      eyebrow="Server layer"
+      eyebrow="World status"
       title="The web-base game is the live system."
       text="This project is being built as a shared 3D multiplayer space where players sign in, fly, spectate, and use blackholes as server-entry systems."
     >
