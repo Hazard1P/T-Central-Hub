@@ -4408,3 +4408,163 @@ button { font: inherit; }
     bottom: 14px;
   }
 }
+
+
+/* Observer/player layer rebuild pass */
+.stable-system-page.polished-shell {
+  isolation: isolate;
+}
+
+.stable-world-canvas.polished-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.stable-system-backdrop {
+  z-index: 0;
+}
+
+.system-news-panel {
+  top: 18px;
+  left: 18px;
+  z-index: 59;
+}
+
+.multiplayer-hud {
+  top: 88px;
+  left: 18px;
+  z-index: 56;
+}
+
+.system-status-strip {
+  z-index: 58;
+}
+
+.lobby-mode-panel {
+  z-index: 57;
+}
+
+.steam-login-hud {
+  top: 18px;
+  right: 18px;
+  z-index: 60;
+}
+
+.stable-system-hud {
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  top: 196px;
+  z-index: 42;
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 400px) minmax(0, 320px);
+  gap: 14px;
+  align-items: start;
+  pointer-events: none;
+}
+
+.stable-system-hud .stable-card {
+  min-height: 100%;
+}
+
+.stable-card.observer {
+  justify-self: end;
+}
+
+.stable-layer-dock {
+  z-index: 44;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+}
+
+.stable-layer-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.stable-layer-pill,
+.system-news-link,
+.system-news-toggle,
+.stable-route-button,
+.stable-node-label.polished,
+.steam-login-button,
+.steam-mini-link {
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.stable-node-label.polished.is-selected {
+  border-color: rgba(131,235,255,0.5);
+  box-shadow: 0 0 0 1px rgba(131,235,255,0.2), 0 18px 44px rgba(0,0,0,0.38);
+  background: linear-gradient(180deg, rgba(10,22,38,0.96), rgba(8,18,32,0.86));
+}
+
+.system-news-card {
+  max-height: min(62vh, 560px);
+  overflow: auto;
+}
+
+@media (max-width: 1200px) {
+  .stable-system-hud {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    max-width: 820px;
+  }
+
+  .stable-card.observer {
+    justify-self: auto;
+    grid-column: 1 / -1;
+  }
+
+  .stable-layer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .system-news-panel {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .steam-login-hud {
+    top: auto;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .multiplayer-hud {
+    top: 78px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .system-status-strip {
+    top: 136px;
+    width: calc(100vw - 28px);
+  }
+
+  .lobby-mode-panel {
+    top: 210px;
+    width: calc(100vw - 28px);
+  }
+
+  .stable-system-hud {
+    left: 14px;
+    right: 14px;
+    top: 330px;
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .stable-layer-dock {
+    left: 14px;
+    right: 14px;
+    bottom: 104px;
+  }
+
+  .stable-layer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

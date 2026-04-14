@@ -90,7 +90,7 @@ function HaloRing({ radius = 1.8, color = '#9fdcff', speed = 0.4, tilt = 0 }) {
   );
 }
 
-function NodeVisual({ node, onOpen }) {
+function NodeVisual({ node, onSelect, selectedKey }) {
   const isBlackhole = node.kind === 'blackhole';
   const isDyson = node.kind === 'dyson';
   const isSolar = node.kind === 'solar';
@@ -115,7 +115,7 @@ function NodeVisual({ node, onOpen }) {
       </mesh>
 
       <group ref={spinRef}>
-        <mesh onClick={() => onOpen(node)} scale={isBlackhole ? 1.2 : isDyson ? 1.05 : isSolar ? 1.35 : 0.75}>
+        <mesh onClick={() => onSelect(node)} scale={isBlackhole ? 1.2 : isDyson ? 1.05 : isSolar ? 1.35 : 0.75}>
           {isBlackhole ? (
             <torusGeometry args={[0.95, 0.26, 20, 64]} />
           ) : isDyson ? (
@@ -145,7 +145,7 @@ function NodeVisual({ node, onOpen }) {
       {node.key === 'deep_blackhole' ? <DeepBlackholeAttachments node={node} /> : null}
 
       <Html center distanceFactor={14} position={[0, isSolar ? 1.85 : 1.55, 0]}>
-        <button className="stable-node-label polished" onClick={() => onOpen(node)}>
+        <button className={`stable-node-label polished ${selectedKey === node.key ? 'is-selected' : ''}`} onClick={() => onSelect(node)}>
           <strong>{node.label}</strong>
           <span>{node.kind}</span>
           <small>{node.address}</small>
@@ -155,7 +155,7 @@ function NodeVisual({ node, onOpen }) {
   );
 }
 
-function StableSceneContent({ onOpen }) {
+function StableSceneContent({ onSelect, selectedKey }) {
   const nodes = useMemo(
     () => WORLD_LAYOUT.filter((node) => ['blackhole', 'dyson', 'solar'].includes(node.kind)),
     []
@@ -195,7 +195,7 @@ function StableSceneContent({ onOpen }) {
       ))}
 
       {nodes.map((node) => (
-        <NodeVisual key={node.key} node={node} onOpen={onOpen} />
+        <NodeVisual key={node.key} node={node} onSelect={onSelect} selectedKey={selectedKey} />
       ))}
 
       <OrbitControls enablePan={false} minDistance={14} maxDistance={55} />
@@ -207,23 +207,31 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
   const router = useRouter();
   const [selected, setSelected] = useState(null);
 
-  const handleOpen = (node) => {
+  const handleSelect = (node) => {
     setSelected(node);
     onSelectionChange?.(node);
-    const href = node.route;
-    if (!href) return;
-    if (node.external) {
-      window.open(href, '_blank', 'noopener,noreferrer');
+  };
+
+  const activeNode = selected || WORLD_LAYOUT.find((node) => node.key === 'deep_blackhole') || null;
+
+  const handleRouteOpen = () => {
+    if (!activeNode?.route) return;
+    if (activeNode.external) {
+      window.open(activeNode.route, '_blank', 'noopener,noreferrer');
     } else {
-      router.push(href);
+      router.push(activeNode.route);
     }
   };
 
-  const highlightedTags = selected?.tags || ['blackhole', 'route shell', '3D anchor'];
+  const highlightedTags = activeNode?.tags || ['blackhole', 'route shell', '3D anchor'];
+  const perspective = steamUser?.steamid
+    ? { role: lobbyMode === 'hub' ? 'Player-linked observer' : 'Private player shell', note: lobbyMode === 'hub' ? 'Steam session linked. You can inspect first, then travel routes.' : 'Private Steam world active with isolated route ownership.' }
+    : { role: 'Observer shell', note: 'Spectator-first layout active. Panels remain readable while routes stay inspectable.' };
   const visibleLayers = [
     { label: 'Steam control', state: steamUser?.steamid ? 'linked' : 'guest' },
     { label: 'News & Info', state: 'active' },
-    { label: 'Route focus', state: selected?.label || 'deep anchor' },
+    { label: 'Route focus', state: activeNode?.label || 'deep anchor' },
+    { label: 'Perspective', state: perspective.role },
     { label: '3D world', state: lobbyMode === 'hub' ? 'shared' : 'private' },
   ];
 
@@ -251,32 +259,47 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
 
         <div className="content-card stable-card route">
           <p className="eyebrow">Selected route</p>
-          <h3>{selected?.label || 'Deep Space Blackhole'}</h3>
-          <p className="muted">{selected?.description || 'Select a node to inspect its route, anchor assets, and linked destination behavior.'}</p>
+          <h3>{activeNode?.label || 'Deep Space Blackhole'}</h3>
+          <p className="muted">{activeNode?.description || 'Select a node to inspect its route, anchor assets, and linked destination behavior.'}</p>
           <div className="focus-meta">
-            <span>{selected?.address || 'Primary deep-space anchor'}</span>
-            <span>{selected?.kind || 'blackhole'}</span>
+            <span>{activeNode?.address || 'Primary deep-space anchor'}</span>
+            <span>{activeNode?.kind || 'blackhole'}</span>
           </div>
           <div className="stable-chip-row alt">
             {highlightedTags.map((tag) => (
               <span key={tag}>{tag}</span>
             ))}
           </div>
-          {selected?.mapAsset || selected?.seedAsset ? (
+          {activeNode?.mapAsset || activeNode?.seedAsset ? (
             <div className="stable-asset-previews">
-              {selected?.mapAsset ? (
-                <img className="stable-asset-preview wide" src={selected.mapAsset} alt={`${selected.label} map anchor`} />
+              {activeNode?.mapAsset ? (
+                <img className="stable-asset-preview wide" src={activeNode.mapAsset} alt={`${activeNode.label} map anchor`} />
               ) : null}
-              {selected?.seedAsset ? (
-                <img className="stable-asset-preview seed" src={selected.seedAsset} alt={`${selected.label} seed anchor`} />
+              {activeNode?.seedAsset ? (
+                <img className="stable-asset-preview seed" src={activeNode.seedAsset} alt={`${activeNode.label} seed anchor`} />
               ) : null}
             </div>
           ) : null}
-          {selected?.route ? (
-            <button className="stable-route-button" onClick={() => handleOpen(selected)}>
-              Open route
+          {activeNode?.route ? (
+            <button className="stable-route-button" onClick={handleRouteOpen}>
+              Travel to route
             </button>
           ) : null}
+        </div>
+
+        <div className="content-card stable-card observer">
+          <p className="eyebrow">Observer / Player</p>
+          <h3>{perspective.role}</h3>
+          <p className="muted">{perspective.note}</p>
+          <div className="focus-meta">
+            <span>{steamUser?.personaname || 'Guest observer'}</span>
+            <span>{lobbyMode === 'hub' ? 'Shared world visibility' : 'Private world visibility'}</span>
+          </div>
+          <div className="stable-chip-row alt">
+            <span>Inspect</span>
+            <span>Travel</span>
+            <span>Overlay-safe</span>
+          </div>
         </div>
       </div>
 
@@ -297,7 +320,7 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
 
       <div className="stable-world-canvas polished-canvas">
         <Canvas camera={{ position: [0, 8, 24], fov: 48 }}>
-          <StableSceneContent onOpen={handleOpen} />
+          <StableSceneContent onSelect={handleSelect} selectedKey={activeNode?.key} />
         </Canvas>
       </div>
     </div>
