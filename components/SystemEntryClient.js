@@ -9,6 +9,7 @@ import SystemLauncher from '@/components/SystemLauncher';
 import LobbyModePanel from '@/components/LobbyModePanel';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
 import StableSystemWorld from '@/components/StableSystemWorld';
+import SystemNewsInfoPanel from '@/components/SystemNewsInfoPanel';
 import { ROUTE_CHIPS } from '@/lib/worldLayout';
 
 const SystemScene = dynamic(() => import('@/components/SystemScene'), {
@@ -20,6 +21,7 @@ export default function SystemEntryClient() {
   const [entered, setEntered] = useState(false);
   const [lobbyMode, setLobbyMode] = useState('hub');
   const [steamUser, setSteamUser] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -42,11 +44,12 @@ export default function SystemEntryClient() {
       <SteamLoginHud />
       <SystemStatusStrip />
       {entered ? <SystemErrorBoundary><MultiplayerHud lobbyMode={lobbyMode} steamUser={steamUser} /></SystemErrorBoundary> : null}
+      {entered ? <SystemNewsInfoPanel lobbyMode={lobbyMode} selected={selectedNode} /> : null}
       {entered ? (
         <SystemErrorBoundary>
           <>
             <LobbyModePanel lobbyMode={lobbyMode} onChange={setLobbyMode} steamUser={steamUser} />
-            <StableSystemWorld lobbyMode={lobbyMode} steamUser={steamUser} />
+            <StableSystemWorld lobbyMode={lobbyMode} steamUser={steamUser} onSelectionChange={setSelectedNode} />
           </>
         </SystemErrorBoundary>
       ) : <SystemLauncher onEnter={() => setEntered(true)} />}

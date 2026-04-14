@@ -203,12 +203,13 @@ function StableSceneContent({ onOpen }) {
   );
 }
 
-export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null }) {
+export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null, onSelectionChange = null }) {
   const router = useRouter();
   const [selected, setSelected] = useState(null);
 
   const handleOpen = (node) => {
     setSelected(node);
+    onSelectionChange?.(node);
     const href = node.route;
     if (!href) return;
     if (node.external) {
@@ -219,6 +220,12 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
   };
 
   const highlightedTags = selected?.tags || ['blackhole', 'route shell', '3D anchor'];
+  const visibleLayers = [
+    { label: 'Steam control', state: steamUser?.steamid ? 'linked' : 'guest' },
+    { label: 'News & Info', state: 'active' },
+    { label: 'Route focus', state: selected?.label || 'deep anchor' },
+    { label: '3D world', state: lobbyMode === 'hub' ? 'shared' : 'private' },
+  ];
 
   return (
     <div className="stable-system-page polished-shell">
@@ -270,6 +277,21 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
               Open route
             </button>
           ) : null}
+        </div>
+      </div>
+
+      <div className="stable-layer-dock content-card">
+        <div className="stable-layer-dock-head">
+          <span className="eyebrow">Visible layers</span>
+          <strong>System shell stack</strong>
+        </div>
+        <div className="stable-layer-grid">
+          {visibleLayers.map((layer) => (
+            <div className="stable-layer-pill" key={layer.label}>
+              <span>{layer.label}</span>
+              <strong>{layer.state}</strong>
+            </div>
+          ))}
         </div>
       </div>
 
