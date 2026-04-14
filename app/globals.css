@@ -3936,3 +3936,32 @@ button { font: inherit; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+.steam-mode-buttons-wrap {
+  position: fixed;
+  left: 50%;
+  top: 116px;
+  transform: translateX(-50%);
+  z-index: 44;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: min(760px, calc(100vw - 28px));
+}
+
+.steam-mode-button {
+  min-width: 220px;
+}
+
+@media (max-width: 900px) {
+  .steam-mode-buttons-wrap {
+    top: 152px;
+    width: calc(100vw - 20px);
+  }
+
+  .steam-mode-button {
+    width: 100%;
+  }
+}

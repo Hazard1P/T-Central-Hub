@@ -455,3 +455,11 @@ Open:
 - Surfaces Steam name, account ID, and instance type:
   - <[Multi_Player_Instance]>
   - <[Single_Player_Instance]>
+
+
+## Steam mode buttons pass
+- Removed the Steam_Access panel from the launch flow
+- Replaced it with two direct Steam-linked mode buttons:
+  - Steam Login <(multi-player)>
+  - Steam Login <(single-player)>
+- Kept multiplayer/private mode switching tied to the Steam account context
