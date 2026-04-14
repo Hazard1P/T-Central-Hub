@@ -8,6 +8,7 @@ import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
 import LobbyModePanel from '@/components/LobbyModePanel';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
+import StableSystemWorld from '@/components/StableSystemWorld';
 import { ROUTE_CHIPS } from '@/lib/worldLayout';
 
 const SystemScene = dynamic(() => import('@/components/SystemScene'), {
@@ -45,7 +46,7 @@ export default function SystemEntryClient() {
         <SystemErrorBoundary>
           <>
             <LobbyModePanel lobbyMode={lobbyMode} onChange={setLobbyMode} steamUser={steamUser} />
-            <SystemScene lobbyMode={lobbyMode} steamUser={steamUser} />
+            <StableSystemWorld lobbyMode={lobbyMode} steamUser={steamUser} />
           </>
         </SystemErrorBoundary>
       ) : <SystemLauncher onEnter={() => setEntered(true)} />}

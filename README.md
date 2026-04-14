@@ -429,3 +429,9 @@ Open:
 - Fixed helper-scope leaks where scene helpers referenced variables only defined in `SystemScene`
 - Hardened `CockpitOverlay`, `RoomPulse`, and `FocusPanel` against undefined runtime data
 - Reduced repeated deployment risk from undefined state during first render and lobby transitions
+
+
+## Stability shell pass
+- Added `StableSystemWorld` as a simplified 3D route shell
+- Kept the main blackholes, Dyson spheres, and solar system online
+- Switched the `/system` launch path to the safer shell while heavier runtime work continues

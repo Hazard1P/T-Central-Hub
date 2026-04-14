@@ -3689,3 +3689,59 @@ button { font: inherit; }
     bottom: 626px;
   }
 }
+
+
+.stable-system-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(0,0,0,0.46), rgba(0,0,0,0.78)),
+    url('/assets/cosmic-bg.jpg') center / cover fixed no-repeat;
+}
+
+.stable-system-hud {
+  position: fixed;
+  left: 18px;
+  top: 196px;
+  z-index: 48;
+  display: grid;
+  gap: 12px;
+  width: min(360px, calc(100vw - 36px));
+}
+
+.stable-world-canvas {
+  height: 100vh;
+}
+
+.stable-node-label {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(7, 12, 20, 0.78);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #eefbff;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.stable-node-label strong {
+  font-size: 12px;
+}
+
+.stable-node-label span {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 900px) {
+  .stable-system-hud {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    top: 236px;
+  }
+}
