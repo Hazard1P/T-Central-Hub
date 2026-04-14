@@ -463,3 +463,47 @@ Open:
   - Steam Login <(multi-player)>
   - Steam Login <(single-player)>
 - Kept multiplayer/private mode switching tied to the Steam account context
+
+
+## Steam mode JSX fix
+- Escaped the Steam mode button labels so JSX no longer parses `<(` as markup.
+
+
+## Standalone anchor pass
+- Expanded the deep standalone blackhole into the permanent universe shell/anchor concept
+- Added `lib/anchorDescriptors.js` and `StandaloneAnchorPanel`
+- Strengthened the standalone blackhole visual weight inside the stable world
+- Added universe-shell copy so the anchor reads as the fabric layer holding instances and multiplayer together
+
+
+## Private-first Steam access pass
+- Steam-linked access now defaults to the private single-player world
+- Multiplayer is treated as an outward transition from the private anchored world
+- Updated Steam mode buttons and copy to reflect private-first access flow
+
+
+## NDSP anchor pass
+- Anchored the Synaptic Systems Dyson sphere to `https://synaptics.systems/ndsp`
+- Added account-scoped NDSP build anchor and build-hash generation for Steam-linked worlds
+- Keeps the build anchor scoped to the current lobby mode and Steam-linked identity context
+
+
+## NDSP discrete profile pass
+- Added `lib/ndspProfile.js` to create NDSP-scoped profile namespaces per Steam-linked account
+- Bound NDSP profile separation to both single-player and multiplayer instance scopes
+- Extended the NDSP anchor panel with namespace and ledger-key visibility
+- Added `NDSPProfilePanel` so the discrete profile context is visible in the stable world
+
+
+## Synaptic rings clean-screen pass
+- Rebuilt the Synaptic Systems Dyson sphere as a three-ring animated object
+- Ring 2 spins when Steam account is authenticated
+- In multiplayer, all three rings spin
+- In private world, ring 3 spins when a PayPal subscription flag is present
+- Cleared the left-side info stack and moved scene detail into a cleaner bottom-right overlay
+
+
+## News & Info tab pass
+- Condensed the left-side info stack into a single clickable tab
+- Renamed the entry to `News & Info`
+- Keeps scene context available without leaving a permanent left-side overlay open
