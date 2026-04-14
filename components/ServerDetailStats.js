@@ -2,6 +2,7 @@ import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import ServerConnectActions from '@/components/ServerConnectActions';
 import { getRelatedServers } from '@/lib/serverData';
+import ProceduralRoutePreview from '@/components/ProceduralRoutePreview';
 
 export default function ServerDetailStats({ server }) {
   if (!server) {
@@ -33,7 +34,7 @@ export default function ServerDetailStats({ server }) {
         </article>
 
         <article className="content-card arma-hero-image-card">
-          <img src={server.image || '/blackhole-anchor.jpg'} alt={`${server.title} route visual`} className="page-image" />
+          <ProceduralRoutePreview title={server.title} seed={server.id?.length || 3} variant={server.family === 'rust' ? 'solar' : 'blackhole'} />
         </article>
       </div>
 

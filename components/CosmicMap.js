@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 const nodes = [
@@ -10,15 +9,13 @@ const nodes = [
 
 export default function CosmicMap() {
   return (
-    <div className="cosmic-map">
-      <Image
-        src="/cosmic-map.jpg"
-        alt="Cosmic system map used as the homepage navigation artwork"
-        width={1152}
-        height={1536}
-        className="cosmic-image"
-        priority
-      />
+    <div className="cosmic-map cosmic-map--generated">
+      <div className="cosmic-generated-field" aria-hidden="true">
+        <span className="cosmic-ring cosmic-ring-a" />
+        <span className="cosmic-ring cosmic-ring-b" />
+        <span className="cosmic-singularity" />
+        <span className="cosmic-starfield" />
+      </div>
       <div className="cosmic-overlay" />
       {nodes.map((node) => (
         <Link key={node.label} href={node.href} className="map-node" style={node.style}>
@@ -28,7 +25,7 @@ export default function CosmicMap() {
       ))}
       <div className="map-caption">
         <p className="eyebrow">Interactive navigation</p>
-        <h3>Click the map nodes to move through the hub.</h3>
+        <h3>Move through the hub with generated route anchors and deep-space navigation nodes.</h3>
       </div>
     </div>
   );

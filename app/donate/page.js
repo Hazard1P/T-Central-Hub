@@ -80,20 +80,19 @@ export default function DonatePage() {
       <section className="donate-action-grid">
         <article className="content-card donate-primary-card">
           <p className="eyebrow">Monthly support</p>
-          <h3>Become a recurring supporter</h3>
+          <h3>Donate through a protected Steam-linked flow</h3>
           <p className="muted">
-            Use the active PayPal subscription flow below if you want to support the project on a recurring basis.
-            This is the cleanest route for long-term supporters and patron-style backers.
+            Use the protected PayPal checkout below to create a server-side donation order bound to your authenticated Steam account, blackhole anchor, and solar system path.
           </p>
 
           <div className="donate-button-stack">
             <a
               className="button primary"
-              href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-95R19588AD368713ENHLWFNY"
+              href="https://paypal.me/TCentralG"
               target="_blank"
               rel="noreferrer"
             >
-              Open subscription link
+              Open PayPal fallback
             </a>
           </div>
 

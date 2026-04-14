@@ -1,35 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSteamSession } from '@/components/SteamSessionProvider';
 
 export default function SteamLoginHud() {
-  const [session, setSession] = useState(null);
-  const [support, setSupport] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadSession = async () => {
-    try {
-      const [steamRes, supportRes] = await Promise.all([
-        fetch('/api/auth/steam/session', { cache: 'no-store' }),
-        fetch('/api/support/session', { cache: 'no-store' }),
-      ]);
-      const steamData = await steamRes.json();
-      const supportData = await supportRes.json();
-      setSession(steamData?.authenticated ? steamData.user : null);
-      setSupport(supportData?.linked ? supportData.support : null);
-    } catch {
-      setSession(null);
-      setSupport(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadSession();
-    const id = setInterval(loadSession, 30000);
-    return () => clearInterval(id);
-  }, []);
+  const { steamUser: session, support, universe, loading, presence } = useSteamSession();
 
   return (
     <div className="steam-login-hud">
@@ -57,19 +31,23 @@ export default function SteamLoginHud() {
               <>
                 <strong>{session.personaname || 'Steam user'}</strong>
                 <small>{session.steamid}</small>
-                <small className="steam-subtle">In-game identity active</small>
+                <small className="steam-subtle">Observer and pilot layers synchronized</small>
+                {universe?.privacy?.observanceScope ? <small className="steam-subtle">{universe.privacy.observanceScope}</small> : null}
               </>
             ) : (
               <>
                 <strong>Sign in with Steam</strong>
                 <small>Connect your Steam profile</small>
-                <small className="steam-subtle">Unlock profile-linked UI</small>
+                <small className="steam-subtle">Guest observer shell stays synchronized until login</small>
+                {universe?.privacy?.observanceScope ? <small className="steam-subtle">{universe.privacy.observanceScope}</small> : null}
               </>
             )}
           </div>
         </div>
 
         <div className="steam-login-actions">
+          {universe?.prayerSeeds?.total ? <span className="steam-mini-link">Seeds {universe.prayerSeeds.total}</span> : null}
+          {presence?.length ? <span className="steam-mini-link">Pilots {presence.length}</span> : null}
           {session ? (
             <>
               {session.profileurl ? (
