@@ -33,7 +33,7 @@ export default function NDSPAnchorPanel({ steamUser, lobbyMode = 'private', sele
       </div>
 
       <p className="muted">
-        This Dyson sphere anchors into NDSP and can refresh the account-scoped build anchor for the current Steam-linked world.
+        This Dyson sphere anchors into NDSP and keeps the Steam-linked build profile discrete from other players by scoping the build anchor, namespace, and ledger path to the current instance.
       </p>
 
       <div className="ndsp-anchor-grid">
@@ -52,6 +52,14 @@ export default function NDSPAnchorPanel({ steamUser, lobbyMode = 'private', sele
         <div className="ndsp-anchor-item">
           <span>Protocol target</span>
           <strong>NDSP</strong>
+        </div>
+        <div className="ndsp-anchor-item">
+          <span>Namespace</span>
+          <strong>{anchor.namespace}</strong>
+        </div>
+        <div className="ndsp-anchor-item">
+          <span>Ledger key</span>
+          <strong>{anchor.profileLedgerKey}</strong>
         </div>
       </div>
 

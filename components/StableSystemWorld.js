@@ -12,6 +12,7 @@ import StableNodePanel from '@/components/StableNodePanel';
 import SceneObjectsSidebar from '@/components/SceneObjectsSidebar';
 import StandaloneAnchorPanel from '@/components/StandaloneAnchorPanel';
 import NDSPAnchorPanel from '@/components/NDSPAnchorPanel';
+import NDSPProfilePanel from '@/components/NDSPProfilePanel';
 
 function NodeVisual({ node, onSelect }) {
   const isBlackhole = node.kind === 'blackhole';
@@ -134,6 +135,7 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
         </div>
         <StandaloneAnchorPanel selected={selected} />
         <NDSPAnchorPanel selected={selected} steamUser={steamUser} lobbyMode={lobbyMode} />
+        <NDSPProfilePanel steamUser={steamUser} lobbyMode={lobbyMode} />
         <StableNodePanel
           selected={selected}
           lobbyMode={lobbyMode}

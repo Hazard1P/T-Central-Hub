@@ -486,3 +486,10 @@ Open:
 - Anchored the Synaptic Systems Dyson sphere to `https://synaptics.systems/ndsp`
 - Added account-scoped NDSP build anchor and build-hash generation for Steam-linked worlds
 - Keeps the build anchor scoped to the current lobby mode and Steam-linked identity context
+
+
+## NDSP discrete profile pass
+- Added `lib/ndspProfile.js` to create NDSP-scoped profile namespaces per Steam-linked account
+- Bound NDSP profile separation to both single-player and multiplayer instance scopes
+- Extended the NDSP anchor panel with namespace and ledger-key visibility
+- Added `NDSPProfilePanel` so the discrete profile context is visible in the stable world

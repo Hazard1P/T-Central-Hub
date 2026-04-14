@@ -11,7 +11,7 @@ export default function SteamModeButtons({ steamUser, lobbyMode = 'private', onC
         <span className="pilot-assist-kicker">Steam access</span>
         <strong>Private world first</strong>
         <p className="muted">
-          Steam-linked access anchors into the private single-player world first. From there, the user can move outward into the shared multiplayer instance.
+          Steam-linked access anchors into the private single-player world first. NDSP keeps each player's build profile discrete from others in both the single-player and multiplayer instances.
         </p>
       </div>
 
