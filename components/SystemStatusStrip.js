@@ -1,20 +1,18 @@
 'use client';
 
+import { getSystemStatusPills } from '@/lib/siteContent';
+
 export default function SystemStatusStrip() {
+  const pills = getSystemStatusPills();
+
   return (
     <div className="system-status-strip">
-      <div className="status-strip-pill">
-        <span>Layer</span>
-        <strong>Live 3D Web-Game</strong>
-      </div>
-      <div className="status-strip-pill">
-        <span>Roles</span>
-        <strong>Pilot / Spectate</strong>
-      </div>
-      <div className="status-strip-pill">
-        <span>Primary route</span>
-        <strong>Arma3 CTH</strong>
-      </div>
+      {pills.map((pill) => (
+        <div className="status-strip-pill" key={`${pill.label}-${pill.value}`}>
+          <span>{pill.label}</span>
+          <strong>{pill.value}</strong>
+        </div>
+      ))}
     </div>
   );
 }

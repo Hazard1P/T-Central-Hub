@@ -1,12 +1,6 @@
 import PageShell from '@/components/PageShell';
-
-const checkpoints = [
-  'Single live Arma3 server route kept as the primary live connection.',
-  'Arma quick-connect flow remains tied to Steam launch and direct connect.',
-  'Donate and report pages remain scrollable while the fullscreen hub stays locked.',
-  'Steam login, support linking, and reporting flow remain in the package.',
-  'Arma route keeps the restored map and uploaded reference photo.',
-];
+import { PRIMARY_SERVER_ROUTES } from '@/lib/serverData';
+import { WORLD_SUMMARY } from '@/lib/worldLayout';
 
 export const metadata = { title: 'Project Status' };
 
@@ -15,37 +9,40 @@ export default function StatusPage() {
     <PageShell
       eyebrow="Project status"
       title="Current conformance pass"
-      text="This page summarizes the current stabilized direction of the T-Central package after the recent architecture, image, support, and quick-connect fixes."
+      text="This page summarizes the current stabilized direction of the T-Central package after the cleanup, dynamic route, and infinite-foundation passes."
     >
       <div className="arma-brief-grid">
         <article className="content-card">
-          <p className="eyebrow">Current state</p>
-          <h3>Stabilized package</h3>
+          <p className="eyebrow">World counts</p>
+          <h3>Generated system shell</h3>
           <ul className="arma-list">
-            {checkpoints.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
+            <li>{WORLD_SUMMARY.blackholes} blackholes active in the world layout.</li>
+            <li>{WORLD_SUMMARY.dysonSpheres} Dyson spheres online.</li>
+            <li>{WORLD_SUMMARY.solarSystems} solar system anchor online.</li>
+            <li>{WORLD_SUMMARY.nodes} total route and expansion nodes rendered from shared generators.</li>
           </ul>
         </article>
 
         <article className="content-card">
-          <p className="eyebrow">Live route</p>
-          <h3>Primary server</h3>
-          <div className="arma-highlight">
-            <strong>tcentral.game.nfoservers.com:2302</strong>
-            <p className="muted">
-              The package is now aligned around one live server overall instead of placeholder multi-server branching.
-            </p>
+          <p className="eyebrow">Primary routes</p>
+          <h3>{PRIMARY_SERVER_ROUTES.length} synchronized</h3>
+          <div className="system-news-list">
+            {PRIMARY_SERVER_ROUTES.map((server) => (
+              <a className="system-news-link" href={server.href} key={server.id}>
+                <span>{server.shortTitle}</span>
+                <small>{server.ip}</small>
+              </a>
+            ))}
           </div>
         </article>
 
         <article className="content-card">
-          <p className="eyebrow">Next steps</p>
+          <p className="eyebrow">Next strongest upgrades</p>
           <h3>Best upgrade path</h3>
           <ul className="arma-list">
-            <li>Live server polling from a real status source.</li>
-            <li>Supporter persistence through webhook-backed billing confirmation.</li>
-            <li>Further blackhole polish around the single-server route.</li>
+            <li>Wire the live-status endpoint to a real status source.</li>
+            <li>Persist moderation reports to a database or webhook destination.</li>
+            <li>Extend generated world nodes into deeper 3D scene behaviors and travel states.</li>
           </ul>
         </article>
       </div>

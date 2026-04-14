@@ -1,27 +1,10 @@
 import SteamLoginHud from '@/components/SteamLoginHud';
-
-const launchCards = [
-  {
-    kicker: 'Deep-space anchor',
-    title: 'Mapped blackhole routing',
-    copy: 'The deep-space blackhole reuses the project map and anchor assets so the visual language stays consistent across the world.',
-    image: '/cosmic-map.jpg',
-  },
-  {
-    kicker: 'Arma3 route',
-    title: 'Server-entry blackhole',
-    copy: 'Arma3 remains one of the primary destination wells with direct routing, live server detail pages, and anchored world presence.',
-    image: '/arma-cth-shot.png',
-  },
-  {
-    kicker: 'Shared shell',
-    title: 'Unified asset presentation',
-    copy: 'Panels, overlays, route cards, and blackhole anchors now share the same polished cosmic treatment for cleaner deployment.',
-    image: '/blackhole-anchor.jpg',
-  },
-];
+import { getHomeLaunchCards, getHomeStatusPills } from '@/lib/siteContent';
 
 export default function HomePage() {
+  const launchCards = getHomeLaunchCards();
+  const statusPills = getHomeStatusPills();
+
   return (
     <main className="entry-page cosmic-entry-page">
       <SteamLoginHud />
@@ -40,14 +23,12 @@ export default function HomePage() {
 
           <div className="entry-actions">
             <a className="button primary" href="/system">Enter system</a>
-            <a className="button secondary" href="/servers/arma3-cth">Arma3 CTH</a>
+            <a className="button secondary" href={launchCards[0]?.href ?? '/servers/arma3-cth'}>{launchCards[0]?.title ?? 'Primary route'}</a>
             <a className="button secondary" href="/donate">Support</a>
           </div>
 
           <div className="entry-status-bar">
-            <span>Deep-space anchor online</span>
-            <span>Steam layer ready</span>
-            <span>Blackhole routes stable</span>
+            {statusPills.map((item) => <span key={item}>{item}</span>)}
           </div>
 
           <div className="entry-link-row">
@@ -77,6 +58,7 @@ export default function HomePage() {
                 <span className="entry-panel-kicker">{card.kicker}</span>
                 <strong>{card.title}</strong>
                 <p>{card.copy}</p>
+                <a className="button secondary" href={card.href}>Open route</a>
               </article>
             ))}
           </div>

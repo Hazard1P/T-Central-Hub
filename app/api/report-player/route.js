@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-
-function decodeSession(value) {
-  try {
-    return JSON.parse(Buffer.from(value, 'base64url').toString('utf8'));
-  } catch {
-    return null;
-  }
-}
+import { decryptJson } from '@/lib/security';
 
 export async function POST(request) {
   const body = await request.json().catch(() => null);
@@ -17,7 +10,13 @@ export async function POST(request) {
 
   const cookieStore = cookies();
   const raw = cookieStore.get('steam_session')?.value;
-  const user = raw ? decodeSession(raw) : null;
+  let user = null;
+
+  try {
+    user = raw ? decryptJson(raw) : null;
+  } catch {
+    user = null;
+  }
 
   const reference = `TC-${Date.now().toString(36).toUpperCase()}`;
 
@@ -25,14 +24,17 @@ export async function POST(request) {
     ok: true,
     reference,
     report: {
-      reporter: user ? {
-        steamid: user.steamid,
-        personaname: user.personaname || null,
-      } : null,
+      reporter: user
+        ? {
+            steamid: user.steamid,
+            personaname: user.personaname || null,
+          }
+        : null,
       reportedPlayer: body.reportedPlayer,
       server: body.server || 'T-Central Hub',
       reason: body.reason,
       evidence: body.evidence,
+      createdAt: new Date().toISOString(),
     },
   });
 }

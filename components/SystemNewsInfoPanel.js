@@ -1,13 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-
-const defaultItems = [
-  { label: 'Information', href: '/information', note: 'Updates, onboarding, and guidance.' },
-  { label: 'Server Info', href: '/server-info', note: 'Route details and live server notes.' },
-  { label: 'Status', href: '/status', note: 'Availability and shell status.' },
-  { label: 'Report Player', href: '/report-player', note: 'Moderation and support path.' },
-];
+import { getSystemNewsItems } from '@/lib/siteContent';
 
 export default function SystemNewsInfoPanel({ lobbyMode = 'hub', selected = null }) {
   const [open, setOpen] = useState(true);
@@ -16,7 +10,7 @@ export default function SystemNewsInfoPanel({ lobbyMode = 'hub', selected = null
     const selectedItem = selected?.route && !selected?.external
       ? [{ label: `Open ${selected.label}`, href: selected.route, note: selected.description || 'Direct route from the active layer.' }]
       : [];
-    return [...selectedItem, ...defaultItems];
+    return [...selectedItem, ...getSystemNewsItems()];
   }, [selected]);
 
   return (
