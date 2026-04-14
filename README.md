@@ -442,3 +442,8 @@ Open:
 - Added top world summary chips to reinforce current layout and lobby mode
 - Added visible solar orbit guides in the stable world
 - Kept route opening deliberate by selecting first, then opening from the panel
+
+
+## Hidden sidebar pass
+- Replaced the always-visible top summary with a collapsible scene-objects sidebar
+- Keeps a quick view of blackholes, Dyson spheres, and the solar system without crowding the scene

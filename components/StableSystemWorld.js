@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { WORLD_LAYOUT } from '@/lib/worldLayout';
 import { getPrivateWorldKey } from '@/lib/securityConfig';
 import StableNodePanel from '@/components/StableNodePanel';
+import SceneObjectsSidebar from '@/components/SceneObjectsSidebar';
 
 function NodeVisual({ node, onSelect }) {
   const isBlackhole = node.kind === 'blackhole';
@@ -107,7 +108,7 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
 
   return (
     <div className="stable-system-page">
-      <div className="stable-system-summary"><span>5 blackholes</span><span>3 Dyson spheres</span><span>1 solar system</span><span>{lobbyMode === 'hub' ? 'Multiplayer hub' : 'Private world'}</span></div>
+      <SceneObjectsSidebar lobbyMode={lobbyMode} />
       <div className="stable-system-hud">
         <div className="content-card">
           <p className="eyebrow">Stability shell</p>
