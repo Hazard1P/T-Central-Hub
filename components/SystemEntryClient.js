@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import SteamLoginHud from '@/components/SteamLoginHud';
 import SteamModeButtons from '@/components/SteamModeButtons';
-import SystemStatusStrip from '@/components/SystemStatusStrip';
 import MultiplayerHud from '@/components/MultiplayerHud';
 import SystemLauncher from '@/components/SystemLauncher';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
@@ -18,7 +17,7 @@ const SystemScene = dynamic(() => import('@/components/SystemScene'), {
 
 export default function SystemEntryClient() {
   const [entered, setEntered] = useState(false);
-  const [lobbyMode, setLobbyMode] = useState('hub');
+  const [lobbyMode, setLobbyMode] = useState(process.env.NEXT_PUBLIC_LOBBY_DEFAULT || 'private');
   const [steamUser, setSteamUser] = useState(null);
 
   useEffect(() => {
@@ -40,7 +39,6 @@ export default function SystemEntryClient() {
   return (
     <>
       <SteamLoginHud />
-      <SystemStatusStrip />
       {entered ? <SystemErrorBoundary><MultiplayerHud lobbyMode={lobbyMode} steamUser={steamUser} /></SystemErrorBoundary> : null}
       {entered ? (
         <SystemErrorBoundary>
