@@ -818,11 +818,12 @@ function MultiplayerPresenceMarkers({ players }) {
 
 
 function RoomPulse({ freeFly, remotePlayers }) {
+  const count = Array.isArray(remotePlayers) ? remotePlayers.length : 0;
   return (
     <div className={`room-pulse ${freeFly ? 'pilot' : 'spectate'}`}>
       <span className="pilot-assist-kicker">Room pulse</span>
       <strong>{freeFly ? 'Pilot lane active' : 'Spectate lane active'}</strong>
-      <p>{remotePlayers?.length || 0} remote player{(remotePlayers?.length || 0) === 1 ? '' : 's'} visible in the shared layer.</p>
+      <p>{count} remote player{count === 1 ? '' : 's'} visible in the shared layer.</p>
     </div>
   );
 }
@@ -839,7 +840,7 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         <button className="focus-close" onClick={onClose}>×</button>
       </div>
       <p className="muted">{item.description}</p>
-      <div className="focus-meta"><span>{item.address || item.sublabel}</span>{item.kind ? <span>{item.kind}</span> : null}</div>
+      <div className="focus-meta"><span>{item?.address || item?.sublabel || 'No address'}</span>{item?.kind ? <span>{item.kind}</span> : null}</div>
       {item.key && status ? (
         <div className="focus-status">
           <div className="status-row"><span>Status</span><strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong></div>
@@ -1087,6 +1088,7 @@ function Radar({ freeFly, target }) {
 }
 
 function CockpitOverlay({ freeFly, flightStats, selected }) {
+  const safeStats = flightStats || { position: [0,0,0], velocity: [0,0,0], speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation', mode: 'spectate' };
   return (
     <div className={`cockpit-overlay ${freeFly ? 'active' : ''}`}>
       <div className="cockpit-frame top-left" />
@@ -1097,18 +1099,18 @@ function CockpitOverlay({ freeFly, flightStats, selected }) {
       <div className="cockpit-panel left">
         <div className="panel-title">Navigation</div>
         <div className="panel-row"><span>Mode</span><strong>{freeFly ? 'Pilot' : 'Observer'}</strong></div>
-        <div className="panel-row"><span>Zone</span><strong>{flightStats.zone || '—'}</strong></div>
-        <div className="panel-row"><span>Pull</span><strong>{safeFlightStats.gravityTarget || '—'}</strong></div>
+        <div className="panel-row"><span>Zone</span><strong>{safeStats.zone || '—'}</strong></div>
+        <div className="panel-row"><span>Pull</span><strong>{safeStats.gravityTarget || '—'}</strong></div>
       </div>
 
       <div className="cockpit-panel right">
         <div className="panel-title">Flight</div>
-        <div className="panel-row"><span>Speed</span><strong>{Math.round(safeFlightStats.speed || 0)}</strong></div>
-        <div className="panel-row"><span>Boost</span><strong>{safeFlightStats.boosting ? 'Active' : 'Standby'}</strong></div>
+        <div className="panel-row"><span>Speed</span><strong>{Math.round(safeStats.speed || 0)}</strong></div>
+        <div className="panel-row"><span>Boost</span><strong>{safeStats.boosting ? 'Active' : 'Standby'}</strong></div>
         <div className="panel-row"><span>Target</span><strong>{selected?.label || 'None'}</strong></div>
       </div>
 
-      <Radar freeFly={freeFly} target={selected?.label || safeFlightStats.gravityTarget} />
+      <Radar freeFly={freeFly} target={selected?.label || safeStats.gravityTarget} />
 
       {freeFly ? (
         <>
@@ -1440,7 +1442,7 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
             personaname: steamUser.personaname || 'Steam user',
             avatar: steamUser.avatar || null,
             position: flightStats.position,
-            mode: flightStats.mode || (freeFly ? 'pilot' : 'spectate'),
+            mode: safeFlightStats.mode || (freeFly ? 'pilot' : 'spectate'),
             zone: safeFlightStats.zone || 'Navigation',
             updatedAt: Date.now(),
           },

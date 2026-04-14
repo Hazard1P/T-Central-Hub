@@ -423,3 +423,9 @@ Open:
 - Normalized scene flight updates before they enter the live UI/runtime
 - Guarded position-based broadcast logic against undefined state
 - Added `ProgressStagePanel` to mark the next stable build stage
+
+
+## Deployment hardening pass
+- Fixed helper-scope leaks where scene helpers referenced variables only defined in `SystemScene`
+- Hardened `CockpitOverlay`, `RoomPulse`, and `FocusPanel` against undefined runtime data
+- Reduced repeated deployment risk from undefined state during first render and lobby transitions

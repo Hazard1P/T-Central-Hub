@@ -11,7 +11,7 @@ function flattenPresence(state) {
 }
 
 export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalSteamUser = null }) {
-  const [steamUser, setSteamUser] = useState(externalSteamUser);
+  const [steamUser, setSteamUser] = useState(externalSteamUser || null);
   const [presenceUsers, setPresenceUsers] = useState([]);
   const [connected, setConnected] = useState(false);
   const [joined, setJoined] = useState(false);
