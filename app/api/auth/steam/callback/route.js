@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
+import { encryptJson } from '@/lib/security';
 
 function getBaseUrl(request) {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
   if (configured) return configured.replace(/\/$/, '');
+
   const origin = request.headers.get('origin');
   if (origin) return origin.replace(/\/$/, '');
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
-  const proto = request.headers.get('x-forwarded-proto') || 'https';
-  return `${proto}://${host}`;
-}
 
-function encodeSession(value) {
-  return Buffer.from(JSON.stringify(value), 'utf8').toString('base64url');
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
+  const inferredProto = host.includes('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
+  const proto = request.headers.get('x-forwarded-proto') || inferredProto;
+  return `${proto}://${host}`;
 }
 
 export async function GET(request) {
@@ -77,12 +77,13 @@ export async function GET(request) {
     }
   }
 
+  const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
   const response = NextResponse.redirect(redirectUrl);
   response.cookies.set({
     name: 'steam_session',
-    value: encodeSession(user),
+    value: encryptJson(user),
     httpOnly: true,
-    secure: true,
+    secure: !isLocalhost,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
