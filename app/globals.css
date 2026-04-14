@@ -3618,3 +3618,15 @@ button { font: inherit; }
     bottom: 470px;
   }
 }
+
+
+.system-runtime-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(4, 9, 16, 0.86);
+  backdrop-filter: blur(10px);
+}

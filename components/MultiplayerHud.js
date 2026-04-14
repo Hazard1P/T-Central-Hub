@@ -32,6 +32,7 @@ export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalS
   }, [externalSteamUser]);
 
   useEffect(() => {
+    if (externalSteamUser?.steamid) return;
     let active = true;
     fetch('/api/auth/steam/session', { cache: 'no-store' })
       .then((r) => r.json())
@@ -54,7 +55,14 @@ export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalS
       return;
     }
 
-    const supabase = getSupabaseClient();
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      setConnected(false);
+      setJoined(false);
+      return;
+    }
     if (!supabase || !steamUser?.steamid) return;
 
     const channel = supabase.channel(`presence:${ROOM_NAME}`, {

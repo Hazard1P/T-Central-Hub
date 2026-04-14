@@ -1325,6 +1325,7 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
   }, [externalSteamUser]);
 
   useEffect(() => {
+    if (externalSteamUser?.steamid) return;
     let active = true;
 
     fetch('/api/auth/steam/session', { cache: 'no-store' })
@@ -1368,7 +1369,13 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
       return;
     }
 
-    const supabase = getSupabaseClient();
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      setRemotePlayers([]);
+      return;
+    }
     if (!supabase || !steamUser?.steamid) return;
 
     const room = SYSTEM_RUNTIME.roomName;
@@ -1403,7 +1410,12 @@ export default function SystemScene({ lobbyMode = 'hub', steamUser: externalStea
   useEffect(() => {
     if (lobbyMode !== 'hub') return;
 
-    const supabase = getSupabaseClient();
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch {
+      return;
+    }
     if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
 
     const room = SYSTEM_RUNTIME.roomName;

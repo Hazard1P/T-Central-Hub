@@ -410,3 +410,9 @@ Open:
 - Restricted shared realtime presence to the public hub
 - Added a security baseline config for encryption/session expectations
 - Updated privacy policy and terms to reflect public/private lobby behavior
+
+
+## Runtime guard pass
+- Added `SystemErrorBoundary` around the live system launch path
+- Prevented duplicate Steam session fetches when a valid external Steam user is already present
+- Added guarded Supabase initialization in the HUD and SystemScene
