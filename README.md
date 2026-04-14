@@ -463,3 +463,26 @@ Open:
   - Steam Login <(multi-player)>
   - Steam Login <(single-player)>
 - Kept multiplayer/private mode switching tied to the Steam account context
+
+
+## Steam mode JSX fix
+- Escaped the Steam mode button labels so JSX no longer parses `<(` as markup.
+
+
+## Standalone anchor pass
+- Expanded the deep standalone blackhole into the permanent universe shell/anchor concept
+- Added `lib/anchorDescriptors.js` and `StandaloneAnchorPanel`
+- Strengthened the standalone blackhole visual weight inside the stable world
+- Added universe-shell copy so the anchor reads as the fabric layer holding instances and multiplayer together
+
+
+## Private-first Steam access pass
+- Steam-linked access now defaults to the private single-player world
+- Multiplayer is treated as an outward transition from the private anchored world
+- Updated Steam mode buttons and copy to reflect private-first access flow
+
+
+## NDSP anchor pass
+- Anchored the Synaptic Systems Dyson sphere to `https://synaptics.systems/ndsp`
+- Added account-scoped NDSP build anchor and build-hash generation for Steam-linked worlds
+- Keeps the build anchor scoped to the current lobby mode and Steam-linked identity context
