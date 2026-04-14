@@ -1,6 +1,10 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { decryptJson, encryptJson, signValue } from '@/lib/security';
+import { shouldUseSecureCookies } from '@/lib/runtimeConfig';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function POST(request) {
   const body = await request.json().catch(() => null);
@@ -52,7 +56,7 @@ export async function POST(request) {
     name: 'support_receipt',
     value: encryptJson(payload),
     httpOnly: true,
-    secure: true,
+    secure: shouldUseSecureCookies(request),
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 90,

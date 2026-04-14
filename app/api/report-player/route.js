@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { decryptJson } from '@/lib/security';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request) {
   const body = await request.json().catch(() => null);
   if (!body?.reportedPlayer || !body?.reason || !body?.evidence) {

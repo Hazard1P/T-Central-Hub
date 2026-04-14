@@ -1,3 +1,9 @@
+# T-Central Hub — Full Phase 3 Build
+
+This repository is the consolidated handoff that folds the earlier cleanup, infinite-layout, cinematic, gravity, session-sync, private-universe, and epoch-anchor passes into one working Next.js codebase.
+
+See `PHASE_3_HANDOFF.md` for the fastest setup and engine overview.
+
 # T-Central Hub Vercel System
 
 A full Next.js codebase for a Vercel-deployable interactive 3D game server hub.

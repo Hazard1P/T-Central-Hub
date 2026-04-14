@@ -1,6 +1,6 @@
 'use client';
 
-export default function LobbyModePanel({ lobbyMode, onChange, steamUser }) {
+export default function LobbyModePanel({ lobbyMode, onChange, steamUser, universe = null }) {
   const privateReady = Boolean(steamUser?.steamid);
 
   return (
@@ -36,6 +36,7 @@ export default function LobbyModePanel({ lobbyMode, onChange, steamUser }) {
         {steamUser?.steamid
           ? <span>Steam linked: private world can bind to this account.</span>
           : <span>Sign in with Steam to unlock the private world.</span>}
+        {universe?.privacy?.observanceScope ? <span>Observance scope: {universe.privacy.observanceScope}</span> : null}
       </div>
     </div>
   );
