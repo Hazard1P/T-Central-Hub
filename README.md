@@ -390,3 +390,9 @@ Open:
 - Extracted runtime settings into `lib/systemRuntime.js`
 - Added `RouteLegend` so the world composition is visible in the current game layer
 - Reduced direct scene-file ownership of layout/runtime data for a cleaner project baseline
+
+
+## Continue patching pass
+- Added `lib/worldHelpers.js` for cleaner world grouping/access
+- Added `WorldStructurePanel` to show the live layout in-system
+- Improved node-selection fallback and focus metadata handling

@@ -3326,3 +3326,63 @@ button { font: inherit; }
     bottom: 146px;
   }
 }
+
+
+.world-structure-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 236px;
+  z-index: 38;
+  width: min(340px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.66);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.structure-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.structure-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.structure-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.structure-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #eefbff;
+  font-size: 11px;
+}
+
+.structure-chip.matrix {
+  border-color: rgba(109,255,181,0.38);
+  color: #dffff1;
+}
+
+@media (max-width: 900px) {
+  .world-structure-panel {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: 266px;
+  }
+}

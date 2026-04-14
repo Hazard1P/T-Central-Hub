@@ -10,6 +10,7 @@ import { getSupabaseClient } from '@/lib/supabaseClient';
 import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
 import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
 import RouteLegend from '@/components/RouteLegend';
+import WorldStructurePanel from '@/components/WorldStructurePanel';
 import WorldGuide from '@/components/WorldGuide';
 import ServerRoutePanel from '@/components/ServerRoutePanel';
 import RoomObjectives from '@/components/RoomObjectives';
@@ -832,7 +833,7 @@ function FocusPanel({ item, statuses, onClose, onOpen }) {
         <button className="focus-close" onClick={onClose}>×</button>
       </div>
       <p className="muted">{item.description}</p>
-      <div className="focus-meta"><span>{item.address || item.sublabel}</span></div>
+      <div className="focus-meta"><span>{item.address || item.sublabel}</span>{item.kind ? <span>{item.kind}</span> : null}</div>
       {item.key && status ? (
         <div className="focus-status">
           <div className="status-row"><span>Status</span><strong>{status.online === true ? 'Online' : status.online === false ? 'Offline' : 'Unavailable'}</strong></div>
@@ -1435,6 +1436,7 @@ export default function SystemScene() {
   };
 
   const openNode = (item) => {
+    if (!item) return;
     const href = item.route || item.href;
     if (!href) return;
     if (item.key === 'arma3') {
@@ -1456,7 +1458,7 @@ export default function SystemScene() {
     setSelected({
       label: 'System Center',
       address: 'Navigation origin',
-      description: 'Centered back into the shared 3D web-game space. Select a node or move toward a blackhole to continue.',
+      description: 'Centered back into the shared 3D web-game space. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue.',
     });
     setResetTick((n) => n + 1);
   };
@@ -1482,6 +1484,7 @@ export default function SystemScene() {
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <ServerRoutePanel selected={selected} />
       <RouteLegend />
+      <WorldStructurePanel />
       <RoomObjectives />
       <WorldGuide />
       <RoomPulse freeFly={freeFly} remotePlayers={remotePlayers} />
