@@ -1,6 +1,6 @@
-import Image from 'next/image';
 import PageShell from '@/components/PageShell';
 import ServerConnectActions from '@/components/ServerConnectActions';
+import ProceduralRoutePreview from '@/components/ProceduralRoutePreview';
 
 export const metadata = { title: 'Arma3 CTH' };
 
@@ -50,14 +50,7 @@ export default function ArmaPage() {
         </article>
 
         <article className="content-card arma-hero-image-card">
-          <Image
-            src="/arma-cth-shot.png"
-            alt="Arma 3 CTH map and command reference"
-            width={1366}
-            height={1024}
-            className="page-image"
-            priority
-          />
+          <ProceduralRoutePreview title="Arma 3 CTH" accent="#8cf6ff" detail="Computed battlefield route panel" />
         </article>
       </div>
 
@@ -78,7 +71,7 @@ export default function ArmaPage() {
           <div className="arma-highlight">
             <strong>Current map and field reference</strong>
             <p className="muted">
-              This page restores the Altis battlefield image so players have a quick visual reference for the Arma3 CTH environment before joining.
+              This page renders a generated tactical observance panel so players get route context without relying on static imagery.
             </p>
           </div>
           <div className="arma-highlight">
@@ -102,20 +95,14 @@ export default function ArmaPage() {
 
       <div className="arma-entry-grid">
         <article className="content-card arma-hero-image-card">
-          <Image
-            src="/arma-cth-shot.png"
-            alt="Uploaded Arma reference photo"
-            width={1366}
-            height={1024}
-            className="page-image"
-          />
+          <ProceduralRoutePreview title="Altis Route" accent="#7fffd4" detail="Generated tactical observance layer" />
         </article>
 
         <article className="content-card">
-          <p className="eyebrow">Altis map reference</p>
+          <p className="eyebrow">Altis route reference</p>
           <h3>Additional battlefield reference</h3>
           <p className="muted">
-            This keeps the Arma3 route visually aligned around the Altis battlefield map for a cleaner and more consistent server entry.
+            This keeps the Arma3 route aligned around a generated battlefield observance layer for a cleaner and more consistent server entry.
           </p>
           <div className="server-inline-meta">
             <span>Server IP: tcentral.game.nfoservers.com:2302</span>

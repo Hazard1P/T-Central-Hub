@@ -1,7 +1,11 @@
 import './globals.css';
+import { SteamSessionProvider } from '@/components/SteamSessionProvider';
+import { getSiteUrl } from '@/lib/runtimeConfig';
+
+const siteUrl = getSiteUrl();
 
 export const metadata = {
-  metadataBase: new URL('https://t-central.me'),
+  metadataBase: new URL(siteUrl),
   title: 'T-Central Hub',
   description: 'Interactive game server and web-game hub for T-Central.',
   alternates: {
@@ -10,7 +14,7 @@ export const metadata = {
   openGraph: {
     title: 'T-Central Hub',
     description: 'Interactive game server and web-game hub for T-Central.',
-    url: 'https://t-central.me',
+    url: siteUrl,
     siteName: 'T-Central Hub',
     type: 'website',
   },
@@ -19,7 +23,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SteamSessionProvider>{children}</SteamSessionProvider>
+      </body>
     </html>
   );
 }

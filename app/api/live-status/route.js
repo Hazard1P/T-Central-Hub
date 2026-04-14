@@ -1,5 +1,8 @@
 import { mergeStatusesWithDefaults } from '@/lib/serverData';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   const url = process.env.STATUS_SOURCE_URL;
 
@@ -23,10 +26,11 @@ export async function GET() {
     }
 
     const data = await res.json();
+    const payload = data?.statuses && typeof data.statuses === 'object' ? data.statuses : {};
     return Response.json({
       ok: true,
       mode: 'remote',
-      statuses: mergeStatusesWithDefaults(data.statuses || {}),
+      statuses: mergeStatusesWithDefaults(payload),
     });
   } catch (error) {
     return Response.json({
