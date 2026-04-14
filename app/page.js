@@ -1,12 +1,36 @@
 import SteamLoginHud from '@/components/SteamLoginHud';
 
+const launchCards = [
+  {
+    kicker: 'Deep-space anchor',
+    title: 'Mapped blackhole routing',
+    copy: 'The deep-space blackhole reuses the project map and anchor assets so the visual language stays consistent across the world.',
+    image: '/cosmic-map.jpg',
+  },
+  {
+    kicker: 'Arma3 route',
+    title: 'Server-entry blackhole',
+    copy: 'Arma3 remains one of the primary destination wells with direct routing, live server detail pages, and anchored world presence.',
+    image: '/arma-cth-shot.png',
+  },
+  {
+    kicker: 'Shared shell',
+    title: 'Unified asset presentation',
+    copy: 'Panels, overlays, route cards, and blackhole anchors now share the same polished cosmic treatment for cleaner deployment.',
+    image: '/blackhole-anchor.jpg',
+  },
+];
+
 export default function HomePage() {
   return (
-    <main className="entry-page">
+    <main className="entry-page cosmic-entry-page">
       <SteamLoginHud />
       <div className="cosmic-overlay" />
+      <div className="entry-orbit entry-orbit-a" />
+      <div className="entry-orbit entry-orbit-b" />
+
       <section className="entry-shell">
-        <div className="entry-copy cosmic-hero-panel" style={{ padding: '22px', borderRadius: '24px' }}>
+        <div className="entry-copy cosmic-hero-panel entry-hero-panel">
           <p className="eyebrow">T-Central Hub</p>
           <h1>Enter the live 3D multiplayer server-space.</h1>
           <p className="muted">
@@ -20,6 +44,12 @@ export default function HomePage() {
             <a className="button secondary" href="/donate">Support</a>
           </div>
 
+          <div className="entry-status-bar">
+            <span>Deep-space anchor online</span>
+            <span>Steam layer ready</span>
+            <span>Blackhole routes stable</span>
+          </div>
+
           <div className="entry-link-row">
             <a href="/privacy-policy">Privacy policy</a>
             <a href="/terms-and-conditions">Terms and conditions</a>
@@ -28,24 +58,28 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="entry-panel-grid">
-          <article className="content-card entry-panel">
-            <span className="entry-panel-kicker">Live 3D system</span>
-            <strong>Shared navigation space</strong>
-            <p>Players can enter the same world, fly, spectate, and interact with blackholes as destination systems.</p>
-          </article>
+        <div className="entry-visual-stack">
+          <div className="entry-map-card">
+            <div className="entry-map-card-copy">
+              <span className="entry-panel-kicker">Primary visual anchor</span>
+              <strong>Deep-space map integration</strong>
+              <p>The existing cosmic map now leads the visual stack so the home shell matches the world anchor strategy.</p>
+            </div>
+            <img src="/cosmic-map.jpg" alt="Deep-space project map" />
+          </div>
 
-          <article className="content-card entry-panel">
-            <span className="entry-panel-kicker">Pilot + spectate</span>
-            <strong>Two clear roles</strong>
-            <p>Fly directly in pilot mode or move through the system as an observer while watching the active player base.</p>
-          </article>
-
-          <article className="content-card entry-panel">
-            <span className="entry-panel-kicker">100-slot target</span>
-            <strong>Multiplayer baseline</strong>
-            <p>The package is prepared for a 100-slot realtime room model through a Supabase-backed presence layer.</p>
-          </article>
+          <div className="entry-panel-grid enhanced">
+            {launchCards.map((card) => (
+              <article className="content-card entry-panel polished" key={card.title}>
+                <div className="entry-panel-media">
+                  <img src={card.image} alt={card.title} />
+                </div>
+                <span className="entry-panel-kicker">{card.kicker}</span>
+                <strong>{card.title}</strong>
+                <p>{card.copy}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </main>

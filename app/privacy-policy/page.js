@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
           <p className="eyebrow">Private world</p>
           <h3>Scoped personal state</h3>
           <p className="muted">
-            Private world state should remain isolated to the linked Steam account, and this private world is the default entry state before any outward move into the shared multiplayer hub. Sensitive private state should be encrypted at rest and transported only over secure sessions.
+            Private world state should remain isolated to the linked Steam account. Sensitive private state should be encrypted at rest and transported only over secure sessions.
           </p>
         </article>
       </div>
