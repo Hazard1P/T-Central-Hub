@@ -435,3 +435,10 @@ Open:
 - Added `StableSystemWorld` as a simplified 3D route shell
 - Kept the main blackholes, Dyson spheres, and solar system online
 - Switched the `/system` launch path to the safer shell while heavier runtime work continues
+
+
+## Continue building from shell
+- Added `StableNodePanel` for richer route interaction inside the stable shell
+- Added top world summary chips to reinforce current layout and lobby mode
+- Added visible solar orbit guides in the stable world
+- Kept route opening deliberate by selecting first, then opening from the panel

@@ -3745,3 +3745,50 @@ button { font: inherit; }
     top: 236px;
   }
 }
+
+
+.stable-system-summary {
+  position: fixed;
+  left: 50%;
+  top: 156px;
+  transform: translateX(-50%);
+  z-index: 48;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: min(900px, calc(100vw - 28px));
+}
+
+.stable-system-summary span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(7, 12, 20, 0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #eefbff;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+}
+
+.stable-node-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.button-column {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .stable-system-summary {
+    top: 196px;
+    width: calc(100vw - 20px);
+  }
+}

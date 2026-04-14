@@ -7,15 +7,16 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { WORLD_LAYOUT } from '@/lib/worldLayout';
 import { getPrivateWorldKey } from '@/lib/securityConfig';
+import StableNodePanel from '@/components/StableNodePanel';
 
-function NodeVisual({ node, onOpen }) {
+function NodeVisual({ node, onSelect }) {
   const isBlackhole = node.kind === 'blackhole';
   const isDyson = node.kind === 'dyson';
   const isSolar = node.kind === 'solar';
 
   return (
     <group position={node.position || [0, 0, 0]}>
-      <mesh onClick={() => onOpen(node)} scale={isBlackhole ? 1.2 : isDyson ? 1.05 : isSolar ? 1.35 : 0.75}>
+      <mesh onClick={() => onSelect(node)} scale={isBlackhole ? 1.2 : isDyson ? 1.05 : isSolar ? 1.35 : 0.75}>
         {isBlackhole ? (
           <torusGeometry args={[0.95, 0.26, 20, 64]} />
         ) : isDyson ? (
@@ -42,7 +43,7 @@ function NodeVisual({ node, onOpen }) {
       ) : null}
 
       <Html center distanceFactor={14} position={[0, isSolar ? 1.8 : 1.45, 0]}>
-        <button className="stable-node-label" onClick={() => onOpen(node)}>
+        <button className="stable-node-label" onClick={() => onSelect(node)}>
           <strong>{node.label}</strong>
           <span>{node.kind}</span>
         </button>
@@ -51,7 +52,7 @@ function NodeVisual({ node, onOpen }) {
   );
 }
 
-function StableSceneContent({ onOpen }) {
+function StableSceneContent({ onSelect }) {
   const nodes = useMemo(
     () => WORLD_LAYOUT.filter((node) => ['blackhole', 'dyson', 'solar'].includes(node.kind)),
     []
@@ -71,8 +72,17 @@ function StableSceneContent({ onOpen }) {
         <meshBasicMaterial color="#071019" transparent opacity={0.45} />
       </mesh>
 
+      <group position={[7.4, 2.2, 5.0]}>
+        {[2.2, 3.4, 4.8].map((radius) => (
+          <mesh key={radius} rotation={[Math.PI / 2, 0, 0]} className="solar-orbit-guide">
+            <torusGeometry args={[radius, 0.02, 6, 80]} />
+            <meshBasicMaterial color="#ffd46b" transparent opacity={0.24} />
+          </mesh>
+        ))}
+      </group>
+
       {nodes.map((node) => (
-        <NodeVisual key={node.key} node={node} onOpen={onOpen} />
+        <NodeVisual key={node.key} node={node} onSelect={onSelect} />
       ))}
 
       <OrbitControls enablePan={false} minDistance={14} maxDistance={55} />
@@ -97,6 +107,7 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
 
   return (
     <div className="stable-system-page">
+      <div className="stable-system-summary"><span>5 blackholes</span><span>3 Dyson spheres</span><span>1 solar system</span><span>{lobbyMode === 'hub' ? 'Multiplayer hub' : 'Private world'}</span></div>
       <div className="stable-system-hud">
         <div className="content-card">
           <p className="eyebrow">Stability shell</p>
@@ -109,22 +120,17 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null 
             <span>{steamUser?.personaname || 'Guest'}</span>
           </div>
         </div>
-        {selected ? (
-          <div className="content-card">
-            <p className="eyebrow">Selected route</p>
-            <h3>{selected.label}</h3>
-            <p className="muted">{selected.description}</p>
-            <div className="focus-meta">
-              <span>{selected.address}</span>
-              <span>{selected.kind}</span>
-            </div>
-          </div>
-        ) : null}
+        <StableNodePanel
+          selected={selected}
+          lobbyMode={lobbyMode}
+          onClose={() => setSelected(null)}
+          onOpen={handleOpen}
+        />
       </div>
 
       <div className="stable-world-canvas">
         <Canvas camera={{ position: [0, 8, 24], fov: 48 }}>
-          <StableSceneContent onOpen={handleOpen} />
+          <StableSceneContent onSelect={setSelected} />
         </Canvas>
       </div>
     </div>
