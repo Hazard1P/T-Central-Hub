@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import SteamLoginHud from '@/components/SteamLoginHud';
 import SystemStatusStrip from '@/components/SystemStatusStrip';
 import SystemLauncher from '@/components/SystemLauncher';
@@ -9,12 +8,6 @@ import LobbyModePanel from '@/components/LobbyModePanel';
 import SystemErrorBoundary from '@/components/SystemErrorBoundary';
 import StableSystemWorld from '@/components/StableSystemWorld';
 import SystemNewsInfoPanel from '@/components/SystemNewsInfoPanel';
-import { ROUTE_CHIPS } from '@/lib/worldLayout';
-
-const SystemScene = dynamic(() => import('@/components/SystemScene'), {
-  ssr: false,
-  loading: () => <div className="system-loading">Initializing navigation system…</div>,
-});
 
 export default function SystemEntryClient() {
   const [entered, setEntered] = useState(false);

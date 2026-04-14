@@ -1,31 +1,19 @@
 import Link from 'next/link';
+import { SERVER_DEFINITIONS } from '@/lib/serverData';
 
-const cards = [
-  {
-    title: 'Arma3 Capture the Hill',
-    meta: 'tcentral.game.nfoservers.com:2302',
-    text: 'Battlefield-focused page with direct connect details, tactical presentation, and room for future events.',
-    href: '/servers/arma3-cth'
-  },
-  {
-    title: 'Rust Vanilla Bi-Weekly Wipe',
-    meta: 'tcentralrust.game.nfoservers.com:28015',
-    text: 'Bi-weekly Rust server with a procedural map and room for future wipe and community updates.',
-    href: '/servers/rust-vanilla'
-  },
-  {
-    title: 'Rust Vanilla Monthly Wipe',
-    meta: 'tcentralrust3.game.nfoservers.com:28015',
-    text: 'Monthly Rust server built for longer progression, a steadier rhythm, and a simpler way for players to find the right wipe cadence.',
-    href: '/servers/rust-monthly'
-  },
-  {
-    title: 'Rust Vanilla Weekly Wipe',
-    meta: 'tcentralrust2.game.nfoservers.com:28015',
-    text: 'Weekly Rust server for players who want faster reset cycles, fresh starts, and a quick route into a new procedural map.',
-    href: '/servers/rust-weekly'
-  }
-];
+const cards = SERVER_DEFINITIONS.filter((server) => server.slug !== 'rust-biweekly').map((server) => ({
+  title: server.slug === 'rust-vanilla' ? 'Rust Vanilla Bi-Weekly Wipe' : server.title,
+  meta: server.ip,
+  text:
+    server.slug === 'arma3-cth'
+      ? 'Battlefield-focused page with direct connect details, tactical presentation, and room for future events.'
+      : server.slug === 'rust-monthly'
+        ? 'Monthly Rust server built for longer progression, a steadier rhythm, and a simpler way for players to find the right wipe cadence.'
+        : server.slug === 'rust-weekly'
+          ? 'Weekly Rust server for players who want faster reset cycles, fresh starts, and a quick route into a new procedural map.'
+          : 'Bi-weekly Rust server with a procedural map and room for future wipe and community updates.',
+  href: server.href,
+}));
 
 export default function ServerCards() {
   return (
