@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import PageShell from '@/components/PageShell';
 import ServerConnectActions from '@/components/ServerConnectActions';
+import ProceduralRoutePreview from '@/components/ProceduralRoutePreview';
 import { getRelatedServers } from '@/lib/serverData';
 
 export default function ServerDetailStats({ server }) {
@@ -33,7 +34,7 @@ export default function ServerDetailStats({ server }) {
         </article>
 
         <article className="content-card arma-hero-image-card">
-          <img src={server.image || '/blackhole-anchor.jpg'} alt={`${server.title} route visual`} className="page-image" />
+          <ProceduralRoutePreview title={server.title} accent={server.color || '#7dd3fc'} detail={server.summary} />
         </article>
       </div>
 

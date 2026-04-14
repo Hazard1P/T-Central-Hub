@@ -984,8 +984,10 @@ function Arma3BlackholeInterior({ item, statuses, onClose }) {
                 <article className="browser-brief-card browser-map-card">
                   <span className="interior-step">Altis reference</span>
                   <h3>Battlefield map</h3>
-                  <div className="browser-map-media">
-                    <img src="/arma-cth-shot.png" alt="Altis Arma 3 battlefield preview" className="browser-map-image" />
+                  <div className="browser-map-media procedural-browser-map">
+                    <div className="procedural-browser-map-core" />
+                    <div className="procedural-browser-map-ring" />
+                    <div className="procedural-browser-map-grid" />
                   </div>
                 </article>
               </div>

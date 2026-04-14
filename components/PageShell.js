@@ -6,6 +6,8 @@ export default function PageShell({ eyebrow, title, text, children }) {
       <div className="content-backdrop" />
       <div className="content-bubbles">
         <Link href="/" className="bubble-link">Return to Hub</Link>
+        <Link href="/about" className="bubble-link">About</Link>
+        <Link href="/contact" className="bubble-link">Contact</Link>
         <Link href="/donate" className="bubble-link">Donate</Link>
         <Link href="/report-player" className="bubble-link">Report</Link>
       </div>
