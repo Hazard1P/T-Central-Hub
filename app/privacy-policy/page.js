@@ -7,28 +7,28 @@ export default function PrivacyPolicyPage() {
     <PageShell
       eyebrow="Privacy policy"
       title="Privacy policy"
-      text="This policy explains the core data used by the T-Central website, Steam-linked sign-in flow, support-link state, and multiplayer presence features."
+      text="This policy explains the core data used by the T-Central website, Steam-linked sign-in flow, multiplayer hub presence, private world isolation, and connected route portals."
     >
       <div className="arma-brief-grid">
         <article className="content-card">
           <p className="eyebrow">Steam sign-in</p>
           <h3>Identity data</h3>
           <p className="muted">
-            When you sign in with Steam, the system may store your SteamID, display name, profile URL, and avatar for session and interface purposes.
+            When you sign in with Steam, the system may process your SteamID, display name, profile URL, and avatar for session, lobby, and route-interface purposes.
           </p>
         </article>
         <article className="content-card">
-          <p className="eyebrow">Realtime system</p>
-          <h3>Presence and movement</h3>
+          <p className="eyebrow">Multiplayer hub</p>
+          <h3>Shared room presence</h3>
           <p className="muted">
-            Multiplayer features may use presence data and lightweight live state such as current room, display name, and in-system movement markers.
+            The public multiplayer hub may process lightweight shared presence data such as room membership, flight role, and in-system movement markers for Steam-linked users.
           </p>
         </article>
         <article className="content-card">
-          <p className="eyebrow">Support status</p>
-          <h3>Linked support state</h3>
+          <p className="eyebrow">Private world</p>
+          <h3>Scoped personal state</h3>
           <p className="muted">
-            If support is linked to your Steam identity, the app may store encrypted support receipt data for in-app supporter status and related features.
+            Private world state should remain isolated to the linked Steam account. Sensitive private state should be encrypted at rest and transported only over secure sessions.
           </p>
         </article>
       </div>

@@ -3511,3 +3511,110 @@ button { font: inherit; }
     width: auto;
   }
 }
+
+
+.lobby-mode-panel {
+  position: fixed;
+  left: 50%;
+  top: 116px;
+  transform: translateX(-50%);
+  z-index: 44;
+  width: min(760px, calc(100vw - 28px));
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.lobby-mode-copy, .lobby-mode-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lobby-mode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.security-standards-panel {
+  position: fixed;
+  left: 18px;
+  top: 236px;
+  z-index: 38;
+  width: min(320px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(7, 12, 20, 0.66);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.security-standard-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.security-standard-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.security-standard-item span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.security-standard-item strong {
+  font-size: 11px;
+}
+
+.security-standards-copy, .private-world-banner {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.private-world-banner {
+  position: fixed;
+  right: 18px;
+  top: 196px;
+  z-index: 38;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(7, 12, 20, 0.68);
+  border: 1px solid rgba(109,255,181,0.18);
+  color: #dffff1;
+}
+
+@media (max-width: 900px) {
+  .lobby-mode-panel {
+    top: 152px;
+    width: calc(100vw - 20px);
+  }
+  .security-standards-panel {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 506px;
+    width: auto;
+  }
+  .private-world-banner {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 470px;
+  }
+}

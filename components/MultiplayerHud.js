@@ -10,8 +10,8 @@ function flattenPresence(state) {
   return Object.values(state || {}).flatMap((entries) => entries || []);
 }
 
-export default function MultiplayerHud() {
-  const [steamUser, setSteamUser] = useState(null);
+export default function MultiplayerHud({ lobbyMode = 'hub', steamUser: externalSteamUser = null }) {
+  const [steamUser, setSteamUser] = useState(externalSteamUser);
   const [presenceUsers, setPresenceUsers] = useState([]);
   const [connected, setConnected] = useState(false);
   const [joined, setJoined] = useState(false);
@@ -26,6 +26,10 @@ export default function MultiplayerHud() {
     slotsLeft,
     safetyInNumbers: slotCount >= 2,
   }), [slotCount, slotsLeft]);
+
+  useEffect(() => {
+    setSteamUser(externalSteamUser || null);
+  }, [externalSteamUser]);
 
   useEffect(() => {
     let active = true;
@@ -43,6 +47,13 @@ export default function MultiplayerHud() {
   }, []);
 
   useEffect(() => {
+    if (lobbyMode !== 'hub') {
+      setConnected(false);
+      setJoined(false);
+      setPresenceUsers([]);
+      return;
+    }
+
     const supabase = getSupabaseClient();
     if (!supabase || !steamUser?.steamid) return;
 
@@ -84,7 +95,7 @@ export default function MultiplayerHud() {
       channel.untrack();
       supabase.removeChannel(channel);
     };
-  }, [steamUser]);
+  }, [steamUser, lobbyMode]);
 
   return (
     <div className="multiplayer-hud">
@@ -98,8 +109,8 @@ export default function MultiplayerHud() {
 
         <div className="multiplayer-grid">
           <div className="multiplayer-stat">
-            <span>Room</span>
-            <strong>{summary.room}</strong>
+            <span>{lobbyMode === 'hub' ? 'Room' : 'World'}</span>
+            <strong>{lobbyMode === 'hub' ? summary.room : (steamUser?.steamid ? `private:${steamUser.steamid}` : 'private:guest')}</strong>
           </div>
           <div className="multiplayer-stat">
             <span>Players</span>
@@ -116,7 +127,9 @@ export default function MultiplayerHud() {
         </div>
 
         <div className="multiplayer-presence">
-          {steamUser ? (
+          {lobbyMode === 'private' ? (
+            <p className="multiplayer-note">You are in a Steam-scoped private world. Shared multiplayer presence is disconnected, but route portals remain available.</p>
+          ) : steamUser ? (
             joined ? <p className="multiplayer-note">You are inside the live web-game server layer as <strong>{steamUser.personaname || 'Steam user'}</strong>.</p>
                    : <p className="multiplayer-note">Steam linked, but the room is full or unavailable.</p>
           ) : (

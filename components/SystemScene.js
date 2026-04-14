@@ -10,12 +10,14 @@ import { getSupabaseClient } from '@/lib/supabaseClient';
 import { WORLD_LAYOUT as NODES } from '@/lib/worldLayout';
 import { SYSTEM_RUNTIME, isMobileViewport, shouldReduceScene } from '@/lib/systemRuntime';
 import RouteLegend from '@/components/RouteLegend';
+import { getPrivateWorldKey } from '@/lib/securityConfig';
 import WorldStructurePanel from '@/components/WorldStructurePanel';
 import NodeCountsPanel from '@/components/NodeCountsPanel';
 import SystemConsolePanel from '@/components/SystemConsolePanel';
 import WorldGuide from '@/components/WorldGuide';
 import ServerRoutePanel from '@/components/ServerRoutePanel';
 import RoomObjectives from '@/components/RoomObjectives';
+import SecurityStandardsPanel from '@/components/SecurityStandardsPanel';
 
 function formatStatus(status) {
   if (!status) return 'Status unavailable';
@@ -1290,7 +1292,7 @@ function SystemOverlay({ loading, mode, freeFly }) {
   );
 }
 
-export default function SystemScene() {
+export default function SystemScene({ lobbyMode = 'hub', steamUser: externalSteamUser = null }) {
   const router = useRouter();
   const [statuses, setStatuses] = useState({});
   const [selected, setSelected] = useState(null);
@@ -1302,7 +1304,7 @@ export default function SystemScene() {
   const [flightStats, setFlightStats] = useState({ speed: 0, boosting: false, boostLevel: 100, gravityTarget: 'None', zone: 'Navigation' });
   const [introVisible, setIntroVisible] = useState(true);
   const [activeInterior, setActiveInterior] = useState(null);
-  const [steamUser, setSteamUser] = useState(null);
+  const [steamUser, setSteamUser] = useState(externalSteamUser);
   const [remotePlayers, setRemotePlayers] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [reducedScene, setReducedScene] = useState(false);
@@ -1317,6 +1319,10 @@ export default function SystemScene() {
     window.addEventListener('resize', updateMobile);
     return () => window.removeEventListener('resize', updateMobile);
   }, []);
+
+  useEffect(() => {
+    setSteamUser(externalSteamUser || null);
+  }, [externalSteamUser]);
 
   useEffect(() => {
     let active = true;
@@ -1357,6 +1363,11 @@ export default function SystemScene() {
 
 
   useEffect(() => {
+    if (lobbyMode !== 'hub') {
+      setRemotePlayers([]);
+      return;
+    }
+
     const supabase = getSupabaseClient();
     if (!supabase || !steamUser?.steamid) return;
 
@@ -1387,9 +1398,11 @@ export default function SystemScene() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [steamUser]);
+  }, [steamUser, lobbyMode]);
 
   useEffect(() => {
+    if (lobbyMode !== 'hub') return;
+
     const supabase = getSupabaseClient();
     if (!supabase || !steamUser?.steamid || !flightStats?.position) return;
 
@@ -1422,7 +1435,7 @@ export default function SystemScene() {
       if (timer) window.clearInterval(timer);
       supabase.removeChannel(channel);
     };
-  }, [steamUser, flightStats, freeFly]);
+  }, [steamUser, flightStats, freeFly, lobbyMode]);
 
   const executeWarp = (item) => {
     const href = item.route || item.href;
@@ -1460,7 +1473,7 @@ export default function SystemScene() {
     setSelected({
       label: 'System Center',
       address: 'Navigation origin',
-      description: 'Centered back into the shared 3D web-game space. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue through the world layout.',
+      description: `Centered back into the ${lobbyMode === 'hub' ? 'shared multiplayer hub' : 'private Steam-scoped world'}. Select one of the 5 blackholes, 3 Dyson spheres, or the solar system to continue through the world layout.`,
     });
     setResetTick((n) => n + 1);
   };
@@ -1485,8 +1498,10 @@ export default function SystemScene() {
       <SystemOverlay loading={loading} mode={mode} freeFly={freeFly} />
       <PilotAssistPanel freeFly={freeFly} isMobile={isMobile} />
       <SystemConsolePanel mode={mode} freeFly={freeFly} />
+      <SecurityStandardsPanel />
       <ServerRoutePanel selected={selected} />
       <RouteLegend />
+      {lobbyMode === 'private' ? <div className="private-world-banner">Private world key: {getPrivateWorldKey(steamUser?.steamid)}</div> : null}
       <WorldStructurePanel />
       <NodeCountsPanel />
       <RoomObjectives />

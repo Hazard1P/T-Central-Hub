@@ -402,3 +402,11 @@ Open:
 - Added `lib/worldDescriptors.js` for higher-level world summaries and featured routes
 - Added `NodeCountsPanel` and `SystemConsolePanel` to strengthen the live-world structure
 - Continued moving the project toward a cleaner internal-system baseline while preserving the current 3D environment
+
+
+## Lobby + security pass
+- Added explicit Multiplayer Hub and Private World lobby modes
+- Kept route portals available in both modes
+- Restricted shared realtime presence to the public hub
+- Added a security baseline config for encryption/session expectations
+- Updated privacy policy and terms to reflect public/private lobby behavior
