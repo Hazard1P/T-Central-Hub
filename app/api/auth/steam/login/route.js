@@ -1,20 +1,15 @@
 import { NextResponse } from 'next/server';
+import { getSteamAuthBaseUrl } from '@/lib/steamAuthUrl';
 
-function getBaseUrl(request) {
-  const configured = process.env.NEXT_PUBLIC_APP_URL;
-  if (configured) return configured.replace(/\/$/, '');
+export async function GET() {
+  let baseUrl;
 
-  const origin = request.headers.get('origin');
-  if (origin) return origin.replace(/\/$/, '');
+  try {
+    baseUrl = getSteamAuthBaseUrl();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
-  const inferredProto = host.includes('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
-  const proto = request.headers.get('x-forwarded-proto') || inferredProto;
-  return `${proto}://${host}`;
-}
-
-export async function GET(request) {
-  const baseUrl = getBaseUrl(request);
   const returnTo = `${baseUrl}/api/auth/steam/callback`;
 
   const params = new URLSearchParams({
