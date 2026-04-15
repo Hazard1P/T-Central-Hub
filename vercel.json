@@ -24,7 +24,7 @@
   ],
   "functions": {
     "app/api/**/route.js": {
-      "runtime": "nodejs24.x"
+      "runtime": "nodejs18.x"
     }
   }
 }
