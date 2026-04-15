@@ -151,6 +151,7 @@ async function verifyPayPalIdentifier({ identifier, identifierType, steamid }) {
 }
 
 export async function POST(request) {
+  const useSecureCookies = shouldUseSecureCookies(request);
   const body = await request.json().catch(() => null);
   const planId = body?.planId || null;
 
@@ -248,7 +249,7 @@ export async function POST(request) {
     name: 'support_receipt',
     value: encryptJson(payload),
     httpOnly: true,
-    secure: true,
+    secure: useSecureCookies,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 90,
