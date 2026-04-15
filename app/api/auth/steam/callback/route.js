@@ -73,7 +73,6 @@ export async function GET(request) {
   }
 
   const response = NextResponse.redirect(redirectUrl);
-  const secure = shouldUseSecureCookies(request);
   response.cookies.set({
     name: 'steam_session',
     value: encryptJson(user),
