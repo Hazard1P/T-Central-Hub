@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { encryptJson } from '@/lib/security';
+import { shouldUseSecureCookies } from '@/lib/runtimeConfig';
 
 function getBaseUrl(request) {
   const configured = process.env.NEXT_PUBLIC_APP_URL;
@@ -77,13 +78,13 @@ export async function GET(request) {
     }
   }
 
-  const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  const useSecureCookies = shouldUseSecureCookies(request);
   const response = NextResponse.redirect(redirectUrl);
   response.cookies.set({
     name: 'steam_session',
     value: encryptJson(user),
     httpOnly: true,
-    secure: !isLocalhost,
+    secure: useSecureCookies,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,

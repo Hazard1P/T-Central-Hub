@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { decryptJson, encryptJson, signValue } from '@/lib/security';
+import { shouldUseSecureCookies } from '@/lib/runtimeConfig';
 
 export async function POST(request) {
+  const useSecureCookies = shouldUseSecureCookies(request);
   const body = await request.json().catch(() => null);
   const subscriptionId = body?.subscriptionId;
   const provider = body?.provider || 'paypal';
@@ -52,7 +54,7 @@ export async function POST(request) {
     name: 'support_receipt',
     value: encryptJson(payload),
     httpOnly: true,
-    secure: true,
+    secure: useSecureCookies,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 90,
