@@ -46,6 +46,8 @@ Expected remote JSON shape:
 ```
 
 ## Local development
+Node.js requirement: **20.x or 22.x** (project engines: `>=20 <23`).
+
 ```bash
 npm install
 npm run dev
@@ -57,8 +59,9 @@ Open:
 ## Deploy to Vercel
 1. Upload the folder to GitHub.
 2. Import the repo into Vercel.
-3. Deploy with default settings.
-4. Optionally add `STATUS_SOURCE_URL` as an environment variable if you later build or connect a real status source.
+3. Set Node.js to **20.x** (or another runtime inside `>=20 <23`).
+4. Deploy.
+5. Optionally add `STATUS_SOURCE_URL` as an environment variable if you later build or connect a real status source.
 
 ## Routes
 - `/`
