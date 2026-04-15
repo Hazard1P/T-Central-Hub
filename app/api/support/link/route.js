@@ -244,6 +244,7 @@ export async function POST(request) {
       reference: payload.reference,
     },
   });
+  const secure = shouldUseSecureCookies(request);
 
   response.cookies.set({
     name: 'support_receipt',
