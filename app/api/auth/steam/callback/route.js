@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 import { encryptJson } from '@/lib/security';
-import { getRequestBaseUrl, shouldUseSecureCookies } from '@/lib/runtimeConfig';
+import { getSteamAuthBaseUrl, shouldUseSecureSteamCookie } from '@/lib/steamAuthUrl';
 
 export async function GET(request) {
+  let baseUrl;
+
+  try {
+    baseUrl = getSteamAuthBaseUrl();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   const url = new URL(request.url);
   const params = url.searchParams;
 
@@ -22,7 +30,6 @@ export async function GET(request) {
   const verifyText = await verifyRes.text();
   const valid = verifyRes.ok && verifyText.includes('is_valid:true');
 
-  const baseUrl = getRequestBaseUrl(request);
   const redirectUrl = new URL(baseUrl);
 
   if (!valid) {
@@ -70,7 +77,7 @@ export async function GET(request) {
     name: 'steam_session',
     value: encryptJson(user),
     httpOnly: true,
-    secure: shouldUseSecureCookies(request),
+    secure: shouldUseSecureSteamCookie(baseUrl),
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,

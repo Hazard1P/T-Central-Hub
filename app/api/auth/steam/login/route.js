@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getRequestBaseUrl } from '@/lib/runtimeConfig';
+import { getSteamAuthBaseUrl } from '@/lib/steamAuthUrl';
 
-export async function GET(request) {
-  const baseUrl = getRequestBaseUrl(request);
+export async function GET() {
+  let baseUrl;
+
+  try {
+    baseUrl = getSteamAuthBaseUrl();
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   const returnTo = `${baseUrl}/api/auth/steam/callback`;
 
   const params = new URLSearchParams({
