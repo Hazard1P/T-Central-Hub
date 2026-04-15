@@ -27,7 +27,7 @@ export default function ContactUsForm() {
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setState({ status: data?.error || 'Unable to send message right now.', ok: false, reference: '' });
+      setState({ status: data?.error || 'Unable to store the message right now. Please use the direct email link.', ok: false, reference: '' });
       return;
     }
 
