@@ -1,20 +1,17 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { capturePayPalOrder, isPayPalConfigured } from '@/lib/paypal';
+import { decryptJson } from '@/lib/security';
 import {
   persistDonationLedger,
   readDonationLedger,
   summarizeDonationLedger,
   upsertDonationRecord,
 } from '@/lib/donationLedger';
-import { decryptJson } from '@/lib/security';
+import { capturePayPalOrder, getPayPalCurrency, isPayPalConfigured } from '@/lib/paypal';
 
-function errorResponse(error, status) {
-  return NextResponse.json({ ok: false, error }, { status });
-}
-
-function readSteamUser() {
-  const rawSteam = cookies().get('steam_session')?.value;
+function readSteamSession() {
+  const cookieStore = cookies();
+  const rawSteam = cookieStore.get('steam_session')?.value;
   try {
     return rawSteam ? decryptJson(rawSteam) : null;
   } catch {
@@ -22,68 +19,79 @@ function readSteamUser() {
   }
 }
 
-function extractCaptureDetails(order) {
-  const purchaseUnit = order?.purchase_units?.[0];
-  const capture = purchaseUnit?.payments?.captures?.[0];
-
-  return {
-    captureId: capture?.id || null,
-    status: capture?.status || order?.status || null,
-    amount: capture?.amount?.value || purchaseUnit?.amount?.value || null,
-    currency: capture?.amount?.currency_code || purchaseUnit?.amount?.currency_code || null,
-  };
+function normalizeOrderId(value) {
+  const orderId = String(value || '').trim();
+  if (!/^[A-Z0-9-]{8,64}$/i.test(orderId)) {
+    throw new Error('Invalid PayPal orderId');
+  }
+  return orderId;
 }
 
 export async function POST(request) {
-  const steamUser = readSteamUser();
-  if (!steamUser?.steamid) {
-    return errorResponse('Steam login required before capturing a donation order', 401);
+  if (!isPayPalConfigured()) {
+    return NextResponse.json({ ok: false, error: 'PayPal is not configured' }, { status: 503 });
   }
 
-  if (!isPayPalConfigured()) {
-    return errorResponse('PayPal is not configured', 503);
+  const steamUser = readSteamSession();
+  if (!steamUser?.steamid) {
+    return NextResponse.json({ ok: false, error: 'Steam session required before capturing orders' }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null);
-  const orderId = String(body?.orderId || '').trim();
-
-  if (!orderId) {
-    return errorResponse('Missing PayPal orderId', 400);
+  if (!body) {
+    return NextResponse.json({ ok: false, error: 'Invalid JSON payload' }, { status: 400 });
   }
 
   try {
+    const orderId = normalizeOrderId(body.orderId);
     const captureOrder = await capturePayPalOrder(orderId);
-    const captureDetails = extractCaptureDetails(captureOrder);
 
-    const ledger = readDonationLedger();
-    const nextLedger = upsertDonationRecord(ledger, {
+    const unit = captureOrder?.purchase_units?.[0];
+    const capture = unit?.payments?.captures?.[0];
+    const amountValue = Number(capture?.amount?.value || 0);
+    const amount = Number.isFinite(amountValue) && amountValue > 0 ? amountValue.toFixed(2) : '0.00';
+    const currency = String(capture?.amount?.currency_code || getPayPalCurrency()).toUpperCase();
+
+    const current = readDonationLedger();
+    const priorRecord = current.find((entry) => entry?.orderId === orderId && entry?.steamid === steamUser.steamid);
+
+    const nextLedger = upsertDonationRecord(current, {
+      ...priorRecord,
       orderId,
       steamid: steamUser.steamid,
       personaname: steamUser.personaname || null,
-      captureId: captureDetails.captureId,
-      amount: captureDetails.amount,
-      currency: captureDetails.currency,
-      status: 'CONFIRMED',
-      provider: 'paypal',
-      captureRaw: captureOrder,
-      confirmedAt: new Date().toISOString(),
+      amount,
+      currency,
+      anchorSlug: priorRecord?.anchorSlug || 'deep_blackhole',
+      solarSystemKey: priorRecord?.solarSystemKey || 'solar_system',
+      status: capture?.status === 'COMPLETED' ? 'CONFIRMED' : captureOrder?.status || 'CAPTURED',
+      captureId: capture?.id || null,
+      capturedAt: capture?.create_time || new Date().toISOString(),
+      paypalStatus: captureOrder?.status || null,
     });
 
+    const summary = summarizeDonationLedger(nextLedger.filter((entry) => entry?.steamid === steamUser.steamid));
     const response = NextResponse.json({
       ok: true,
-      error: null,
       orderId,
       capture: {
-        id: captureDetails.captureId,
-        status: captureDetails.status,
-        amount: captureDetails.amount,
-        currency: captureDetails.currency,
+        id: capture?.id || null,
+        status: capture?.status || captureOrder?.status || null,
+        amount,
+        currency,
       },
-      ledger: summarizeDonationLedger(nextLedger),
+      ledger: summary,
+      summary,
     });
 
     return persistDonationLedger(response, request, nextLedger);
   } catch (error) {
-    return errorResponse(error instanceof Error ? error.message : 'Unable to capture PayPal order', 502);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Unable to capture order',
+      },
+      { status: 400 }
+    );
   }
 }

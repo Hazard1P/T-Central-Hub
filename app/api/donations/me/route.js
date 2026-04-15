@@ -1,14 +1,11 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { readDonationLedger, summarizeDonationLedger } from '@/lib/donationLedger';
 import { decryptJson } from '@/lib/security';
+import { readDonationLedger, summarizeDonationLedger } from '@/lib/donationLedger';
 
-function errorResponse(error, status) {
-  return NextResponse.json({ ok: false, error }, { status });
-}
-
-function readSteamUser() {
-  const rawSteam = cookies().get('steam_session')?.value;
+function readSteamSession() {
+  const cookieStore = cookies();
+  const rawSteam = cookieStore.get('steam_session')?.value;
   try {
     return rawSteam ? decryptJson(rawSteam) : null;
   } catch {
@@ -17,18 +14,16 @@ function readSteamUser() {
 }
 
 export async function GET() {
-  const steamUser = readSteamUser();
+  const steamUser = readSteamSession();
+
   if (!steamUser?.steamid) {
-    return errorResponse('Steam login required to view donation summary', 401);
+    return NextResponse.json({ ok: true, summary: summarizeDonationLedger([]) });
   }
 
-  const ledger = readDonationLedger();
-  const ownLedger = ledger.filter((entry) => entry.steamid === steamUser.steamid);
+  const ledger = readDonationLedger().filter((entry) => entry?.steamid === steamUser.steamid);
 
   return NextResponse.json({
     ok: true,
-    error: null,
-    steamid: steamUser.steamid,
-    summary: summarizeDonationLedger(ownLedger),
+    summary: summarizeDonationLedger(ledger),
   });
 }

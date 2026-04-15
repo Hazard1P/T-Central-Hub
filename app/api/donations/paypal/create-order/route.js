@@ -1,38 +1,57 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { decryptJson } from '@/lib/security';
+import {
+  createDonationIntent,
+  persistDonationLedger,
+  readDonationLedger,
+  summarizeDonationLedger,
+  upsertDonationRecord,
+} from '@/lib/donationLedger';
 import {
   createPayPalOrder,
   getPayPalCurrency,
   isPayPalConfigured,
 } from '@/lib/paypal';
-import {
-  createDonationIntent,
-  persistDonationLedger,
-  readDonationLedger,
-  upsertDonationRecord,
-} from '@/lib/donationLedger';
-import { decryptJson } from '@/lib/security';
 
-function errorResponse(error, status) {
-  return NextResponse.json({ ok: false, error }, { status });
-}
-
-function parseDonationAmount(rawAmount) {
-  const normalized = typeof rawAmount === 'number' ? rawAmount.toString() : String(rawAmount || '').trim();
-  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) {
-    return null;
+function normalizeDonationPayload(body = {}) {
+  const rawAmount = String(body.amount ?? '').trim();
+  if (!/^\d+(?:\.\d{1,2})?$/.test(rawAmount)) {
+    throw new Error('Amount must be a positive number with up to 2 decimal places');
   }
 
-  const amount = Number.parseFloat(normalized);
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return null;
+  const numericAmount = Number(rawAmount);
+  if (!Number.isFinite(numericAmount) || numericAmount <= 0 || numericAmount > 10000) {
+    throw new Error('Amount must be between 0.01 and 10000.00');
   }
 
-  return amount.toFixed(2);
+  const currencyInput = String(body.currency || '').trim().toUpperCase();
+  const fallbackCurrency = getPayPalCurrency().toUpperCase();
+  const currency = /^[A-Z]{3}$/.test(currencyInput) ? currencyInput : fallbackCurrency;
+
+  const anchorSlug = String(body.anchorSlug || 'deep_blackhole')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '')
+    .slice(0, 64) || 'deep_blackhole';
+
+  const solarSystemKey = String(body.solarSystemKey || 'solar_system')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '')
+    .slice(0, 64) || 'solar_system';
+
+  return {
+    amount: numericAmount.toFixed(2),
+    currency,
+    anchorSlug,
+    solarSystemKey,
+  };
 }
 
-function readSteamUser() {
-  const rawSteam = cookies().get('steam_session')?.value;
+function readSteamSession() {
+  const cookieStore = cookies();
+  const rawSteam = cookieStore.get('steam_session')?.value;
   try {
     return rawSteam ? decryptJson(rawSteam) : null;
   } catch {
@@ -41,26 +60,22 @@ function readSteamUser() {
 }
 
 export async function POST(request) {
-  const steamUser = readSteamUser();
-  if (!steamUser?.steamid) {
-    return errorResponse('Steam login required before creating a donation order', 401);
+  if (!isPayPalConfigured()) {
+    return NextResponse.json({ ok: false, error: 'PayPal is not configured' }, { status: 503 });
   }
 
-  if (!isPayPalConfigured()) {
-    return errorResponse('PayPal is not configured', 503);
+  const steamUser = readSteamSession();
+  if (!steamUser?.steamid) {
+    return NextResponse.json({ ok: false, error: 'Steam session required before creating orders' }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null);
-  const amount = parseDonationAmount(body?.amount);
-  if (!amount) {
-    return errorResponse('Amount must be a positive decimal with up to 2 places', 400);
+  if (!body) {
+    return NextResponse.json({ ok: false, error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  const currency = String(body?.currency || getPayPalCurrency()).toUpperCase();
-  const anchorSlug = body?.anchorSlug || 'deep_blackhole';
-  const solarSystemKey = body?.solarSystemKey || 'solar_system';
-
   try {
+    const { amount, currency, anchorSlug, solarSystemKey } = normalizeDonationPayload(body);
     const order = await createPayPalOrder({
       request,
       amount,
@@ -71,10 +86,9 @@ export async function POST(request) {
     });
 
     if (!order?.id) {
-      return errorResponse('PayPal did not return an order ID', 502);
+      throw new Error('PayPal order ID missing from response');
     }
 
-    const ledger = readDonationLedger();
     const intent = createDonationIntent({
       steamUser,
       amount,
@@ -83,16 +97,26 @@ export async function POST(request) {
       solarSystemKey,
       orderId: order.id,
     });
-    const nextLedger = upsertDonationRecord(ledger, intent);
+
+    const nextLedger = upsertDonationRecord(readDonationLedger(), intent);
+    const summary = summarizeDonationLedger(nextLedger);
 
     const response = NextResponse.json({
       ok: true,
-      error: null,
       orderId: order.id,
+      status: order.status || 'CREATED',
+      intent,
+      summary,
     });
 
     return persistDonationLedger(response, request, nextLedger);
   } catch (error) {
-    return errorResponse(error instanceof Error ? error.message : 'Unable to create PayPal order', 502);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Unable to create order',
+      },
+      { status: 400 }
+    );
   }
 }
