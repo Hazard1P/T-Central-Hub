@@ -32,16 +32,37 @@ export function SteamSessionProvider({ children }) {
         fetch('/api/support/session', { cache: 'no-store' }),
         fetch(`/api/universe/session?lobbyMode=${encodeURIComponent(lobbyMode)}`, { cache: 'no-store' }),
       ]);
-      const steamData = await steamRes.json();
-      const supportData = await supportRes.json();
-      const universeData = await universeRes.json();
+
+      const steamData = await steamRes.json().catch(() => null);
+      const supportData = await supportRes.json().catch(() => null);
+      const universeData = await universeRes.json().catch(() => null);
+
       setSteamUser(steamData?.authenticated ? steamData.user : null);
       setSupport(supportData?.linked ? supportData.support : null);
-      setUniverse(universeData?.ok ? universeData : null);
+
+      if (universeData?.ok || universeData?.unavailable) {
+        setUniverse(universeData);
+      } else {
+        setUniverse({
+          ok: false,
+          unavailable: true,
+          code: 'UNIVERSE_SESSION_UNAVAILABLE',
+          message: 'Universe session could not be resolved.',
+          privacy: { observanceScope: 'hub:public', privacyTier: 'guest-public', storageKey: 'vault:guest' },
+          prayerSeeds: { total: 0, latest: [] },
+        });
+      }
     } catch {
       setSteamUser(null);
       setSupport(null);
-      setUniverse(null);
+      setUniverse({
+        ok: false,
+        unavailable: true,
+        code: 'UNIVERSE_SESSION_FETCH_FAILED',
+        message: 'Universe session request failed.',
+        privacy: { observanceScope: 'hub:public', privacyTier: 'guest-public', storageKey: 'vault:guest' },
+        prayerSeeds: { total: 0, latest: [] },
+      });
     } finally {
       setLoading(false);
     }
