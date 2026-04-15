@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { insertRecord, isServerPersistenceConfigured } from '@/lib/serverPersistence';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,13 +15,6 @@ function clean(value, max = 500) {
 
 function referenceCode() {
   return `TC-${Date.now().toString(36).toUpperCase()}`;
-}
-
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
 }
 
 export async function POST(request) {
@@ -47,6 +40,12 @@ export async function POST(request) {
     return json({ error: 'Name, email, subject, and message are required.' }, { status: 400 });
   }
 
+  if (!isServerPersistenceConfigured()) {
+    return json({
+      error: 'Contact storage is not configured yet. Please use the direct email link until backend persistence is enabled.',
+    }, { status: 503 });
+  }
+
   const reference = referenceCode();
   const payload = {
     reference,
@@ -59,18 +58,12 @@ export async function POST(request) {
     source: 't-central-contact-form',
   };
 
-  const supabase = getAdminClient();
-  if (supabase) {
-    try {
-      const { error } = await supabase.from('contact_messages').insert(payload);
-      if (error) {
-        return json({ ok: true, message: 'Message received. Database storage was skipped, but the reference is valid.', reference, warning: error.message });
-      }
-      return json({ ok: true, message: 'Message received and stored successfully.', reference });
-    } catch {
-      return json({ ok: true, message: 'Message received. Storage fallback engaged.', reference });
-    }
+  try {
+    await insertRecord('contact_messages', payload);
+    return json({ ok: true, message: 'Message received and stored successfully.', reference });
+  } catch (error) {
+    return json({
+      error: error.message || 'Unable to store the message right now. Please use the direct email link.',
+    }, { status: 503 });
   }
-
-  return json({ ok: true, message: 'Message received. Backend storage is not configured yet, so keep the reference for manual follow-up.', reference });
 }

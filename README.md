@@ -18,7 +18,7 @@ A full Next.js codebase for a Vercel-deployable interactive 3D game server hub.
 - Affiliate Star link
 - Focus-panel interaction flow
 - Transition overlay when opening a destination
-- Donate page with PayPal subscription
+- Donate page with protected server-side PayPal donation flow
 - Player reporting page
 - Dedicated pages for:
   - Arma3 CTH
@@ -50,6 +50,8 @@ Expected remote JSON shape:
 npm install
 npm run dev
 ```
+
+Use `.env.example` to create your local `.env.local` before testing auth, payments, or persistence.
 
 Open:
 `http://localhost:3000`
@@ -441,3 +443,13 @@ Open:
 - Added `StableSystemWorld` as a simplified 3D route shell
 - Kept the main blackholes, Dyson spheres, and solar system online
 - Switched the `/system` launch path to the safer shell while heavier runtime work continues
+
+
+## Production hardening updates included
+- Removed the stale `package-lock.json` so clean installs are generated from the current manifest instead of a mismatched lockfile.
+- Added `.nvmrc` for Node 24 alignment.
+- Removed hardcoded PayPal subscription identifiers from the static widget component.
+- Contact and report routes now fail clearly when persistence is not configured instead of claiming data was stored.
+- Added optional Supabase-backed moderation/contact/donation receipt persistence and an example schema in `SUPABASE_SCHEMA.sql`.
+- Cookie encryption now requires a real secret in production.
+- Health endpoint now reports missing secrets, PayPal config, and server persistence.

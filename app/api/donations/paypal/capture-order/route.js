@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { decryptJson, encryptJson, signValue } from '@/lib/security';
 import { shouldUseSecureCookies } from '@/lib/runtimeConfig';
 import { capturePayPalOrder } from '@/lib/paypal';
+import { insertRecord, isServerPersistenceConfigured } from '@/lib/serverPersistence';
 import { persistDonationLedger, readDonationLedger, summarizeDonationLedger, upsertDonationRecord } from '@/lib/donationLedger';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,27 @@ export async function POST(request) {
       receiptRef: signValue(`${steamUser.steamid}:${orderId}:${payment?.id || 'pending'}`),
     };
     const updated = upsertDonationRecord(ledger, record);
+
+    if (isServerPersistenceConfigured()) {
+      try {
+        await insertRecord('donation_receipts', {
+          reference: record.receiptRef,
+          provider: 'paypal',
+          order_id: orderId,
+          capture_id: record.captureId,
+          steamid: record.steamid,
+          personaname: record.personaname,
+          amount: record.amount,
+          currency: record.currency,
+          status: record.status,
+          anchor_slug: record.anchorSlug,
+          solar_system_key: record.solarSystemKey,
+          payer: record.payer,
+          confirmed_at: record.confirmedAt || new Date().toISOString(),
+          created_at: new Date().toISOString(),
+        });
+      } catch {}
+    }
 
     const response = NextResponse.json({
       ok: true,
