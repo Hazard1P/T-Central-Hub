@@ -3,9 +3,9 @@
 import { useState } from 'react';
 
 const initial = {
-  name: 'Michael Rybaltowicz',
-  email: 'BrainandBodyai@gmail.com',
-  phone: '6048309324',
+  name: '',
+  email: '',
+  phone: '',
   subject: '',
   message: '',
   company: '',
@@ -27,7 +27,7 @@ export default function ContactUsForm() {
 
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      setState({ status: data?.error || 'Unable to send message right now.', ok: false, reference: '' });
+      setState({ status: data?.error || 'Unable to store the message right now. Please use the direct email link.', ok: false, reference: '' });
       return;
     }
 
@@ -36,7 +36,7 @@ export default function ContactUsForm() {
       ok: true,
       reference: data?.reference || '',
     });
-    setForm({ ...initial, subject: '', message: '', company: '' });
+    setForm(initial);
   }
 
   function update(key, value) {
@@ -48,21 +48,21 @@ export default function ContactUsForm() {
       <div className="donation-form-grid">
         <label className="donation-field">
           <span>Name</span>
-          <input value={form.name} onChange={(event) => update('name', event.target.value)} required maxLength={120} />
+          <input placeholder="Your name" value={form.name} onChange={(event) => update('name', event.target.value)} required maxLength={120} />
         </label>
         <label className="donation-field">
           <span>Email</span>
-          <input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required maxLength={160} />
+          <input type="email" placeholder="you@example.com" value={form.email} onChange={(event) => update('email', event.target.value)} required maxLength={160} />
         </label>
         <label className="donation-field">
           <span>Phone</span>
-          <input value={form.phone} onChange={(event) => update('phone', event.target.value)} maxLength={40} />
+          <input placeholder="Optional" value={form.phone} onChange={(event) => update('phone', event.target.value)} maxLength={40} />
         </label>
       </div>
 
       <label className="donation-field contact-field-wide">
         <span>Subject</span>
-        <input value={form.subject} onChange={(event) => update('subject', event.target.value)} required maxLength={140} />
+        <input placeholder="What can we help with?" value={form.subject} onChange={(event) => update('subject', event.target.value)} required maxLength={140} />
       </label>
 
       <label className="donation-field contact-field-wide honeypot-field" aria-hidden="true">
@@ -72,7 +72,7 @@ export default function ContactUsForm() {
 
       <label className="donation-field contact-field-wide">
         <span>Message</span>
-        <textarea value={form.message} onChange={(event) => update('message', event.target.value)} required rows={7} maxLength={2500} />
+        <textarea placeholder="Tell us about your server, support request, partnership, or deployment question." value={form.message} onChange={(event) => update('message', event.target.value)} required rows={7} maxLength={2500} />
       </label>
 
       <div className="contact-actions">
