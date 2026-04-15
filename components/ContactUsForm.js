@@ -19,24 +19,33 @@ export default function ContactUsForm() {
     event.preventDefault();
     setState({ status: 'Sending transmission...', ok: false, reference: '' });
 
-    const response = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      setState({ status: data?.error || 'Unable to send message right now.', ok: false, reference: '' });
-      return;
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const directEmail = data?.directEmail ? ` Contact directly: ${data.directEmail}.` : '';
+        setState({ status: `${data?.error || 'Unable to send message right now.'}${directEmail}`, ok: false, reference: '' });
+        return;
+      }
+
+      setState({
+        status: data?.message || 'Message received.',
+        ok: true,
+        reference: data?.reference || '',
+      });
+      setForm({ ...initial, subject: '', message: '', company: '' });
+    } catch {
+      setState({
+        status: 'Contact service is unavailable right now. Please use direct email instead.',
+        ok: false,
+        reference: '',
+      });
     }
-
-    setState({
-      status: data?.message || 'Message received.',
-      ok: true,
-      reference: data?.reference || '',
-    });
-    setForm({ ...initial, subject: '', message: '', company: '' });
   }
 
   function update(key, value) {

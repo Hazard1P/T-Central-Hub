@@ -486,6 +486,8 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
     position: [0, 0, 18],
   });
 
+  const [prayerSeedState, setPrayerSeedState] = useState({ status: '', ok: true });
+
   const graph = useMemo(() => buildUniverseGraph(), []);
   const graphByKey = useMemo(() => Object.fromEntries(graph.nodes.map((node) => [node.key, node])), [graph]);
 
@@ -525,14 +527,31 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
   const handlePrayerSeed = async () => {
     const body = window.prompt('Plant a private Prayer Seed into the Solar System vault:', activeNode?.label ? `${activeNode.label} / ` : '');
     if (!body || !body.trim()) return;
+
+    setPrayerSeedState({ status: 'Planting Prayer Seed...', ok: true });
+
     try {
-      await fetch('/api/universe/prayer-seeds', {
+      const response = await fetch('/api/universe/prayer-seeds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body, solarSystemKey: 'solar_system', tags: [activeNode?.key || 'deep_blackhole', lobbyMode] }),
+        body: JSON.stringify({ body, solarSystemKey: 'solar_system', tags: [activeNode?.key || 'deep_blackhole', lobbyMode], lobbyMode }),
       });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.ok) {
+        setPrayerSeedState({
+          status: data?.error || data?.message || 'Prayer Seed planting is unavailable right now.',
+          ok: false,
+        });
+        return;
+      }
+
+      setPrayerSeedState({ status: data?.message || 'Prayer Seed planted.', ok: true });
       await refresh?.();
-    } catch {}
+    } catch {
+      setPrayerSeedState({ status: 'Prayer Seed request failed. Try again in a moment.', ok: false });
+    }
   };
 
   const perspective = steamUser?.steamid
@@ -608,6 +627,9 @@ export default function StableSystemWorld({ lobbyMode = 'hub', steamUser = null,
             <button className="stable-route-button" onClick={handlePrayerSeed}>
               Plant Prayer Seed
             </button>
+          ) : null}
+          {prayerSeedState.status ? (
+            <p className={`report-status ${prayerSeedState.ok ? 'success' : 'error'}`}>{prayerSeedState.status}</p>
           ) : null}
         </div>
 
