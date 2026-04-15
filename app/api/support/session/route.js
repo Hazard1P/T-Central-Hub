@@ -19,10 +19,13 @@ export async function GET() {
       ? {
           provider: support.provider,
           planId: support.planId || null,
-          subscriptionId: support.subscriptionId,
+          identifier: support.identifier || support.subscriptionId,
+          identifierType: support.identifierType || 'subscription',
+          subscriptionId: support.subscriptionId || (support.identifierType === 'subscription' ? support.identifier : null),
           steamid: support.steamid,
           personaname: support.personaname || null,
           linkedAt: support.linkedAt,
+          verification: support.verification || null,
           reference: support.reference,
         }
       : null,

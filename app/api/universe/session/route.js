@@ -1,63 +1,44 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { decryptJson } from '@/lib/security';
-import { createPrivacySummary } from '@/lib/universePrivacyEngine';
 import { createEpochAnchor, summarizeEpochRelativity } from '@/lib/epochDysonEngine';
-import { buildUniverseGraph } from '@/lib/universeEngine';
-import { parsePrayerSeedVault, PRAYER_SEED_COOKIE } from '@/lib/universeApiStore';
+import { createPrivacySummary } from '@/lib/universePrivacyEngine';
+import { summarizePrayerSeeds } from '@/lib/prayerSeedEngine';
+import { readDonationLedger, summarizeDonationLedger } from '@/lib/donationLedger';
 
-export async function GET(request) {
-  const universeEnabled = process.env.UNIVERSE_API_ENABLED !== 'false';
-  const cookieStore = cookies();
+function resolveLobbyMode(value) {
+  return value === 'private' ? 'private' : 'hub';
+}
 
-  const url = new URL(request.url);
-  const lobbyMode = url.searchParams.get('lobbyMode') === 'private' ? 'private' : 'hub';
-
-  const rawSteam = cookieStore.get('steam_session')?.value;
-  let steamUser = null;
+function readSteamUser(cookieStore) {
+  const rawSteamSession = cookieStore.get('steam_session')?.value;
 
   try {
-    steamUser = rawSteam ? decryptJson(rawSteam) : null;
+    const user = rawSteamSession ? decryptJson(rawSteamSession) : null;
+    return user && typeof user === 'object' ? user : null;
   } catch {
-    steamUser = null;
+    return null;
   }
+}
 
-  if (!universeEnabled) {
-    return NextResponse.json({
-      ok: false,
-      unavailable: true,
-      code: 'UNIVERSE_API_DISABLED',
-      message: 'Universe session API is disabled by configuration.',
-      privacy: createPrivacySummary({ steamUser, lobbyMode }),
-      prayerSeeds: { total: 0, latest: [] },
-    }, { status: 503 });
-  }
+export async function GET(request) {
+  const cookieStore = cookies();
+  const steamUser = readSteamUser(cookieStore);
+
+  const { searchParams } = new URL(request.url);
+  const lobbyMode = resolveLobbyMode(searchParams.get('lobbyMode'));
 
   const privacy = createPrivacySummary({ steamUser, lobbyMode });
-  const epoch = summarizeEpochRelativity(createEpochAnchor({ now: Date.now(), solarSystemKey: 'solar_system', dysonKey: 'ss' }));
-  const graph = buildUniverseGraph();
-
-  const vault = parsePrayerSeedVault(cookieStore.get(PRAYER_SEED_COOKIE)?.value);
-  const scopedSeeds = vault.filter((entry) => entry.scope === privacy.storageKey);
+  const epochAnchor = createEpochAnchor();
 
   return NextResponse.json({
     ok: true,
-    mode: 'active',
+    authenticated: Boolean(steamUser?.steamid),
     lobbyMode,
     privacy,
-    epoch,
-    graph: {
-      stats: graph.stats,
-      heroNodes: graph.heroNodes.slice(0, 12).map((node) => ({
-        key: node.key,
-        label: node.label,
-        kind: node.kind,
-        route: node.route || null,
-      })),
-    },
-    prayerSeeds: {
-      total: scopedSeeds.length,
-      latest: scopedSeeds.slice(-5).reverse(),
-    },
+    epoch: summarizeEpochRelativity(epochAnchor),
+    prayerSeeds: summarizePrayerSeeds([], 'solar_system'),
+    donations: summarizeDonationLedger(readDonationLedger()),
+    generatedAt: new Date().toISOString(),
   });
 }
