@@ -1,18 +1,6 @@
 import { NextResponse } from 'next/server';
 import { encryptJson } from '@/lib/security';
-
-function getBaseUrl(request) {
-  const configured = process.env.NEXT_PUBLIC_APP_URL;
-  if (configured) return configured.replace(/\/$/, '');
-
-  const origin = request.headers.get('origin');
-  if (origin) return origin.replace(/\/$/, '');
-
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
-  const inferredProto = host.includes('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
-  const proto = request.headers.get('x-forwarded-proto') || inferredProto;
-  return `${proto}://${host}`;
-}
+import { getRequestBaseUrl, shouldUseSecureCookies } from '@/lib/runtimeConfig';
 
 export async function GET(request) {
   const url = new URL(request.url);
@@ -34,7 +22,7 @@ export async function GET(request) {
   const verifyText = await verifyRes.text();
   const valid = verifyRes.ok && verifyText.includes('is_valid:true');
 
-  const baseUrl = getBaseUrl(request);
+  const baseUrl = getRequestBaseUrl(request);
   const redirectUrl = new URL(baseUrl);
 
   if (!valid) {
@@ -77,13 +65,12 @@ export async function GET(request) {
     }
   }
 
-  const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
   const response = NextResponse.redirect(redirectUrl);
   response.cookies.set({
     name: 'steam_session',
     value: encryptJson(user),
     httpOnly: true,
-    secure: !isLocalhost,
+    secure: shouldUseSecureCookies(request),
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
