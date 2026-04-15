@@ -49,7 +49,7 @@ export default function ReportPlayerPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'Report failed');
+      if (!res.ok) throw new Error(data?.error || 'Unable to store report right now.');
       setStatus({ state: 'success', message: `Report submitted. Reference: ${data.reference}` });
       setForm(initialForm);
     } catch (err) {
