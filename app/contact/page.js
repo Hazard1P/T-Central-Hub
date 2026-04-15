@@ -11,7 +11,7 @@ export default function ContactPage() {
     <PageShell
       eyebrow="Contact T-Central"
       title="Direct support, partnerships, and system inquiries."
-      text="Use the contact route for support, server inquiries, development discussion, deployment help, and business communication. Messages can be stored in the configured backend when available and always return a reference code for follow-up."
+      text="Use the contact route for support, server inquiries, development discussion, deployment help, and business communication. Messages can be stored in the configured backend when available and always return a reference code for follow-up. The contact card below stays public while the form is kept blank for visitors."
     >
       <div className="arma-entry-grid">
         <article className="content-card">

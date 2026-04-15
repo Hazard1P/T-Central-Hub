@@ -2,6 +2,7 @@ import SteamLoginHud from '@/components/SteamLoginHud';
 import CinematicUniverseCanvas from '@/components/CinematicUniverseCanvas';
 import { getHomeLaunchCards, getHomeStatusPills } from '@/lib/siteContent';
 import { buildUniverseGraph } from '@/lib/universeEngine';
+import CinematicCallout from '@/components/CinematicCallout';
 
 export default function HomePage() {
   const launchCards = getHomeLaunchCards().slice(0, 3);
@@ -60,6 +61,8 @@ export default function HomePage() {
             <a href="/donate">Support</a>
           </div>
         </div>
+
+        <CinematicCallout />
 
         <div className="entry-panel-grid enhanced simplified-grid">
           {launchCards.map((card) => (
