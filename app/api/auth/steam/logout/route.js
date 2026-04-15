@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server';
+import { shouldUseSecureCookies } from '@/lib/runtimeConfig';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request) {
   const url = new URL(request.url);
@@ -8,7 +12,7 @@ export async function GET(request) {
     name: 'steam_session',
     value: '',
     httpOnly: true,
-    secure: true,
+    secure: shouldUseSecureCookies(request),
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
