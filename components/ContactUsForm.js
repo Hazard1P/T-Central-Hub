@@ -3,9 +3,9 @@
 import { useState } from 'react';
 
 const initial = {
-  name: 'Michael Rybaltowicz',
-  email: 'BrainandBodyai@gmail.com',
-  phone: '6048309324',
+  name: '',
+  email: '',
+  phone: '',
   subject: '',
   message: '',
   company: '',
@@ -48,15 +48,33 @@ export default function ContactUsForm() {
       <div className="donation-form-grid">
         <label className="donation-field">
           <span>Name</span>
-          <input value={form.name} onChange={(event) => update('name', event.target.value)} required maxLength={120} />
+          <input
+            value={form.name}
+            onChange={(event) => update('name', event.target.value)}
+            placeholder="Your full name"
+            required
+            maxLength={120}
+          />
         </label>
         <label className="donation-field">
           <span>Email</span>
-          <input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} required maxLength={160} />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(event) => update('email', event.target.value)}
+            placeholder="you@example.com"
+            required
+            maxLength={160}
+          />
         </label>
         <label className="donation-field">
           <span>Phone</span>
-          <input value={form.phone} onChange={(event) => update('phone', event.target.value)} maxLength={40} />
+          <input
+            value={form.phone}
+            onChange={(event) => update('phone', event.target.value)}
+            placeholder="(555) 123-4567"
+            maxLength={40}
+          />
         </label>
       </div>
 
